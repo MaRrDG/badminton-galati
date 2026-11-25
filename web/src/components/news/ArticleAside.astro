@@ -16,7 +16,7 @@ const { competition, inCalendar, tagged } = Astro.props;
 const when = competition ? splitRangeRo(competition.start, competition.end) : undefined;
 ---
 
-<!-- Beside the text: the competition the article is about (red), then the athletes in it. -->
+{/* Beside the text: the competition the article is about (red), then the athletes in it. */}
 <aside class="side" aria-label="Legături">
   {
     competition && when && (

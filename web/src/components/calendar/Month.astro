@@ -10,10 +10,10 @@ const { month, year } = Astro.props;
 const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Jo', 'Vi', 'Sâ', 'Du'];
 ---
 
-<!--
+{/*
   Plain days are hidden from screen readers (the list below the grids is their route); today
   and the competition blocks are read. calendar-today.ts moves the marks when the page is stale.
--->
+*/}
 <section class:list={['mo', { empty: month.empty }]} aria-label={`${month.name} ${year}`} data-ym={`${year}-${String(month.month).padStart(2, '0')}`}>
   <h3>{month.name}{month.empty && <span class="none"> fără competiții</span>}</h3>
   <div class="grid">

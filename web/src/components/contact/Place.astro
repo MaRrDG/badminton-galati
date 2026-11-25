@@ -14,7 +14,7 @@ const { contact, photo } = Astro.props;
 const phone = contact.phone ? { href: `tel:${normalizePhoneRo(contact.phone)}`, text: formatPhoneRo(contact.phone) } : undefined;
 ---
 
-<!-- Where the hall is and how to reach the club, in one blue panel beside the form. -->
+{/* Where the hall is and how to reach the club, in one blue panel beside the form. */}
 <aside class="place" aria-labelledby="sala-h">
   {photo && <PlatePhoto img={photo} offset={14} sizes="(max-width: 860px) 100vw, 480px" class="reveal" />}
   <div class="place-body">

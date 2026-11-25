@@ -12,11 +12,11 @@ interface Props {
 const { next, countdown, todayLabel, legend } = Astro.props;
 ---
 
-<!--
+{/*
   The details panel: the next competition until a block in the grid is chosen
   (calendar-panel.ts, which fills it from the templates below). Without JavaScript and on
   narrow screens it keeps the next one. The back button shows only while another is pinned.
--->
+*/}
 <div class:list={['panel', next ? { home: next.home } : 'none']} data-panel data-next={next?.id}>
   <div class="pbody">
     {

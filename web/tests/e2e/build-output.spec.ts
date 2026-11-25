@@ -30,3 +30,30 @@ test('an athlete without consent is in no built file', () => {
   // The scan reads the profiles of the consented athletes, so it would see her if she were there.
   expect(existsSync(join(root, 'mixed-strip', 'sportivi/nistor-cristian-ionut/index.html'))).toBe(true);
 });
+
+// Template notes are for developers: written as frontmatter `//` or JSX `{/* */}` comments, they
+// stay out of the page. An HTML comment would ship to every visitor (one named the honeypot).
+test('no HTML comment in any built page', () => {
+  const pages = (Object.keys(SERVERS) as ServerName[]).flatMap(filesOf).filter(f => f.endsWith('.html'));
+  expect(pages.length).toBeGreaterThan(0);
+  const withComments = pages.filter(f => readFileSync(f, 'utf8').includes('<!--')).map(f => f.slice(root.length));
+  expect(withComments).toEqual([]);
+});
+
+/** The CSS a built page uses: its linked stylesheets and its inline <style> blocks. */
+function cssOf(name: ServerName, page: string) {
+  const html = readFileSync(join(root, name, page), 'utf8');
+  const linked = [...html.matchAll(/<link[^>]+rel="stylesheet"[^>]+href="\/([^"]+)"/g)].map(m => readFileSync(join(root, name, m[1]), 'utf8'));
+  const inline = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]);
+  return [...linked, ...inline].join('\n');
+}
+
+// A browser without :has() drops a whole rule whose selector list holds one, so the trial form's
+// data-who fallback must never share a list with a :has() selector. The minifier may merge rules
+// with equal bodies, and Chromium (the e2e browser) supports :has(), so only the output shows it.
+test('the trial form fallback never shares a selector list with :has()', () => {
+  const css = cssOf('home', 'contact/index.html');
+  expect(css).toContain('[data-who');
+  const preludes = [...css.matchAll(/([^{}]+)\{/g)].map(m => m[1].trim());
+  expect(preludes.filter(p => p.includes(':has(') && p.includes('[data-who'))).toEqual([]);
+});

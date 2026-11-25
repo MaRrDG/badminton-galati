@@ -38,12 +38,12 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
     data-endpoint={endpoint}
     data-reply-days={replyDays}
   >
-    <!-- Focused when shown, so it carries no live role (that would announce it twice). -->
+    {/* Focused when shown, so it carries no live role (that would announce it twice). */}
     <div class="errsum" tabindex="-1" hidden></div>
 
-    <!-- Choosing "Eu" hides the child's age and renames the name field: CSS :has() without JS,
+    {/* Choosing "Eu" hides the child's age and renames the name field: CSS :has() without JS,
          data-who from the script for browsers without :has(). The age is never `required` in the
-         markup (the browser cannot require it on one path only); the script checks it. -->
+         markup (the browser cannot require it on one path only); the script checks it. */}
     <fieldset class="who" data-field="cine">
       <legend>Cine vine la antrenament?</legend>
       <p class="err" id="f-cine-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
@@ -86,7 +86,7 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
       <label for="f-acord">{consent}</label>
     </div>
 
-    <!-- Honeypot for plan 2b's endpoint: hidden from people, the keyboard and assistive tech. -->
+    {/* Honeypot for plan 2b's endpoint: hidden from people, the keyboard and assistive tech. */}
     <div class="visually-hidden" aria-hidden="true">
       <label for="f-site">Nu completați acest câmp</label>
       <input id="f-site" name="site_web" type="text" tabindex="-1" autocomplete="off" />
@@ -95,7 +95,7 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
     <button class="send" type="submit">Trimite cererea</button>
   </form>
 
-  <!-- Its heading takes the focus when shown; no live role, so it is announced once. -->
+  {/* Its heading takes the focus when shown; no live role, so it is announced once. */}
   <div class="sent" hidden></div>
 </div>
 

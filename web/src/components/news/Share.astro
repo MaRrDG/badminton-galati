@@ -6,10 +6,10 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<!--
+{/*
   Share links, filled in the browser from the page's own address (share.ts): the public address
   is not known before launch, so without JavaScript the row stays hidden. No third-party script.
--->
+*/}
 <div class="share" data-share-title={title} hidden>
   <span class="lbl">Distribuie articolul</span>
   <a href="https://www.facebook.com/sharer/sharer.php" data-share="fb">Facebook</a>
