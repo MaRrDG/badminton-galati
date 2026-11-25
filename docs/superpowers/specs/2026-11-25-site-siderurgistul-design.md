@@ -1,293 +1,306 @@
-# Site nou pentru CS Siderurgistul Galați: design
+# New site for CS Siderurgistul Galați: design
 
-Data: 25 noiembrie 2026
-Stare: aprobat de Mario pe 25 noiembrie 2026
+Date: 25 November 2026
+Status: approved by Mario on 25 November 2026
 
-## De ce
+> Translated from the Romanian original on 25 November 2026. Quoted site copy and the
+> owner's quoted remarks stay in Romanian, with an English gloss in parentheses.
 
-Mario face cadou clubului CS Siderurgistul Galați un site nou, gratuit, care să înlocuiască
-https://www.badmintongalati.ro/ (făcut în SitePad 5.1.6). Site-ul actual e vechi și pe
-jumătate abandonat: contoare care arată „1”, © 2023, știri din 2024 pe prima pagină, fără
-program, prețuri sau galerie, adrese de tip `/page-2/`, înscriere prin PDF de printat.
+## Why
 
-Site-ul nou trebuie:
+Mario is giving the club CS Siderurgistul Galați a new site, free of charge, to replace
+https://www.badmintongalati.ro/ (built with SitePad 5.1.6). The current site is old and half
+abandoned: counters that show "1", © 2023, news from 2024 on the front page, no schedule,
+prices or gallery, addresses like `/page-2/`, sign-up through a PDF to print.
 
-1. să arate viu și să inspire: sportul și talentul copiilor în față, cu animații la scroll;
-2. să nu pară făcut de AI (cerință explicită, repetată);
-3. să poată fi întreținut de antrenori fără ajutor tehnic: text, poze, articole, calendar;
-4. să arate clubului că își poate face marketing cu el: înscrieri noi și sponsori.
+The new site must:
 
-## Cine îl folosește
+1. look alive and inspire: the sport and the children's talent up front, with scroll animations;
+2. not look made by AI (an explicit, repeated requirement);
+3. be maintainable by the coaches without technical help: text, photos, articles, calendar;
+4. show the club that it can do its marketing with it: new sign-ups and sponsors.
 
-- **Părinți din Galați** care caută un sport pentru copil. Vin de pe telefon. Vor să afle
-  repede: de la ce vârstă, când, cât costă, cum încearcă.
-- **Sportivii și părinții lor.** Vor să-și vadă rezultatele și pozele și să le distribuie.
-- **Antrenorii** (Dorel Badiu, Iulian Călin, Adrian Panfil). Ei publică, de obicei de pe
-  telefon, după o competiție, cu poze din WhatsApp. Azi postează rar: 15 articole în 3 ani.
-- **Mario.** Administrator, cu acces complet.
-- **Posibili sponsori și federația.** Vor cifre și seriozitate.
+## Who uses it
 
-## Scopuri
+- **Parents in Galați** looking for a sport for their child. They come from a phone. They want
+  to find out quickly: from what age, when, how much it costs, how to try it.
+- **The athletes and their parents.** They want to see their results and photos and share them.
+- **The coaches** (Dorel Badiu, Iulian Călin, Adrian Panfil). They publish, usually from a
+  phone, after a competition, with photos from WhatsApp. Today they post rarely: 15 articles in
+  3 years.
+- **Mario.** Administrator, with full access.
+- **Possible sponsors and the federation.** They want figures and seriousness.
 
-- Toate paginile utile din site-ul vechi, curățate, plus cele noi de mai jos.
-- Publicarea unui articol cu poze, de pe telefon, în câteva minute.
-- Statistici reale despre sportivi, actualizate automat din clasamentul FRB.
-- Încărcare rapidă pe telefoane ieftine și conexiune mobilă.
-- Cost lunar zero pentru club.
+## Goals
 
-## Ce nu facem
+- All the useful pages of the old site, cleaned up, plus the new ones below.
+- Publishing an article with photos, from a phone, in a few minutes.
+- Real statistics about the athletes, updated automatically from the FRB ranking.
+- Fast loading on cheap phones and mobile connections.
+- Zero monthly cost for the club.
 
-- Magazin, plăți online, conturi pentru părinți sau sportivi.
-- Versiune în engleză (doar română, cu diacritice corecte).
-- Scoruri pe meciuri sau tablouri: FRB nu le publică, iar antrenorii nu le vor introduce.
-- Integrare cu tournamentsoftware.com: FRB nu e acolo, iar platforma blochează accesul.
-- Preluarea automată a postărilor de pe Facebook.
+## What we do not do
 
-## Ce ar însemna eșec, chiar dacă funcționează
+- Shop, online payments, accounts for parents or athletes.
+- An English version (Romanian only, with correct diacritics).
+- Match scores or draws: FRB does not publish them, and the coaches will not enter them.
+- Integration with tournamentsoftware.com: FRB is not on it, and the platform blocks access.
+- Automatic import of Facebook posts.
 
-- Arată a șablon generat: fundal crem, carduri rotunjite cu umbră, etichete cu majuscule
-  deasupra fiecărui titlu, fade la fiecare secțiune, cifre inventate, poze de stoc.
-- Antrenorii nu-l folosesc pentru că editarea e greoaie, și peste un an e iar abandonat.
-- Apar date despre minori fără acordul părinților.
-- Animațiile îl fac lent sau obositor pe telefon.
-- Conținut inventat prezentat ca fapt (ore de program, prețuri, rezultate).
+## What would count as failure, even if it works
 
-## Constrângeri
+- It looks like a generated template: cream background, rounded cards with shadows, all-caps
+  labels above every heading, a fade on every section, invented figures, stock photos.
+- The coaches do not use it because editing is cumbersome, and a year later it is abandoned
+  again.
+- Data about minors appears without the parents' consent.
+- The animations make it slow or tiring on a phone.
+- Invented content presented as fact (training hours, prices, results).
 
-- **Gratuit**, deci doar planuri gratuite la servicii externe. Limitele lor se verifică la
-  implementare; dacă un serviciu nu mai e gratuit pentru acest volum, se alege altul.
-- **Domeniul** `badmintongalati.ro` e al clubului. Lansarea are nevoie de acces la DNS de la
-  ei. Până atunci site-ul stă pe o adresă de test.
-- **Minori.** O fișă de sportiv apare public doar dacă are bifat „acord părinte”.
-- **FRB.** Datele din clasament se iau de pe badminton.ro, care nu are API. Sincronizarea
-  automată pornește după ce clubul are acordul federației (contact@badminton.ro). Fără
-  acord, site-ul merge doar cu linkuri spre profilurile FRB.
-- **Date lipsă de la club:** programul cu zile și ore, prețurile, legendele pozelor,
-  descrierile grupelor. Până vin, paginile arată „de confirmat”, nu text inventat.
-- **Material foto:** doar pozele clubului. Cele de pe site-ul vechi sunt punctul de plecare.
+## Constraints
 
-## Variante luate în calcul
+- **Free**, so only free plans of external services. Their limits are checked during
+  implementation; if a service stops being free for this volume, another one is chosen.
+- **The domain** `badmintongalati.ro` belongs to the club. Launch needs DNS access from them.
+  Until then the site lives on a test address.
+- **Minors.** An athlete's page appears publicly only if "acord părinte" (parental consent) is
+  ticked.
+- **FRB.** Ranking data is taken from badminton.ro, which has no API. Automatic sync starts once
+  the club has the federation's agreement (contact@badminton.ro). Without agreement, the site
+  works only with links to the FRB profiles.
+- **Data missing from the club:** the schedule with days and hours, prices, photo captions,
+  group descriptions. Until they arrive, the pages show "de confirmat" (to be confirmed), not
+  invented text.
+- **Photos:** only the club's photos. Those on the old site are the starting point.
 
-### Cum editează clubul
+## Options considered
 
-| Variantă | Plus | Minus |
+### How the club edits
+
+| Option | Plus | Minus |
 |---|---|---|
-| **Astro + Sanity** (aleasă) | panou simplu, merge de pe telefon, pozele se optimizează singure, antrenorii completează câmpuri și nu pot strica designul | depinde de un serviciu extern |
-| WordPress pe hostingul lor | cunoscut | actualizări, risc de spargere, se degradează în doi ani; animațiile din design ar cere temă scrisă de la zero |
-| Astro + CMS pe git | fără serviciu extern | încărcare de poze greoaie, panou rudimentar |
+| **Astro + Sanity** (chosen) | simple panel, works from a phone, photos are optimised automatically, coaches fill in fields and cannot break the design | depends on an external service |
+| WordPress on their hosting | familiar | updates, risk of being hacked, degrades within two years; the design's animations would need a theme written from scratch |
+| Astro + git-based CMS | no external service | cumbersome photo upload, rudimentary panel |
 
-Mario a ales prima variantă. E alegerea mea de tehnologie, acceptată de el, nu o cerință.
+Mario chose the first option. It is my technology choice, accepted by him, not a requirement.
 
-### De unde vin statisticile
+### Where the statistics come from
 
-| Variantă | Plus | Minus |
+| Option | Plus | Minus |
 |---|---|---|
-| **Sincronizare din badminton.ro + linkuri** (aleasă) | zero efort pentru antrenori, date reale săptămânal | se oprește dacă FRB își schimbă site-ul; cere acordul FRB |
-| Doar linkuri spre FRB | zero risc | nicio statistică pe site-ul clubului |
-| Introducere manuală | orice date | nu se va face |
+| **Sync from badminton.ro + links** (chosen) | zero effort for the coaches, real data weekly | stops if FRB changes its site; needs FRB's agreement |
+| Links to FRB only | zero risk | no statistics on the club's site |
+| Manual entry | any data | will not be done |
 
-Mario a ales sincronizarea, cu linkurile ca plasă de siguranță.
+Mario chose the sync, with the links as a safety net.
 
-### Direcția vizuală
+### Visual direction
 
-S-au făcut patru schițe animate de homepage (în `.superpowers/brainstorm/…/content/`):
+Four animated homepage sketches were made (in `.superpowers/brainstorm/…/content/`):
 
-- A „Terenul”: sala văzută de sus, luminoasă. Nealeasă.
-- B „Afiș”: poster cu albastrul emblemei. I-a plăcut stilul și animațiile, dar e prea mare,
-  prea full-screen.
-- C „Tabela”: rezultatele ca erou. I-a plăcut structura, dar arăta a AI.
-- **D „Afiș + Tabela”** (aleasă): stilul și animațiile din B la scară cuminte, structura din C
-  fără elementele de șablon. Fișierul `varianta-d-afis-tabela.html` e referința vizuală, în
-  forma de după corecturile lui Mario (hero cu motto-ul clubului, fără tabelă cu cartonașe; grupe ca două liste).
+- A "Terenul" (the court): the hall seen from above, bright. Not chosen.
+- B "Afiș" (the poster): a poster in the crest's blue. He liked the style and the animations,
+  but it is too big, too full-screen.
+- C "Tabela" (the scoreboard): results as the hero. He liked the structure, but it looked like
+  AI.
+- **D "Afiș + Tabela"** (chosen): the style and animations of B at a modest scale, the structure
+  of C without the template elements. The file `varianta-d-afis-tabela.html` is the visual
+  reference, in its form after Mario's corrections (hero with the club motto, no flip-card
+  scoreboard; groups as two lists).
 
-## Designul
+## The design
 
-### Identitate vizuală
+### Visual identity
 
-Vine din ce are clubul deja, nu din ceva inventat:
+It comes from what the club already has, not from something invented:
 
-- **Albastrul emblemei** (~`#1549A8`) și **roșul echipamentului** (~`#E23A45`), ca suprafețe
-  pline. Alb. **Portocaliul terenului** din sala lor doar ca atingere mică. Un albastru foarte
-  deschis pentru secțiunile de odihnă. Culoarea textului: bleumarin închis.
-- **Litere:** Big Shoulders Display pentru titluri (condensat, industrial, trimite la numele
-  „Siderurgistul”), Instrument Sans pentru text. Ambele cu ș, ț, ă, î, â.
-- **Muchii drepte.** Pozele reale tratate ca afiș, cu o placă roșie decalată în spate.
-- **Scară:** conținut într-o coloană de ~1180px, titluri plafonate la ~6rem, hero cel mult
-  ~85% din înălțimea ecranului. Secțiunile alternează albastru, roșu, alb.
-- **Hero-ul poartă motto-ul clubului**, cel de pe site-ul actual: „Ai reușit? Continuă!
-  N-ai reușit? Continuă!”, ca titlu de afiș, cu o propoziție despre club dedesubt. Textul se
-  editează din panou. Mario a respins varianta cu locurile din clasament în titlu; clasamentul
-  apare mai jos, în lista de sportivi.
-- **Grupele** apar ca două liste simple, una lângă alta: „Pentru cine vrea performanță”
-  (Inițiere, Performanță, Elite) și „Pentru cine vrea doar să joace” (Amatori copii, Amatori
-  adulți). Fiecare rând: numele grupei mare, pentru cine e, iar când există, zilele și orele.
-  Mario a respins tabelul cu chenare și varianta în trepte („nu prea se înțelege”).
-- **Emblema** clubului (cerc albastru, disc roșu, fluturaș alb) rămâne neschimbată. Trebuie
-  cerută de la club în format vectorial; cea de pe site are 270px.
+- **The crest's blue** (~`#1549A8`) and **the kit's red** (~`#E23A45`), as solid surfaces.
+  White. **The orange of the court** in their hall only as a small touch. A very light blue for
+  resting sections. Text colour: dark navy.
+- **Type:** Big Shoulders Display for headings (condensed, industrial, a nod to the name
+  "Siderurgistul", the steelworker), Instrument Sans for text. Both have ș, ț, ă, î, â.
+- **Straight edges.** Real photos treated as a poster, with an offset red plate behind.
+- **Scale:** content in a column of ~1180px, headings capped at ~6rem, hero at most ~85% of the
+  screen height. Sections alternate blue, red, white.
+- **The hero carries the club motto**, the one on the current site: „Ai reușit? Continuă!
+  N-ai reușit? Continuă!” ("Did you make it? Keep going! Didn't make it? Keep going!"), as a
+  poster headline, with one sentence about the club below. The text is edited from the panel.
+  Mario rejected the version with ranking places in the headline; the ranking appears lower, in
+  the list of athletes.
+- **The groups** appear as two plain lists, side by side: „Pentru cine vrea performanță” (for
+  those who want performance: Inițiere, Performanță, Elite) and „Pentru cine vrea doar să
+  joace” (for those who just want to play: Amatori copii, Amatori adulți). Each row: the group
+  name large, who it is for and, when known, the days and hours. Mario rejected the bordered
+  table and the staircase version („nu prea se înțelege”, "it's hard to follow").
+- **The club crest** (blue circle, red disc, white shuttlecock) stays unchanged. It must be
+  requested from the club in vector format; the one on the site is 270px.
 
-Interzise: fundal crem, carduri rotunjite cu umbră, etichete cu contur punctat, bare gri de
-umplutură, etichete cu majuscule deasupra titlurilor, numerotări 01/02/03, săgeți la butoane,
-un singur cuvânt colorat în titlu, grafice sau cifre fără date reale în spate, widgeturi de
-decor (Mario a respins tabela cu cartonașe care se întorc: „AI slop masiv”) și tabele cu
-celule goale sau cu același text repetat pe fiecare rând.
+Forbidden: cream background, rounded cards with shadows, labels with a dotted outline, grey
+filler bars, all-caps labels above headings, 01/02/03 numbering, arrows on buttons, a single
+coloured word in a heading, charts or figures without real data behind them, decorative widgets
+(Mario rejected the scoreboard with flipping cards: „AI slop masiv”, "massive AI slop") and
+tables with empty cells or with the same text repeated on every row.
 
-### Mișcare
+### Motion
 
-Mario vrea site-ul „viu” și i-au plăcut animațiile din B. Regula: puține, legate de sport,
-restul paginii stă liniștit.
+Mario wants the site "viu" (alive) and liked B's animations. The rule: few, tied to the sport,
+the rest of the page stays calm.
 
-- **Hero:** secvență la încărcare (afișul se așază, rândurile titlului intră din părți
-  opuse), apoi la scroll rândurile alunecă în sensuri opuse și poza crește. Fixare scurtă.
-- **Lista de sportivi:** cifrele locurilor se rotesc când ajungi la ele.
-- **Titlurile de secțiune:** alunecă ușor lateral la scroll.
-- **Banda de poze:** curge lateral cât derulezi, până la ultima poză.
+- **Hero:** a sequence on load (the poster settles, the headline lines come in from opposite
+  sides), then on scroll the lines slide in opposite directions and the photo grows. A short
+  pin.
+- **The list of athletes:** the place numerals roll when you reach them.
+- **Section headings:** drift slightly sideways on scroll.
+- **The photo strip:** flows sideways as you scroll, up to the last photo.
 
-Fără fade la fiecare secțiune. Cu „reduce motion” activ se arată starea finală. Tot
-conținutul e vizibil și fără JavaScript. Pe mobil, fixările la scroll sunt mai scurte sau
-lipsesc. Pozele au dimensiuni declarate, ca distanțele animațiilor să se calculeze corect
-(bug găsit în schiță).
+No fade on every section. With "reduce motion" on, the final state is shown. All content is
+visible without JavaScript too. On mobile, scroll pins are shorter or absent. Photos have
+declared dimensions, so animation distances are computed correctly (a bug found in the sketch).
 
-### Pagini
+### Pages
 
-**Păstrate din site-ul vechi**
+**Kept from the old site**
 
-- **Acasă.** Tonul e invitația, nu lauda: Mario a observat că site-ul actual al clubului
-  spune „de ce să joci badminton”, nu „uite ce sus suntem”, și vrea să rămână așa. Ordinea:
-  motto, „De ce badminton” (beneficiile din textul clubului, rescrise scurt, cu diacritice),
-  grupe, calendar, sportivi („Unde ajung cei care continuă”, ca dovadă, nu ca titlu de
-  pagină), sală, noutăți, antrenament de probă. Vechea ordine din schiță: calendar, sportivi, grupe, sală, noutăți,
-  antrenament de probă.
-- **Despre club.** Istoric, înființare 7 martie 2002, sala cu 4 terenuri de pe Bd. Cloșca,
-  Balcaniadele din 2002 și 2023. O singură pagină în locul celor două duplicate.
-- **Antrenori și consiliu director.** Cu poze. Contact prin adresa clubului, nu prin cele
-  personale.
-- **Noutăți (blog).** Cele 15 articole vechi mutate. Trei tipuri: Competiție, Viața clubului,
-  Proiecte. Un articol de competiție e legat de etapa din calendar și de sportivii care au
-  jucat, și are galerie.
-- **Calendar competițional.** Tot sezonul, filtru pe categorie de vârstă, etapele de la
-  Galați marcate „acasă”. O etapă jucată duce la articolul ei și la rezultatele FRB.
-- **Documente.** Statut, regulament de ordine interioară, cerere de înscriere.
-- **Proiecte.** Talents with Rackets (Erasmus+), cu cele două manuale.
-- **Contact.** Adresă, hartă, telefon, formular.
+- **Home.** The tone is invitation, not boasting: Mario noticed that the club's current site
+  says "why play badminton", not "look how high we are", and wants it to stay that way. Order:
+  motto, „De ce badminton” ("Why badminton": the benefits from the club's text, rewritten
+  briefly, with diacritics), groups, calendar, athletes („Unde ajung cei care continuă”, "where
+  those who keep going end up", as proof, not as a page title), hall, news, trial training. The
+  old order in the sketch: calendar, athletes, groups, hall, news, trial training.
+- **About the club.** History, founded 7 March 2002, the hall with 4 courts on Bd. Cloșca, the
+  Balkan Championships of 2002 and 2023. A single page instead of the two duplicates.
+- **Coaches and board of directors.** With photos. Contact through the club's address, not
+  personal ones.
+- **News (blog).** The 15 old articles moved over. Three kinds: Competiție (competition), Viața
+  clubului (club life), Proiecte (projects). A competition article is linked to the event in the
+  calendar and to the athletes who played, and has a gallery.
+- **Competition calendar.** The whole season, filter by age category, the Galați events marked
+  "acasă" (home). A played event leads to its article and to the FRB results.
+- **Documents.** Statute, internal rules, sign-up form.
+- **Projects.** Talents with Rackets (Erasmus+), with its two handbooks.
+- **Contact.** Address, map, phone, form.
 
-Scoase ca pagini, lăsate ca linkuri în subsol: istoricul general al badmintonului și
-adresele FRB, Badminton Europe, BWF.
+Removed as pages, kept as links in the footer: the general history of badminton and the
+addresses of FRB, Badminton Europe, BWF.
 
-**Noi**
+**New**
 
-- **Sportivi.** Listă și fișă pe fiecare: locul și punctele din clasamentul FRB pe probe,
-  turneele punctate, medalii, poze, articolele în care apare, link spre profilul FRB.
-  Evoluția în timp apare abia când există istoric real adunat de sincronizare.
-- **Program și grupe.** Inițiere, Performanță, Elite, Amatori copii, Amatori adulți: zile,
-  ore, antrenor, pentru cine e.
-- **Antrenament de probă.** Formular online: nume părinte, telefon, vârsta copilului, mesaj.
-  Ajunge pe emailul clubului.
-- **Galerie.** Pe competiții și evenimente, legată de articole.
-- **Rezultate.** Palmares pe sezoane, construit din articole și din datele FRB.
-- **Pentru părinți.** De la ce vârstă, ce îi trebuie copilului, cât costă, ce urmează după
-  primul antrenament.
-- **Pentru sponsori.** Cifre reale ale clubului și cum apare un sponsor pe site.
+- **Athletes.** A list and a page for each: place and points in the FRB ranking per discipline,
+  scoring tournaments, medals, photos, the articles they appear in, a link to the FRB profile.
+  Progress over time appears only once there is real history collected by the sync.
+- **Schedule and groups.** Inițiere, Performanță, Elite, Amatori copii, Amatori adulți: days,
+  hours, coach, who it is for.
+- **Trial training.** An online form: parent's name, phone, child's age, message. It reaches
+  the club's email.
+- **Gallery.** By competitions and events, linked to articles.
+- **Results.** Honours by season, built from the articles and the FRB data.
+- **For parents.** From what age, what the child needs, how much it costs, what follows after
+  the first training.
+- **For sponsors.** The club's real figures and how a sponsor appears on the site.
 
-### Ce editează clubul
+### What the club edits
 
-Totul din lista de mai jos se editează din panou, fără cod:
+Everything in the list below is edited from the panel, without code:
 
-- articole (titlu, tip, dată, text, poze, competiția, sportivii bifați);
-- competiții din calendar (dată, loc, categorii, gazdă);
-- sportivi (nume, an, grupă, poză, link profil FRB, **acord părinte**);
-- grupe și program; antrenori; documente; sponsori; galerii;
-- textele paginilor fixe (despre, pentru părinți, pentru sponsori, contact).
+- articles (title, kind, date, text, photos, the competition, the ticked athletes);
+- competitions in the calendar (date, place, categories, host);
+- athletes (name, year, group, photo, FRB profile link, **parental consent**);
+- groups and schedule; coaches; documents; sponsors; galleries;
+- the texts of the fixed pages (about, for parents, for sponsors, contact).
 
-Formularul „articol nou” e gândit pentru telefon: puține câmpuri obligatorii, poze multe
-dintr-o singură selecție. Legăturile dintre articol, competiție și sportivi se fac prin
-bifare, o singură dată, și apar apoi peste tot.
+The "new article" form is designed for a phone: few required fields, many photos from a single
+selection. The links between article, competition and athletes are made by ticking, once, and
+then appear everywhere.
 
-### Sincronizarea cu FRB
+### Sync with FRB
 
-- Rulează automat o dată pe săptămână, după ce FRB publică clasamentul.
-- Pentru fiecare sportiv care are link de profil FRB, citește locul, punctele și turneele
-  punctate și le salvează, păstrând și fotografia săptămânii, ca să se adune istoric.
-- Cifrele de pe homepage (câți sportivi în top 10 național etc.) se calculează din aceste
-  date. Nu există cifre scrise de mână.
-- Dacă citirea eșuează, site-ul rămâne cu ultimele date bune și arată „actualizat la data X”.
-  Mario primește un email. Site-ul nu arată niciodată o eroare vizitatorului.
-- Citire politicoasă: puține cereri, cu pauze, identificată ca fiind a clubului.
-- E oprită implicit și pornește când clubul are acordul FRB.
+- Runs automatically once a week, after FRB publishes the ranking.
+- For each athlete who has an FRB profile link, it reads the place, points and scoring
+  tournaments and saves them, also keeping the week's snapshot, so history accumulates.
+- The homepage figures (how many athletes in the national top 10, etc.) are computed from this
+  data. There are no hand-written figures.
+- If reading fails, the site keeps the last good data and shows "updated on date X". Mario gets
+  an email. The site never shows an error to the visitor.
+- Polite reading: few requests, with pauses, identified as the club's.
+- It is off by default and starts when the club has FRB's agreement.
 
 ### Marketing
 
-- Previzualizare corectă la distribuire pe Facebook și WhatsApp (poză, titlu, descriere).
-- Titluri și descrieri pentru căutări ca „badminton Galați” și „badminton copii Galați”;
-  date structurate de club sportiv local; hartă de site.
-- Redirecționări de la toate adresele vechi (`/page-2/`, `/blog/post1/` etc.) la cele noi.
-- Statistici de vizitare fără cookie-uri, deci fără banner de consimțământ.
+- Correct preview when shared on Facebook and WhatsApp (photo, title, description).
+- Titles and descriptions for searches like "badminton Galați" and "badminton copii Galați";
+  structured data for a local sports club; a sitemap.
+- Redirects from all old addresses (`/page-2/`, `/blog/post1/` etc.) to the new ones.
+- Cookie-free visit statistics, so no consent banner.
 
-## Reguli stabilite după verificarea documentului
+## Rules set after reviewing the document
 
-Deciziile de mai jos sunt ale mele, de confirmat de Mario:
+The decisions below are mine, to be confirmed by Mario:
 
-- **Lansarea nu așteaptă acordul FRB.** Fără date sincronizate, lista de sportivi arată
-  nume, grupă, poză și link spre profilul FRB, iar cifrele calculate și pagina de rezultate
-  pe bază de clasament lipsesc. Hero-ul nu depinde de date. Sincronizarea se adaugă după,
-  fără schimbări de design.
-- **Ce ascunde lipsa acordului părintelui:** sportivul nu are fișă, nu apare în lista de
-  sportivi, pe homepage sau în cifre, iar numele lui nu e link și nu e bifabil ca etichetă în
-  articole. Datele lui din clasamentul FRB nu se afișează pe site-ul clubului, chiar dacă
-  sunt publice la federație. Pozele de grup și textul articolelor rămân în răspunderea
-  clubului, ca până acum. Cele 15 articole vechi se mută neschimbate, fiind deja publice.
-- **Medaliile vin din articole.** La un articol de competiție, fiecare sportiv bifat poate
-  primi opțional un rezultat (aur, argint, bronz sau locul) și proba. Câmpul e opțional, ca
-  formularul să rămână scurt. Palmaresul se construiește din aceste câmpuri.
-- **Antrenorii publică direct**, fără aprobare. Mario poate retrage orice.
+- **Launch does not wait for FRB's agreement.** Without synced data, the list of athletes shows
+  name, group, photo and link to the FRB profile, and the computed figures and the
+  ranking-based results page are absent. The hero does not depend on data. The sync is added
+  afterwards, without design changes.
+- **What the lack of parental consent hides:** the athlete has no page, does not appear in the
+  list of athletes, on the homepage or in figures, and their name is not a link and cannot be
+  ticked as a tag in articles. Their data from the FRB ranking is not displayed on the club's
+  site, even though it is public at the federation. Group photos and article text remain the
+  club's responsibility, as until now. The 15 old articles are moved unchanged, being already
+  public.
+- **Medals come from articles.** On a competition article, each ticked athlete can optionally
+  get a result (gold, silver, bronze or the place) and the discipline. The field is optional, so
+  the form stays short. The honours list is built from these fields.
+- **Coaches publish directly**, without approval. Mario can withdraw anything.
 
-## Conturi și termen (hotărât de Mario)
+## Accounts and deadline (decided by Mario)
 
-- **Deocamdată un singur cont de administrator**, al lui Mario, cu email și parolă. Conturile
-  antrenorilor și mutarea proprietății pe un email al clubului vin mai târziu, la predare.
-- Parola nu se scrie în cod și nu intră în depozitul git. Mario o alege la crearea contului.
-- **Nu există termen.** Se construiește tot înainte de lansare.
+- **For now a single administrator account**, Mario's, with email and password. The coaches'
+  accounts and moving ownership to a club email come later, at handover.
+- The password is not written in code and does not enter the git repository. Mario chooses it
+  when creating the account.
+- **There is no deadline.** Everything is built before launch.
 
-## Domeniu și email (verificat pe 25 noiembrie 2026)
+## Domain and email (checked on 25 November 2026)
 
-- Domeniul are serverele de nume la ROMARG (`ns1–ns4.romarg.com`), iar site-ul vechi stă pe
+- The domain has its name servers at ROMARG (`ns1–ns4.romarg.com`), and the old site lives on
   `89.42.218.134`.
-- Emailul clubului trece tot prin ROMARG (`mx01–03.whmpanels.com`, SPF `relay.romarg.net`).
-- **Serverele de nume nu se mută.** La lansare se schimbă doar înregistrările pentru site
-  (`www` și domeniul gol). Înregistrările de email rămân neatinse, ca adresa
-  `siderurgistul@badmintongalati.ro` să meargă în continuare.
-- Găzduirea se alege astfel încât să meargă cu DNS-ul rămas la ROMARG, inclusiv pentru
-  domeniul fără `www`.
-- Pachetul de găzduire de la ROMARG trebuie păstrat cât timp emailul stă acolo, chiar dacă
-  site-ul pleacă. De verificat cu clubul ce plătesc și ce include.
+- The club's email also goes through ROMARG (`mx01–03.whmpanels.com`, SPF `relay.romarg.net`).
+- **The name servers do not move.** At launch only the site records change (`www` and the bare
+  domain). The email records stay untouched, so the address
+  `siderurgistul@badmintongalati.ro` keeps working.
+- Hosting is chosen so that it works with DNS remaining at ROMARG, including for the domain
+  without `www`.
+- The ROMARG hosting package must be kept while the email lives there, even if the site leaves.
+  To check with the club what they pay and what it includes.
 
-## Decizii luate de mine, de verificat
+## Decisions made by me, to be checked
 
-Mario a vorbit despre rezultat, nu despre unelte, așa că acestea sunt alegerile mele:
+Mario talked about the result, not the tools, so these are my choices:
 
-- Astro pentru site, Sanity pentru conținut, găzduire statică gratuită (Cloudflare Pages,
-  Netlify sau similar, după ce merge cu DNS-ul de la ROMARG).
-- GSAP cu ScrollTrigger pentru animații, ca în schiță.
-- Sincronizarea FRB ca sarcină programată săptămânal (GitHub Actions), care scrie în Sanity
-  și declanșează republicarea.
-- Formularele trimit email printr-o funcție mică de server, cu protecție anti-spam fără
-  captcha vizibil.
-- Statistici de vizitare fără cookie-uri, printr-un serviciu gratuit.
-- Scos paginile cu istoricul general al badmintonului și adresele federațiilor.
-- Trei tipuri de articol: Competiție, Viața clubului, Proiecte.
-- Emailurile personale ale antrenorilor nu mai apar pe site.
+- Astro for the site, Sanity for content, free static hosting (Cloudflare Pages, Netlify or
+  similar, once it works with the DNS at ROMARG).
+- GSAP with ScrollTrigger for the animations, as in the sketch.
+- FRB sync as a weekly scheduled job (GitHub Actions), which writes to Sanity and triggers a
+  rebuild.
+- Forms send email through a small server function, with spam protection without a visible
+  captcha.
+- Cookie-free visit statistics, through a free service.
+- Removed the pages with the general history of badminton and the federations' addresses.
+- Three article kinds: Competiție, Viața clubului, Proiecte.
+- The coaches' personal emails no longer appear on the site.
 
-## Lăsat la latitudinea celui care construiește
+## Left to whoever builds it
 
-- Structura exactă a câmpurilor din panou și a adreselor paginilor.
-- Aspectul paginilor interioare, în limbajul vizual al schiței D.
-- Cum se citește pagina FRB și cum se testează fără să fie lovit site-ul federației.
-- Serviciul de email pentru formulare și alerte.
-- Ordinea de construcție și împărțirea pe etape.
+- The exact structure of the panel fields and of the page addresses.
+- The look of the inner pages, in the visual language of sketch D.
+- How the FRB page is read and how it is tested without hitting the federation's site.
+- The email service for forms and alerts.
+- The build order and the split into stages.
 
-## Depinde de club
+## Depends on the club
 
-- Acordul pentru proiect și accesul la DNS pentru lansare.
-- Acordul FRB pentru sincronizare.
-- Programul cu ore, prețurile, lista sportivilor cu acordul părinților.
-- Emblema în format vectorial, poze noi și, ideal, o filmare scurtă pentru hero.
-- Confirmarea textelor scrise de mine în schiță (descrierile grupelor, legendele pozelor).
+- Agreement to the project and DNS access for launch.
+- FRB's agreement for the sync.
+- The schedule with hours, prices, the list of athletes with parental consent.
+- The crest in vector format, new photos and, ideally, a short video for the hero.
+- Confirmation of the texts I wrote in the sketch (group descriptions, photo captions).
