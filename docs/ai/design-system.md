@@ -18,6 +18,12 @@ săptămâna N, ..."), the footer from the shell.
 | `--mist` | `#e8eef8` | Resting sections (hall) |
 | `--court` | `#f39a1e` | Court orange, small touches only |
 | `--ink` | `#0a1f4d` | Text (dark navy) |
+| `--blue-tint` | `#afc1e1` | Inner pages: a played event (calendar); text `--blue-deep` (6.89:1) |
+| `--red-tint` | `#f3c2c6` | Inner pages: a home event (calendar); text `--red-deep` (5.05:1) |
+| `--red-deep` | `#9a2134` | Text on `--red-tint` |
+| `--mist-soft` | `#f0f4fa` | A calendar day cell; ink on it 14.46:1 |
+| `--ink-soft` | `#3a4866` | "De confirmat" text (`.tbc`), 9.14:1 on white |
+| `--ink-muted` | `#5d6b8a` | Weekday letters, "fără competiții", quiet borders; 5.34:1 on white |
 | `--display` | Big Shoulders Display (800, 900) | Headings, uppercase, line-height 0.95 |
 | `--body` | Instrument Sans Variable | Body, 17px / 1.5 |
 | `--col` | `1180px` | Content column (`.wrap`) |
@@ -64,6 +70,57 @@ tap-to-smash removed).
 Hero lines may wrap below 860px (coach-editable motto must never clip). `initMotion()` returns at once
 under `prefers-reduced-motion: reduce` (`base.css` also turns off smooth scrolling). GSAP is bundled
 from npm, never a CDN. No other animation may be added without Mario's approval.
+
+## Inner pages
+
+Reference: `mockups/pagini/*.html` (approved). Mario rejected the first round of inner pages:
+"you abuse those lines and the big blue text far too much… the same layout on every page".
+His rules:
+
+- Each page gets the layout natural to its content: calendar = month grids; athletes = wall of
+  portrait tiles; news = photo-led magazine front; programme = week timetable; parents = calm
+  reading page; contact = the form.
+- Big uppercase display type once per page: the page title, plus a featured article title and
+  the closing call-to-action headline. Section headings are modest: body face, bold, sentence
+  case (`SectionHeading`, `.h2s`).
+- No thick ink rules as section dividers; structure comes from colour fields, photos,
+  alignment and whitespace.
+- An empty state is never louder than real content.
+- Motion: at most one small load or scroll moment per page (below); reduced motion shows the
+  final state; every page works without JavaScript.
+- No single-browser CSS: `object-view-box` becomes `object-fit: cover` + `object-position` from
+  `Img.position`. `:has()`, `color-mix()` and `text-wrap: balance` only progressively, with a
+  working fallback; `color-mix()` values are tokens.
+
+### Shared pieces (`web/src/components/ui/`)
+
+| Component | Use |
+|---|---|
+| `Photo` | One `<img>` with `width`/`height`/`alt`, `srcset` only when the image has one, `object-position` from `Img.position`; lazy by default, `loading="eager" priority` for the page's main photo |
+| `PlatePhoto` | `figure.plated` (red plate offset 12/14/16/18 px, optional crop `ratio`); the only red-plate implementation, also on the homepage (hero `class="poster"`, why, third hall photo, news) |
+| `InitialTile` | A coloured field with the initials (`initialsOf`, tone from `toneAt`: blue, deep, red) where a photo is missing; sizes `tile`, `poster`, `coach` |
+| `PageHead` | The page title (`h1.display`); `white` (title left, lede right: athletes, news) or `blue` (a band, lede below: programme, parents, contact); slots `before` and default |
+| `SectionHeading` | `h2.h2s` (or `h3`): modest section heading |
+| `FilterBar` | Radios + `:has()` CSS from `filterCss()` (`lib/filter.ts`), works without JS; variants `chips`, `links`, `swatches`; effect `hide` or `dim` (no reflow); optional count line announced by `initFilterStatus()` (`scripts/filter-status.ts`). Items carry `data-f`, counts `data-count-for` |
+| `Tbc` | "**De confirmat de club:** …" with the hatched court-orange square (`.tbc` in `base.css`) |
+| `ClosingCta` | Red closing section `#proba` "Vino la un antrenament de probă"; `display` big uppercase (programme, parents) or modest (athletes); `email` adds the club address |
+
+Counts in Romanian go through `lib/ro.ts` (`countRo`, `feminineCountRo`).
+
+### Motion: one moment per page (`web/src/scripts/page-motion.ts`)
+
+A page calls `initPageMotion(moment)` once; it returns at once under reduced motion. Rolling
+numerals share `digitBands()` (`scripts/roll.ts`) with the homepage roster.
+
+| Page | Moment | Behaviour | Source |
+|---|---|---|---|
+| `/sportivi/` | `tile-roll` | Place digits roll when a tile enters (once) | `sportivi-lista.html` |
+| `/sportivi/[slug]/` | `place-roll` | The place numeral rolls on load | `sportiv-fisa.html` |
+| `/calendar/` | `season-fill` | Event blocks fill in date order on load | `calendar.html` |
+| `/noutati/` | `feature-reveal` | Featured plate rises, photo unclips on load | `noutati-lista.html` |
+| `/noutati/[slug]/` | `cover-recrop` | Cover scales to 1.16 while scrolling away | `articol.html` |
+| `/program/` | `sessions-settle` | Blocks settle into slots once, wide only | `program.html` |
+| `/pentru-parinti/`, `/contact/` | `poster-reveal` | The `PlatePhoto` with `class="reveal"`: plate grows (`scaleY` from 0), photo unclips (`inset(100% 0 0 0)`), once at `top 85%` | `pentru-parinti.html`, `contact.html` |
 
 ## Forbidden patterns, with the owner's objections
 

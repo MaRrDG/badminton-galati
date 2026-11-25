@@ -1,0 +1,12 @@
+---
+interface Props {
+  id: string;
+  level?: 2 | 3;
+}
+
+const { id, level = 2 } = Astro.props;
+const Tag = level === 3 ? 'h3' : 'h2';
+---
+
+<!-- A modest section heading (body face, sentence case); .h2s lives in base.css. -->
+<Tag class="h2s" id={id}><slot /></Tag>

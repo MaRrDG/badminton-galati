@@ -71,6 +71,7 @@ A test runs on `home` unless tagged: `test.describe('â€¦', on('sparse'), () => â
 | Changed path (under `web/`) | Specs |
 |---|---|
 | `src/pages/404.astro`, `src/components/notfound/**`, `src/lib/rally/**`, `src/scripts/rally.ts` | not-found, build-output |
+| `src/components/ui/**` (shared by the homepage and every inner page) | all |
 | `src/scripts/**` | motion, scroll-scan, home |
 | `src/components/home/{Hero,CalendarBand,News,TrialCta}.astro` | home, motion, scroll-scan, shell |
 | `src/components/home/**` | home, motion, scroll-scan |

@@ -1,0 +1,106 @@
+---
+interface Props {
+  text: string;
+  /** The big uppercase heading (programme, parents) or the modest one (athletes). */
+  display: boolean;
+  label: string;
+  href: string;
+  /** Adds "sau scrieți la …" under the button. */
+  email?: boolean;
+}
+
+const { text, display, label, href, email = false } = Astro.props;
+const address = 'siderurgistul@badmintongalati.ro';
+---
+
+<section class:list={['cta', display ? 'big' : 'modest']} id="proba" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div>
+      <h2 class:list={{ display }} id="cta-h">Vino la un antrenament de probă</h2>
+      <p>{text}</p>
+    </div>
+    <div>
+      <a class="btn" href={href}>{label}</a>
+      {email && <p class="alt">sau scrieți la <a href={`mailto:${address}`}>{address}</a></p>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: var(--red-field);
+    color: var(--white);
+  }
+  .btn {
+    display: inline-block;
+    background: var(--white);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 15px 26px;
+    text-decoration: none;
+  }
+  .btn:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .btn:focus-visible {
+    outline-color: var(--white);
+  }
+  .alt {
+    margin-top: 14px;
+    font-size: 0.98rem;
+  }
+  .alt a {
+    overflow-wrap: anywhere;
+  }
+
+  .big {
+    padding: clamp(44px, 6vw, 84px) 0;
+  }
+  .big .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px clamp(24px, 5vw, 72px);
+    align-items: end;
+  }
+  .big h2 {
+    font-size: clamp(2.4rem, 5.4vw, 4.8rem);
+    max-width: 13ch;
+  }
+  .big p:not(.alt) {
+    margin-top: 1em;
+    max-width: 46ch;
+    font-size: 1.05rem;
+  }
+  .big .btn {
+    padding: 16px 26px;
+    min-height: 52px;
+  }
+
+  .modest {
+    padding: clamp(32px, 4.4vw, 56px) 0;
+  }
+  .modest .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 48px;
+  }
+  .modest h2 {
+    font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .modest p:not(.alt) {
+    margin-top: 6px;
+    max-width: 52ch;
+  }
+
+  @media (max-width: 860px) {
+    .big .wrap {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

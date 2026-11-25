@@ -34,6 +34,19 @@ describe('colour tokens meet WCAG AA for body text', () => {
     });
   }
 
+  // Pairs the inner pages add (values from the mockups' color-mix()).
+  for (const [text, field] of [
+    ['blue-deep', 'blue-tint'], // a played event in the calendar
+    ['red-deep', 'red-tint'], // a home event
+    ['ink-soft', 'white'], // "de confirmat" text
+    ['ink-muted', 'white'], // weekday letters, "fără competiții"
+    ['ink', 'mist-soft'], // a calendar day
+  ] as const) {
+    test(`--${text} on --${field} is at least 4.5:1`, () => {
+      expect(contrast(token(text), token(field))).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+
   test('the accent red stays the brand red; text sits on the deeper field red', () => {
     expect(token('red').toLowerCase()).toBe('#e23a45');
     expect(contrast(token('white'), token('red'))).toBeLessThan(4.5);

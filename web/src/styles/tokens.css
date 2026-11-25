@@ -15,6 +15,14 @@
   --court: #f39a1e;
   --ink: #0a1f4d;
 
+  /* Inner pages: the mockups' color-mix() values, computed. */
+  --blue-tint: #afc1e1; /* a played event (calendar), text --blue-deep */
+  --red-tint: #f3c2c6; /* a home event (calendar), text --red-deep */
+  --red-deep: #9a2134; /* text on --red-tint */
+  --mist-soft: #f0f4fa; /* a calendar day cell */
+  --ink-soft: #3a4866; /* "de confirmat" text */
+  --ink-muted: #5d6b8a; /* weekday letters, "fără competiții" */
+
   --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
   --body: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
 

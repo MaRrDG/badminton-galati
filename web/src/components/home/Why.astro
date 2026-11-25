@@ -1,5 +1,6 @@
 ---
 import type { Img } from '../../lib/types';
+import PlatePhoto from '../ui/PlatePhoto.astro';
 
 interface Props {
   intro: string;
@@ -17,13 +18,7 @@ const { intro, photo, points } = Astro.props;
       <p>{intro}</p>
     </div>
     <div class:list={['why-body', { solo: !photo }]}>
-      {
-        photo && (
-          <figure>
-            <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
-          </figure>
-        )
-      }
+      {photo && <PlatePhoto img={photo} offset={14} />}
       <ul>
         {
           points.map((point) => (
@@ -65,14 +60,6 @@ const { intro, photo, points } = Astro.props;
   }
   .why-body.solo {
     grid-template-columns: minmax(0, 1fr);
-  }
-  figure {
-    margin: 0 14px 14px 0;
-    box-shadow: 14px 14px 0 var(--red);
-  }
-  img {
-    width: 100%;
-    height: auto;
   }
   ul {
     list-style: none;

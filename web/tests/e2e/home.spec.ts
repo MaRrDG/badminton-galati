@@ -73,6 +73,15 @@ test('the hero photo loads first, everything below the fold waits', async ({ pag
   for (const img of below) expect(img, img.src!).toMatchObject({ loading: 'lazy', decoding: 'async' });
 });
 
+test('the homepage draws every red plate with one component', async ({ page }) => {
+  await page.goto('/');
+  // Hero, why, the third hall photo and the news cover.
+  await expect(page.locator('main .plated > .plate')).toHaveCount(4);
+  const shadowed = await page.locator('main *').evaluateAll(els =>
+    els.filter(e => getComputedStyle(e).boxShadow !== 'none').map(e => e.outerHTML.slice(0, 80)));
+  expect(shadowed).toEqual([]);
+});
+
 test('all content is visible without JavaScript', async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false }); const page = await ctx.newPage();
   await page.goto('/');

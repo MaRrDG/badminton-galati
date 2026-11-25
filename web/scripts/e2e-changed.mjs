@@ -15,6 +15,7 @@
 // Paths relative to web/:
 //   src/pages/404.astro, src/components/notfound/**, src/lib/rally/**, src/scripts/rally.ts
 //                                      not-found, build-output (the 404 page and its rally)
+//   src/components/ui/**               every spec (shared by the homepage and every inner page)
 //   src/scripts/**                     motion, scroll-scan, home, build-output
 //   src/components/home/**             home, motion, scroll-scan, build-output
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
@@ -45,6 +46,7 @@ const ROOT_RULES = [
 /** Inside web/, relative to web/. First match wins; no match runs every spec. */
 const WEB_RULES = [
   [/^src\/(pages\/404\.astro|components\/notfound\/|lib\/rally\/|scripts\/rally\.ts)/, [NOT_FOUND, BUILD]],
+  [/^src\/components\/ui\//, ALL],
   [/^src\/scripts\//, [MOTION, SCAN, HOME, BUILD]],
   [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
   [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],

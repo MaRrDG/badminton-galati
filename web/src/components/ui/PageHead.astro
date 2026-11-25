@@ -1,0 +1,79 @@
+---
+interface Props {
+  title: string;
+  lede?: string;
+  /** white: title left, lede right (athletes, news); blue: a band with the lede below (programme, parents, contact). */
+  tone: 'white' | 'blue';
+  headingId?: string;
+}
+
+const { title, lede, tone, headingId = 'page-h' } = Astro.props;
+const before = Astro.slots.has('before');
+const after = Astro.slots.has('default');
+---
+
+<section class:list={['pagehead', tone]} aria-labelledby={headingId}>
+  <div class="wrap">
+    {before && <div class="before"><slot name="before" /></div>}
+    <h1 class="display" id={headingId}>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    {after && <div class="after"><slot /></div>}
+  </div>
+</section>
+
+<style>
+  /* The page title is the page's one big uppercase heading; everything below stays modest. */
+  .white {
+    background: var(--white);
+    color: var(--ink);
+    padding: clamp(32px, 4.6vw, 64px) 0 clamp(26px, 3.4vw, 44px);
+  }
+  .white .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px clamp(24px, 5vw, 72px);
+    align-items: end;
+  }
+  .white .before,
+  .white .after {
+    grid-column: 1 / -1;
+  }
+  .white h1 {
+    font-size: clamp(3rem, 6.4vw, 5.4rem);
+  }
+  .white .lede {
+    max-width: 44ch;
+    font-size: 1.06rem;
+  }
+
+  .blue {
+    background: var(--blue);
+    color: var(--white);
+    padding: clamp(26px, 3.6vw, 48px) 0 clamp(28px, 3.8vw, 50px);
+  }
+  .blue h1 {
+    font-size: clamp(3rem, 6.4vw, 5.6rem);
+  }
+  .blue .lede {
+    margin-top: clamp(14px, 1.8vw, 22px);
+    max-width: 60ch;
+    font-size: clamp(1.02rem, 1.3vw, 1.14rem);
+  }
+  .blue .before {
+    margin-bottom: clamp(14px, 1.8vw, 22px);
+  }
+  .blue .after {
+    margin-top: clamp(14px, 1.8vw, 22px);
+  }
+  .pagehead :global(a) {
+    font-weight: 600;
+    text-underline-offset: 4px;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 860px) {
+    .white .wrap {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
