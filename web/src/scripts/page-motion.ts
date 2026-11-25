@@ -33,6 +33,9 @@ export function initPageMotion(moment: PageMoment): void {
     case 'feature-reveal':
       featureReveal();
       break;
+    case 'cover-recrop':
+      coverRecrop();
+      break;
     // The other moments arrive with their pages.
   }
 }
@@ -65,6 +68,19 @@ function featureReveal(): void {
     .timeline({ defaults: { ease: 'power4.out' } })
     .from(plate, { scaleY: 0, duration: 0.7, clearProps: 'transform' })
     .from(shot, { clipPath: 'inset(100% 0 0 0)', duration: 0.9, clearProps: 'clipPath' }, '-=.45');
+}
+
+/**
+ * The article's cover (`.cover img`) re-crops slowly as it scrolls away: it scales to 1.16
+ * from when its top meets the top of the viewport until its bottom does, scrubbed (0.6 s), as
+ * the homepage hero scrub without a pin. The frame clips it, so the layout never moves; an
+ * article without a cover has nothing to move.
+ */
+function coverRecrop(): void {
+  const cover = document.querySelector<HTMLElement>('.cover');
+  const img = cover?.querySelector('img');
+  if (!cover || !img) return;
+  gsap.to(img, { scale: 1.16, ease: 'none', scrollTrigger: { trigger: cover, start: 'top top', end: 'bottom top', scrub: 0.6 } });
 }
 
 /**

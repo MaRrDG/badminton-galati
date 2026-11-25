@@ -198,7 +198,26 @@
       "date": "2026-03-30",
       "cover": { "url": "/img/medalii.jpg", "width": 1280, "height": 579, "alt": "Sportivi ai clubului cu medaliile, la festivitatea de premiere" },
       "competitionId": "competition-2026-03-27-cr-u15-cr-u23",
-      "results": [{ "athleteId": "athlete-zet-exemplu-ana", "discipline": "SF", "result": "aur" }]
+      "results": [{ "athleteId": "athlete-zet-exemplu-ana", "discipline": "SF", "result": "aur" }],
+      "body": [
+        {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "b1s", "text": "Paragraful de deschidere al articolului de test, scris ca să se vadă textul mai mare de la început."}], "markDefs": []},
+        {"_type": "block", "_key": "b2", "style": "normal", "markDefs": [{"_key": "l1", "_type": "link", "href": "https://www.badminton.ro/"}], "children": [{"_type": "span", "_key": "b2s", "text": "Al doilea paragraf are un cuvânt "}, {"_type": "span", "_key": "b2b", "text": "îngroșat", "marks": ["strong"]}, {"_type": "span", "_key": "b2c", "text": " și un link spre "}, {"_type": "span", "_key": "b2d", "text": "Federația Română de Badminton", "marks": ["l1"]}, {"_type": "span", "_key": "b2e", "text": "."}]},
+        {"_type": "photo", "_key": "b3", "photo": {"url": "/img/smash.jpg", "width": 800, "height": 1200, "alt": "Sportiv în săritură, cu racheta ridicată spre fluturaș"}},
+        {"_type": "block", "_key": "b4", "style": "h2", "children": [{"_type": "span", "_key": "b4s", "text": "Subtitlu de test"}], "markDefs": []},
+        {"_type": "block", "_key": "b5", "style": "normal", "listItem": "bullet", "level": 1, "children": [{"_type": "span", "_key": "b5s", "text": "Primul punct al listei"}], "markDefs": []},
+        {"_type": "block", "_key": "b6", "style": "normal", "listItem": "bullet", "level": 1, "children": [{"_type": "span", "_key": "b6s", "text": "Al doilea punct al listei"}], "markDefs": []},
+        {"_type": "block", "_key": "b7", "style": "blockquote", "children": [{"_type": "span", "_key": "b7s", "text": "Un citat de test, pus aici ca să se vadă cum arată."}], "markDefs": []},
+        {"_type": "block", "_key": "b8", "style": "normal", "children": [{"_type": "span", "_key": "b8s", "text": "Ultimul paragraf al articolului de test."}], "markDefs": []}
+      ],
+      "gallery": [
+        {"url": "/img/cantonament.jpg", "width": 1280, "height": 960, "alt": "Grupul din cantonament, în tricouri verzi"},
+        {"url": "/img/smash.jpg", "width": 800, "height": 1200, "alt": "Sportiv în săritură, cu racheta ridicată spre fluturaș"},
+        {"url": "/img/meci-dublu.jpg", "width": 1280, "height": 720, "alt": "Meci de dublu în sala Siderurgistul"},
+        {"url": "/img/echipa-rosu.jpg", "width": 1280, "height": 854, "alt": "Sportivi și antrenori în echipamentul roșu al clubului"},
+        {"url": "/img/sala-turneu-1.jpg", "width": 1280, "height": 720, "alt": "Sala Siderurgistul în timpul unui turneu"},
+        {"url": "/img/festivitate.jpg", "width": 1280, "height": 720, "alt": "Sportivi aliniați la o festivitate în sală"},
+        {"url": "/img/medalii.jpg", "width": 1280, "height": 579, "alt": "Sportivi cu medalii după o competiție"}
+      ]
     },
     {
       "title": "Galați, Olimpiada Națională a Sportului Școlar – 2026",

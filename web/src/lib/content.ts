@@ -1,3 +1,4 @@
+import { postView, type PostPage } from './article';
 import { athleteProfile, athletesView, type AthleteProfile, type AthletesPage } from './athletes';
 import { calendarView, type CalendarPage } from './calendar';
 import { isIsoDate, todayInBucharest } from './dates';
@@ -84,6 +85,13 @@ export async function getCalendarPage(): Promise<CalendarPage> {
 /** The news page (/noutati/): every post, newest first, on the front or in the older list. */
 export async function getNewsPage(): Promise<NewsPage> {
   return newsView(await getSiteData());
+}
+
+/** One page per article (/noutati/[slug]/), with its neighbours in the news list's order. */
+export async function getPostPages(): Promise<PostPage[]> {
+  const site = await getSiteData();
+  const today = buildToday();
+  return site.posts.map(post => postView(site, post, today));
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */

@@ -19,12 +19,14 @@
 //   src/pages/sportivi/**, src/components/athletes/**   athletes, build-output
 //   src/pages/calendar/**, src/components/calendar/**   calendar, home, build-output
 //   src/pages/noutati/index.astro, src/components/news/**   news, article
-//   src/scripts/**                     motion, scroll-scan, home, athletes, calendar, news, build-output
+//   src/pages/noutati/[slug].astro, src/scripts/{lightbox,share}.ts   article
+//   src/scripts/**                     motion, scroll-scan, home, athletes, calendar, news, article,
+//                                      build-output
 //                                      (countdown.ts and calendar-panel.ts among them)
 //   src/components/home/**             home, motion, scroll-scan, build-output
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
 //   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan, athletes, calendar,
-//                                                         news, build-output
+//                                                         news, article, build-output
 //   tests/e2e/<name>.spec.ts           that spec
 //   tests/unit/**, vitest.config.ts, .env.example, *.md   no e2e spec
 //   everything else (src/lib, Site*.astro, layouts, pages, styles, public, src/fixtures/home.json,
@@ -56,10 +58,11 @@ const WEB_RULES = [
   [/^src\/(pages\/sportivi|components\/athletes)\//, [ATHLETES, BUILD]],
   [/^src\/(pages\/calendar|components\/calendar)\//, [CALENDAR, HOME, BUILD]],
   [/^src\/(pages\/noutati\/index\.astro$|components\/news\/)/, [NEWS, ARTICLE]],
-  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, CALENDAR, NEWS, BUILD]],
+  [/^src\/(pages\/noutati\/\[slug\]|scripts\/(lightbox|share)\.ts$)/, [ARTICLE]],
+  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, CALENDAR, NEWS, ARTICLE, BUILD]],
   [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
   [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],
-  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, CALENDAR, NEWS, BUILD]],
+  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, CALENDAR, NEWS, ARTICLE, BUILD]],
   [/^tests\/e2e\/([^/]+\.spec\.ts)$/, m => [m[1]]],
   [/^tests\/unit\//, NONE],
   [/^(vitest\.config\.ts|\.env\.example|[^/]+\.md)$/, NONE],

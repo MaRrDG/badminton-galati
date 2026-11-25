@@ -1,0 +1,70 @@
+---
+import PlatePhoto from '../ui/PlatePhoto.astro';
+import { formatDateRo } from '../../lib/dates';
+import { postKindLabel } from '../../lib/home';
+import type { Post } from '../../lib/types';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { cover } = post;
+---
+
+<!-- The blue head band with the page's one big title; the cover straddles its lower edge. -->
+<section class:list={['arthead', { 'has-cover': cover }]} aria-labelledby="art-h">
+  <div class="wrap">
+    <a class="back textlink" href="/noutati/">Noutăți</a>
+    <p class="meta">{postKindLabel(post.kind)}, <time datetime={post.date}>{formatDateRo(post.date)}</time></p>
+    <h1 class="display" id="art-h">{post.title}</h1>
+  </div>
+</section>
+{
+  cover && (
+    <div class="wrap">
+      <div class="cover">
+        <PlatePhoto img={cover} offset={18} ratio="16 / 9" loading="eager" priority sizes="(max-width: 980px) 100vw, 940px" />
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .arthead {
+    --overlap: clamp(70px, 10vw, 150px);
+    background: var(--blue);
+    color: var(--white);
+    padding: clamp(26px, 3.6vw, 48px) 0 clamp(34px, 4.6vw, 62px);
+  }
+  .arthead.has-cover {
+    padding-bottom: calc(var(--overlap) + clamp(30px, 3.4vw, 44px));
+  }
+  .back {
+    font-size: 0.98rem;
+  }
+  .back:focus-visible {
+    outline-color: var(--white);
+  }
+  .meta {
+    margin-top: clamp(18px, 2.6vw, 30px);
+    font-weight: 600;
+  }
+  h1 {
+    margin-top: 10px;
+    line-height: 1;
+    font-size: clamp(2.8rem, 6.4vw, 5.8rem);
+    max-width: 15ch;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+  /* The plate (18px) sits inside this width: the photo itself is at most 940px wide. */
+  .cover {
+    position: relative;
+    width: min(100%, 958px);
+    margin-top: calc(-1 * clamp(70px, 10vw, 150px));
+  }
+  .cover :global(img) {
+    transform-origin: 50% 60%;
+  }
+</style>
