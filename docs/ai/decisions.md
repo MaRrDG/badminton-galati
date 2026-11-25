@@ -145,6 +145,21 @@ decisions; this log holds what was decided while building, and where it supersed
 - Studio click-through at 390px (owed since Task 3; not recorded as done).
 - A daily scheduled rebuild (and a rebuild trigger after publishing in the Studio).
 
+### Final review and owner decisions (2026-11-26)
+| Decision | Why | Cost if wrong |
+|---|---|---|
+| Visitors are addressed as "tu" on every page (owner) | One voice; fits the motto "Ai reușit? Continuă!"; pages mixed "tu" and "dumneavoastră" | Rewrite strings back; listed in `copy-to-confirm.md` |
+| "Pentru părinți" in the main menu; header switches to "Meniu" below 900px (owner) | Parents are the main audience; seven items do not fit at 861 | 861–899 shows the phone menu on a desktop layout |
+| Home events in the calendar grid carry a corner triangle besides the red (owner) | Colour must not be the only signal (WCAG 1.4.1) | Small visual change to the approved mockup |
+| Dim filtered items at opacity 0.8 + grayscale, kept as is (owner) | Text stays ≥3:1; neutral rows change subtly | A visitor may miss which rows the filter dimmed |
+| The news type filter is shown only with two or more kinds (same rule as athletes and calendar) | A filter with one option changes nothing | None |
+| The empty "Medalii" block is omitted on profiles | "Încă nu are medalii" read as a claim about a child | Visitors do not see that medals come from articles |
+| Articles without body text show no share row | Inviting people to share an empty page | None |
+| Trial copy on /program/ and the contact meta is neutral (child or adult) | Adults can request a trial | None |
+| GSAP is loaded only when motion will run; load intros are skipped when the motion code arrives >1 s after first paint | Lighter pages, no snap-back on slow links | On slow links visitors see no intro |
+| The trial form's consent box is first person ("Sunt de acord … să mă contacteze") | The visitor is the one stating it | None |
+| No HTML comments in built pages (one disclosed the honeypot); a build-output test guards it | Leaks implementation details | None |
+
 ### Deferred to later plans
 See `roadmap.md` for the list per plan.
 
