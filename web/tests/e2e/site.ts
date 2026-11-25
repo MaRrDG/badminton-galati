@@ -13,8 +13,14 @@ const OUT = join(WEB, 'dist-e2e');
 /** Stamps, preview pids and logs live beside the builds, never inside an output directory. */
 const STATE = join(OUT, '.state');
 
-/** Everything a build reads besides node_modules (pinned by the lockfile). */
-const INPUTS = ['src', 'public', 'astro.config.mjs', 'package.json', 'tsconfig.json', '../pnpm-lock.yaml'];
+/**
+ * Everything a build reads besides node_modules (pinned by the lockfile), and the code that
+ * runs it: a changed build env or astro argument must not reuse an old build.
+ */
+const INPUTS = [
+  'src', 'public', 'astro.config.mjs', 'package.json', 'tsconfig.json', '../pnpm-lock.yaml',
+  'tests/e2e/site.ts', 'tests/e2e/servers.ts',
+];
 const FIXTURES = join(WEB, 'src/fixtures');
 
 export const outDir = (name: ServerName) => join(OUT, name);

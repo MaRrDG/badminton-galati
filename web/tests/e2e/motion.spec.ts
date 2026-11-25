@@ -189,9 +189,10 @@ test('reduced motion shows final states', async ({ browser }) => {
   await ctx.close();
 });
 
-// One server per motion path: the full page, a single hall photo with no roster and a wrapped
-// hero line, and a strip that pins only when narrow. The other fixtures differ in content only.
-for (const server of ['home', 'sparse', 'mixed-strip'] as const)
+// Every server: the full page, a single hall photo with no roster and a wrapped hero line, a
+// strip that pins only when narrow, and a roster without rank numerals beside a calendar
+// without countdown (two scripts with nothing to animate).
+for (const server of ['home', 'sparse', 'mixed-strip', 'quiet-season'] as const)
   test(`no page errors while scrolling: ${server}`, on(server), async ({ page }) => {
     const errs: string[] = []; page.on('pageerror', e => errs.push(e.message));
     await page.goto('/'); await page.mouse.wheel(0, 8000); await page.waitForTimeout(800);
