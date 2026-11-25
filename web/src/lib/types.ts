@@ -48,6 +48,8 @@ export type Post = {
 export type ClubInfo = {
   parents: { age?: string; equipment?: string; cost?: string; firstWeeks?: string; registration?: string };
   programNote?: string;
+  /** The hall itself (the courts), for the parents' and contact pages. */
+  venuePhoto?: Img;
   contact: { phone?: string; directions?: string; replyDays?: number };
 };
 export type HomeData = {

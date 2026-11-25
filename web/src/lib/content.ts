@@ -4,6 +4,7 @@ import { calendarView, type CalendarPage } from './calendar';
 import { isIsoDate, todayInBucharest } from './dates';
 import { byStart, latestPosts, newestFirst, visibleAthletes } from './home';
 import { newsView, type NewsPage } from './news';
+import { parentsView, type ParentsPage } from './parents';
 import { programView, type ProgramPage } from './program';
 import { fetchHomeQuery, slugifyRo, toHomeData } from './sanity';
 import {
@@ -98,6 +99,11 @@ export async function getPostPages(): Promise<PostPage[]> {
 /** The programme (/program/): the week in the hall, the group picker and the guide to the groups. */
 export async function getProgramPage(): Promise<ProgramPage> {
   return programView(await getSiteData());
+}
+
+/** The parents' page (/pentru-parinti/): the club's answers, the coaches, the opening and hall photos. */
+export async function getParentsPage(): Promise<ParentsPage> {
+  return parentsView(await getSiteData());
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */
@@ -315,6 +321,7 @@ export function parseSiteData(value: unknown, source: string): SiteData {
       for (const key of PARENT_ANSWERS) optional(parents, key, q, text);
     });
     optional(info, 'programNote', p, text);
+    optional(info, 'venuePhoto', p, img);
     optional(info, 'contact', p, (x, q) => {
       const contact = record(x, q);
       optional(contact, 'phone', q, text);

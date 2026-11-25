@@ -247,6 +247,14 @@
       "name": "Adrian Panfil"
     }
   ],
+  "info": {
+    "venuePhoto": {
+      "url": "/img/sala-turneu-2.jpg",
+      "width": 1280,
+      "height": 720,
+      "alt": "Meciuri pe cele patru terenuri ale sălii Siderurgistul"
+    }
+  },
   "posts": [
     {
       "title": "Novi Sad – 2026",

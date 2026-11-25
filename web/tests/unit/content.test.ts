@@ -175,7 +175,8 @@ describe('site data', () => {
     const site = await getSiteData();
     expect(site.posts).toHaveLength(3);
     expect(site.coaches.map(c => c.name)).toEqual(['Dorel Badiu', 'Iulian Călin', 'Adrian Panfil']);
-    expect(site.info).toEqual({ parents: {}, contact: {} });
+    // Only the hall photo is known; the club's answers are not yet.
+    expect(site.info).toEqual({ parents: {}, contact: {}, venuePhoto: fixture.info.venuePhoto });
     expect(site.competitions.find(c => c.title === 'CR Echipe Seniori și Cupa U15')!.categories).toEqual(['U15', 'Seniori', 'Echipe']);
     expect((await getHomeData()).posts).toHaveLength(3);
   });
@@ -211,6 +212,12 @@ describe('site data', () => {
     for (const g of site.groups) expect(g.sessions).toEqual([]);
     for (const c of site.competitions) expect(c.categories).toEqual([]);
     for (const p of site.posts) expect([p.body, p.gallery, p.results]).toEqual([[], [], []]);
+  });
+
+  test('the venue photo is optional and checked like every image', () => {
+    const venuePhoto = { url: '/img/sala-turneu-2.jpg', width: 1280, height: 720, alt: 'Sala' };
+    expect(parseSiteData({ ...fixture, info: { venuePhoto } }, 't').info.venuePhoto).toEqual(venuePhoto);
+    expect(() => parseSiteData({ ...fixture, info: { venuePhoto: { ...venuePhoto, width: 0 } } }, 't')).toThrow('info.venuePhoto.width');
   });
 
   test('groups take the seed ids and slugs; a fixture without them gets the same from the name', () => {
@@ -323,6 +330,12 @@ describe('toHomeData', () => {
   test('mapping tolerates empty optional data', () => {
     const d = toHomeData({ ...rawSample, athletes: [], competitions: [], posts: [], settings: { ...rawSample.settings, hallPhotos: null, rankingWeek: null } });
     expect(d.hallPhotos).toEqual([]); expect(d.rankingWeek).toBeUndefined();
+  });
+
+  test('the venue photo is read when set and left out when not', () => {
+    expect(HOME_QUERY).toContain('"venuePhoto": venuePhoto{');
+    expect(toHomeData({ ...rawSample, settings: { ...rawSample.settings, venuePhoto: rawImg('sala') } }).info.venuePhoto).toEqual(rawImg('sala'));
+    expect(toHomeData({ ...rawSample, settings: { ...rawSample.settings, venuePhoto: null } }).info).toEqual({ parents: {}, contact: {} });
   });
 
   test('missing hero and why photos map to undefined', () => {

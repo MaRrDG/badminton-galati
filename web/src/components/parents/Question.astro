@@ -1,0 +1,52 @@
+---
+import Tbc from '../ui/Tbc.astro';
+import { answerParagraphs } from '../../lib/parents';
+
+interface Props {
+  /** The anchor the list of questions links to. */
+  id: string;
+  question: string;
+  /** The club's answer (paragraphs split on blank lines); shown in place of `tbc`. */
+  answer?: string;
+  /** What the club still has to confirm when there is no answer. */
+  tbc?: string;
+  /** Extra classes for the section (the venue lays out beside its photo). */
+  class?: string;
+}
+
+const { id, question, answer, tbc, class: className } = Astro.props;
+const paragraphs = answerParagraphs(answer);
+const figure = Astro.slots.has('figure');
+const headingId = `${id}-h`;
+---
+
+<section class:list={['q', className, { 'with-figure': figure }]} id={id} aria-labelledby={headingId}>
+  <slot name="figure" />
+  <div class="qbody">
+    <h2 class="qh" id={headingId}>{question}</h2>
+    <slot name="before" />
+    {paragraphs.length > 0 ? paragraphs.map(p => <p>{p}</p>) : tbc && <Tbc what={tbc} />}
+    <slot />
+  </div>
+</section>
+
+<style>
+  /* A question reads like a sub-heading in a letter: body face, bold, sentence case. */
+  .q {
+    scroll-margin-top: 16px;
+  }
+  .qh {
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: clamp(1.35rem, 1.9vw, 1.6rem);
+    line-height: 1.25;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .qbody > :global(p) {
+    max-width: 68ch;
+  }
+  .qbody > :global(p + p) {
+    margin-top: 12px;
+  }
+</style>

@@ -1,0 +1,306 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import PlatePhoto from '../../components/ui/PlatePhoto.astro';
+import Tbc from '../../components/ui/Tbc.astro';
+import ClosingCta from '../../components/ui/ClosingCta.astro';
+import Question from '../../components/parents/Question.astro';
+import Coaches from '../../components/parents/Coaches.astro';
+import { getParentsPage } from '../../lib/content';
+import { answerParagraphs } from '../../lib/parents';
+
+const page = await getParentsPage();
+const { parents, groupSlugs } = page;
+const lede = 'Ce e bine să știți înainte de primul antrenament, în ordinea în care vă vin întrebările.';
+const MAP = 'https://www.google.com/maps/search/?api=1&query=45.4194907,28.0277769';
+const program = (slug?: string) => (slug ? `/program/#${slug}` : undefined);
+const firstWeeks = answerParagraphs(parents.firstWeeks);
+
+const questions = [
+  ['varsta', 'De la ce vârstă poate începe copilul?'],
+  ['echipament', 'Ce îi trebuie la primul antrenament?'],
+  ['cost', 'Cât costă?'],
+  ['inceput', 'Cum arată primele săptămâni?'],
+  ['dupa', 'Ce urmează după?'],
+  ['antrenori', 'Cine sunt antrenorii?'],
+  ['sala', 'Unde e sala?'],
+] as const;
+const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0], string>;
+---
+
+<Base title="Pentru părinți | CS Siderurgistul Galați" description={lede}>
+  <PageHead title="Pentru părinți" lede={lede} tone="blue" />
+
+  <section class="letter" aria-label="Întrebări și răspunsuri">
+    <div class="wrap">
+      <div class:list={['opening', { solo: !page.openingPhoto }]}>
+        <div>
+          <p class="said">„Asigurăm un climat prietenos pentru toate categoriile de vârstă.”</p>
+          <p class="said-by">
+            Așa își descrie clubul antrenamentele, din 7 martie 2002 încoace. Mai jos găsiți răspunsurile la întrebările pe care și le
+            pune orice părinte înainte să-și aducă copilul în sală.
+          </p>
+        </div>
+        {
+          page.openingPhoto && (
+            <PlatePhoto img={page.openingPhoto} offset={14} loading="eager" priority sizes="(max-width: 860px) 460px, 40vw" class="reveal" />
+          )
+        }
+      </div>
+
+      <div class="reading">
+        <aside class="toc-wrap">
+          <nav class="toc" aria-labelledby="toc-h">
+            <h2 id="toc-h">Întrebările de pe pagină</h2>
+            <ul>
+              {questions.map(([id, text]) => <li><a href={`#${id}`}>{text}</a></li>)}
+            </ul>
+          </nav>
+        </aside>
+
+        <div class="text">
+          <Question id="varsta" question={q.varsta} answer={parents.age} tbc="vârsta minimă de la care primiți copii la Inițiere și dacă un copil mai mare poate începe direct acolo.">
+            <p>
+              Copiii încep la grupa de {groupSlugs.first ? <a href={program(groupSlugs.first)}>Inițiere</a> : 'Inițiere'}. Dacă vrea doar să
+              joace, fără competiții, există grupa {groupSlugs.play ? <a href={program(groupSlugs.play)}>Amatori copii</a> : 'Amatori copii'}.
+            </p>
+          </Question>
+
+          <Question id="echipament" question={q.echipament} answer={parents.equipment} tbc="ce înseamnă echipamentul minim (rachetă, fluturași?) și ce aduce copilul de acasă: încălțăminte, haine, apă.">
+            <p slot="before">De la club primește asistență calificată, instructaj și echipamentul minim necesar.</p>
+          </Question>
+
+          <Question id="cost" question={q.cost} answer={parents.cost} tbc="taxa lunară la fiecare grupă, dacă antrenamentul de probă se plătește, dacă există reducere pentru frați și cum se plătește." />
+
+          <Question id="inceput" question={q.inceput}>
+            <ol class="steps">
+              <li>
+                <b>Ne scrieți.</b> Completați <a href="/contact/#formular">formularul de probă</a> sau trimiteți-ne un e-mail, iar clubul vă
+                contactează ca să stabiliți ziua.
+              </li>
+              <li><b>Antrenamentul de probă.</b> Copilul încearcă un antrenament în sală, iar dumneavoastră cunoașteți antrenorul.</li>
+              <li>
+                <b>Primele săptămâni la Inițiere.</b>
+                {
+                  firstWeeks.length > 0 ? (
+                    <>
+                      {' '}
+                      {firstWeeks[0]}
+                      {firstWeeks.slice(1).map(p => <p>{p}</p>)}
+                    </>
+                  ) : (
+                    <Tbc as="span" what="de câte ori pe săptămână vine copilul și ce învață în prima lună." />
+                  )
+                }
+              </li>
+              <li>
+                <b>Alegeți drumul.</b> Împreună cu antrenorul vedeți dacă merge spre Performanță și competiții sau joacă de plăcere la Amatori
+                copii.
+              </li>
+            </ol>
+          </Question>
+
+          <Question id="dupa" question={q.dupa} answer={parents.registration} tbc="ce acte sunt necesare pentru legitimare, cât costă și când se face.">
+            <p slot="before">
+              <b>Legitimarea.</b> Ca să joace în competițiile oficiale, copilul e legitimat la Federația Română de Badminton, prin club.
+            </p>
+            <p>
+              <b>Competițiile.</b> Federația organizează campionate naționale pe categorii de vârstă, de la U9 la U19, iar unele se joacă la
+              Galați. Le găsiți în <a href="/calendar/">calendarul competițiilor</a>, iar pe cei care merg deja la ele, pe pagina <a
+                href="/sportivi/">sportivilor clubului</a
+              >.
+            </p>
+          </Question>
+
+          <Question id="antrenori" question={q.antrenori}>
+            <Coaches coaches={page.coaches} />
+          </Question>
+        </div>
+      </div>
+
+      <Question id="sala" question={q.sala} class:list={['venue', { solo: !page.hallPhoto }]}>
+        {page.hallPhoto && <PlatePhoto slot="figure" img={page.hallPhoto} offset={14} sizes="(max-width: 860px) 100vw, 600px" />}
+        <p>
+          <b>Sala Siderurgistul, Bd. Cloșca, Galați.</b> Are patru terenuri de badminton și aici se antrenează toate grupele. În aceeași sală
+          s-a jucat Balcaniada din 2002 și cea din 2023.
+        </p>
+        <p class="links"><a class="textlink" href={MAP}>Sala pe hartă</a><a class="textlink" href="/contact/#drum">Cum ajungeți</a></p>
+      </Question>
+    </div>
+  </section>
+
+  <ClosingCta
+    text="Cel mai simplu răspuns la toate întrebările de mai sus e o oră în sală. Lăsați-ne vârsta copilului și un număr de telefon."
+    display
+    label="Cere un antrenament de probă"
+    href="/contact/#formular"
+    email
+  />
+</Base>
+
+<script>
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  initPageMotion('poster-reveal');
+</script>
+
+<style>
+  /* A calm reading page: a letter with a list of its questions beside it. */
+  .letter {
+    padding: clamp(36px, 5vw, 72px) 0 clamp(52px, 7vw, 100px);
+    font-size: 1.06rem;
+    line-height: 1.6;
+  }
+  .letter :global(a:not(.textlink)) {
+    font-weight: 600;
+    text-underline-offset: 3px;
+  }
+
+  .opening {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 32px clamp(32px, 6vw, 96px);
+    align-items: start;
+    margin-bottom: clamp(44px, 6vw, 80px);
+  }
+  .opening.solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .said {
+    font-size: clamp(1.3rem, 1.9vw, 1.6rem);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--blue);
+    max-width: 30ch;
+  }
+  .said-by {
+    margin-top: 12px;
+    max-width: 56ch;
+  }
+
+  .reading {
+    display: grid;
+    grid-template-columns: minmax(0, 68ch) minmax(0, 1fr);
+    gap: 32px clamp(40px, 7vw, 120px);
+    align-items: start;
+  }
+  /* Sticky inside the reading grid only, so the list stops before the venue and the footer. */
+  .toc-wrap {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 20px;
+    max-width: 22rem;
+  }
+  .toc {
+    background: var(--mist);
+    padding: 18px 22px 16px;
+  }
+  .toc h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .toc ul {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+  .toc li {
+    padding: 3px 0;
+  }
+  .letter .toc a {
+    font-weight: 500;
+  }
+
+  .text {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 68ch;
+  }
+  .text > :global(.q + .q) {
+    margin-top: clamp(36px, 4.6vw, 56px);
+  }
+
+  /* The first weeks: the page's one numbered list, because it is a real sequence. */
+  .steps {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: s;
+  }
+  .steps li {
+    counter-increment: s;
+    position: relative;
+    padding: 0 0 0 2.4em;
+    max-width: 64ch;
+  }
+  .steps li + li {
+    margin-top: 12px;
+  }
+  .steps li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    width: 1.6em;
+    height: 1.6em;
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+  .steps :global(.tbc) {
+    display: block;
+    margin-top: 4px;
+  }
+  .steps li > p {
+    margin-top: 12px;
+  }
+
+  .letter :global(.venue) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 24px clamp(28px, 5vw, 72px);
+    align-items: center;
+    background: var(--mist);
+    padding: clamp(20px, 3vw, 40px);
+    margin-top: clamp(48px, 6vw, 80px);
+  }
+  .letter :global(.venue.solo) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin-top: 14px;
+  }
+  .links .textlink {
+    display: inline-block;
+    padding: 6px 0;
+  }
+
+  @media (max-width: 860px) {
+    .opening,
+    .letter :global(.venue) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .opening :global(.plated) {
+      order: -1;
+      max-width: 460px;
+    }
+    .reading {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .toc-wrap,
+    .text {
+      grid-column: 1;
+      grid-row: auto;
+      position: static;
+      max-width: none;
+    }
+  }
+</style>
