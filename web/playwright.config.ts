@@ -13,8 +13,7 @@ const tagged = (name: Exclude<ServerName, 'home'>) => new RegExp(`${tagOf(name)}
 // or `--grep …` builds just the servers those tests use. Setups run in parallel workers and
 // reuse an unchanged build (see tests/e2e/site.ts).
 const perServer = names.flatMap((name): Project[] => [
-  { name: `serve ${name}`, testMatch: 'serve.setup.ts', teardown: `stop ${name}`, metadata: { server: name } },
-  { name: `stop ${name}`, testMatch: 'stop.teardown.ts', metadata: { server: name } },
+  { name: `serve ${name}`, testMatch: 'serve.setup.ts', metadata: { server: name } },
   {
     name,
     testMatch: '*.spec.ts',
@@ -29,6 +28,8 @@ export default defineConfig({
   testDir: 'tests/e2e',
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
+  // Stops the previews the setup projects started, also when a run is interrupted.
+  globalTeardown: './tests/e2e/global-teardown.ts',
   reporter: 'list',
   use: {
     launchOptions: { executablePath: '/usr/bin/google-chrome' },

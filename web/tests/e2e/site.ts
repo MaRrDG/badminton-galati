@@ -1,5 +1,5 @@
-// Builds and previews one fixture server for the e2e run. Used by serve.setup.ts and
-// stop.teardown.ts, which Playwright runs as the setup and teardown project of each server.
+// Builds and previews one fixture server for the e2e run. serve.setup.ts runs it as the setup
+// project of each server; global-teardown.ts stops the previews at the end of the run.
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -108,7 +108,7 @@ export async function stop(name: ServerName): Promise<void> {
 
 /**
  * Starts `astro preview` for `name` in its own process group, so it outlives the setup worker;
- * the teardown project stops it. Resolves once the page answers.
+ * the global teardown stops it. Resolves once the page answers.
  */
 export async function serve(name: ServerName): Promise<void> {
   await stop(name);
