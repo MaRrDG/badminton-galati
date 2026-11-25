@@ -2,6 +2,7 @@ import { athleteProfile, athletesView, type AthleteProfile, type AthletesPage } 
 import { calendarView, type CalendarPage } from './calendar';
 import { isIsoDate, todayInBucharest } from './dates';
 import { byStart, latestPosts, newestFirst, visibleAthletes } from './home';
+import { newsView, type NewsPage } from './news';
 import { fetchHomeQuery, slugifyRo, toHomeData } from './sanity';
 import {
   COMPETITION_CATEGORIES, DISCIPLINES, POST_KINDS, TRACKS, WEEKDAYS,
@@ -78,6 +79,11 @@ export async function getAthleteProfiles(): Promise<AthleteProfile[]> {
 /** The competition calendar (/calendar/) of the build year, with the build date marked. */
 export async function getCalendarPage(): Promise<CalendarPage> {
   return calendarView(await getSiteData(), buildToday());
+}
+
+/** The news page (/noutati/): every post, newest first, on the front or in the older list. */
+export async function getNewsPage(): Promise<NewsPage> {
+  return newsView(await getSiteData());
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */

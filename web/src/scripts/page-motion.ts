@@ -30,6 +30,9 @@ export function initPageMotion(moment: PageMoment): void {
     case 'poster-reveal':
       posterReveal();
       break;
+    case 'feature-reveal':
+      featureReveal();
+      break;
     // The other moments arrive with their pages.
   }
 }
@@ -47,6 +50,21 @@ function seasonFill(): void {
     { clipPath: 'inset(0 100% 0 0)' },
     { clipPath: 'inset(0 0% 0 0)', duration: 0.5, ease: 'power3.out', stagger: 0.07, delay: 0.2, clearProps: 'clipPath' },
   );
+}
+
+/**
+ * The featured article of the news page (`.feat .plated`) arrives on load, as the homepage
+ * poster does: the red plate grows from the bottom, then the photo unclips upwards. A featured
+ * article without a photo has no plate, and nothing moves. Both end as rendered.
+ */
+function featureReveal(): void {
+  const plate = document.querySelector('.feat .plated .plate');
+  const shot = document.querySelector('.feat .plated .shot');
+  if (!plate || !shot) return;
+  gsap
+    .timeline({ defaults: { ease: 'power4.out' } })
+    .from(plate, { scaleY: 0, duration: 0.7, clearProps: 'transform' })
+    .from(shot, { clipPath: 'inset(100% 0 0 0)', duration: 0.9, clearProps: 'clipPath' }, '-=.45');
 }
 
 /**

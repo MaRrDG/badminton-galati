@@ -45,8 +45,8 @@ and a dummy `SANITY_READ_TOKEN`.
 | Server (port) | Fixture | Covers |
 |---|---|---|
 | `home` (4329) | `home.json` | The real homepage content (dev default; must match the Studio seed) |
-| `quiet-season` (4330) | `quiet-season.json` | Athletes without rankings (no places, no source line, equal rows); the fictional `Zet Exemplu-Ana` with photo and birth year (athletes wall: category from the birth year); season over (three played, no countdown) |
-| `sparse` (4331) | `sparse.json` | No athlete may be shown (only one, without consent): roster and links omitted, section order; no competition at all (the calendar's one quiet line); a 20-character hero line wrapping at 380px; a single hall photo (never pins, fits its column with and without JS) |
+| `quiet-season` (4330) | `quiet-season.json` | Athletes without rankings (no places, no source line, equal rows); the fictional `Zet Exemplu-Ana` with photo and birth year (athletes wall: category from the birth year); season over (three played, no countdown); 15 posts, three with a cover (the full news front, four older) |
+| `sparse` (4331) | `sparse.json` | No athlete may be shown (only one, without consent): roster and links omitted, section order; no competition at all (the calendar's one quiet line); a 20-character hero line wrapping at 380px; a single hall photo (never pins, fits its column with and without JS); no post with a cover (news: featured blue tile) |
 | `mixed-strip` (4332) | `mixed-strip.json` | Landscape + portrait strip (travels at 390/600, stays put at 1440, pins/unpins on resize); one ranked athlete; a non-consenting athlete holding place 1 |
 
 A test runs on `home` unless tagged: `test.describe('…', on('sparse'), () => …)`.
@@ -74,13 +74,14 @@ A test runs on `home` unless tagged: `test.describe('…', on('sparse'), () => �
 | `src/components/ui/**` (shared by the homepage and every inner page) | all |
 | `src/pages/sportivi/**`, `src/components/athletes/**` | athletes, build-output |
 | `src/pages/calendar/**`, `src/components/calendar/**` | calendar, home, build-output |
-| `src/scripts/**` | motion, scroll-scan, home, athletes, calendar, build-output |
+| `src/pages/noutati/index.astro`, `src/components/news/**` | news, article |
+| `src/scripts/**` | motion, scroll-scan, home, athletes, calendar, news, build-output |
 | `src/components/home/{Hero,CalendarBand,News,TrialCta}.astro` | home, motion, scroll-scan, shell |
 | `src/components/home/**` | home, motion, scroll-scan |
 | `src/components/Site*.astro` | shell, home |
 | `src/lib/**` | home, motion, build-output |
 | `src/fixtures/home.json` | all |
-| `src/fixtures/{sparse,mixed-strip,quiet-season}.json` | home, motion, scroll-scan, athletes, calendar, build-output |
+| `src/fixtures/{sparse,mixed-strip,quiet-season}.json` | home, motion, scroll-scan, athletes, calendar, news, build-output |
 | `tests/e2e/**` | Playwright's own `--only-changed` (spec + importers) |
 | `tests/unit/**`, `scripts/e2e-changed.mjs` | none |
 | other `src/`, `public/`, `astro.config.mjs`, `package.json`, `tsconfig.json`, `playwright.config.ts`, `scripts/playwright.mjs` | all |

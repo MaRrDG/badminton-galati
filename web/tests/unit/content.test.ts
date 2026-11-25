@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { buildToday, getAthletesPage, getHomeData, getSiteData, parseHomeData, parseSiteData } from '../../src/lib/content';
+import { buildToday, getAthletesPage, getHomeData, getNewsPage, getSiteData, parseHomeData, parseSiteData } from '../../src/lib/content';
 import { todayInBucharest } from '../../src/lib/dates';
 import { HOME_QUERY, toHomeData } from '../../src/lib/sanity';
 import fixture from '../../src/fixtures/home.json';
@@ -190,6 +190,17 @@ describe('site data', () => {
     expect(page.rankingWeek).toBeUndefined();
     // The shared site data keeps its own order.
     expect((await getSiteData()).athletes.map(a => a.name)[0]).toBe('Nistor Cristian-Ionuț');
+  });
+
+  test('the news page holds every post; the shared site data keeps its own list', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'quiet-season.json';
+    const site = await getSiteData();
+    const before = site.posts.map(p => p.slug);
+    const { front, filters } = await getNewsPage();
+    const shown = [front.feat!, ...front.side, ...front.rows.flat()].map(i => i.post.slug).concat(front.older.map(p => p.slug));
+    expect(shown).toEqual(before);
+    expect(filters[0]).toMatchObject({ label: 'Toate', count: 15 });
+    expect(site.posts.map(p => p.slug)).toEqual(before);
   });
 
   test('new list fields default to empty lists', async () => {

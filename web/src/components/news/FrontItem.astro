@@ -1,0 +1,234 @@
+---
+import Photo from '../ui/Photo.astro';
+import PlatePhoto from '../ui/PlatePhoto.astro';
+import { formatDateRo } from '../../lib/dates';
+import { postKindLabel } from '../../lib/home';
+import type { FrontItem } from '../../lib/news';
+
+interface Props {
+  item: FrontItem;
+  /** feat: the featured article; side: the two beside it; row: the rows under them. */
+  place: 'feat' | 'side' | 'row';
+}
+
+const { item, place } = Astro.props;
+const { post, span, kind, tone, big } = item;
+const feat = place === 'feat';
+const Title = feat ? 'h2' : 'h3';
+// Widths the photo takes at 1440 (12 columns of ~74px with ~30px gaps), for a srcset later.
+const sizes = feat ? '(max-width: 1000px) 100vw, 780px' : `(max-width: 640px) 100vw, (max-width: 1000px) 50vw, ${Math.round(span * 98)}px`;
+---
+
+<li
+  class:list={[kind === 'photo' ? 'ph' : 'tile', tone, { big, solo: feat && span === 12 }, place === 'row' ? `s${span}` : place]}
+  data-f={post.kind}
+>
+  {
+    post.cover &&
+      (feat ? (
+        <PlatePhoto offset={16} ratio="3 / 2">
+          <Photo img={post.cover} decorative loading="eager" priority sizes={sizes} />
+        </PlatePhoto>
+      ) : (
+        <div class="pic">
+          <Photo img={post.cover} decorative sizes={sizes} />
+        </div>
+      ))
+  }
+  <div class="txt">
+    <p class="meta">{postKindLabel(post.kind)}, <time datetime={post.date}>{formatDateRo(post.date)}</time></p>
+    <Title class:list={{ display: feat }}><a href={`/noutati/${post.slug}/`}>{post.title}</a></Title>
+  </div>
+</li>
+
+<style>
+  li {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  /* The whole item is the link; its name stays the title. */
+  a {
+    text-decoration: none;
+  }
+  a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  a:focus-visible {
+    outline: none;
+  }
+  a:focus-visible::after {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .meta {
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+  h2,
+  h3 {
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 800;
+    line-height: 1.02;
+    font-size: clamp(1.45rem, 1.9vw, 1.75rem);
+    margin-top: 4px;
+  }
+
+  /* Photo items: the photo, then kind and date, then the title. */
+  .pic :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+  .ph .meta {
+    margin-top: 12px;
+    color: var(--red-ink);
+  }
+  .ph:hover :is(h2, h3) {
+    color: var(--blue);
+  }
+  /* Narrow columns get a taller photo, wide half rows a panorama, so a row's photos stay near one height. */
+  :is(.s3, .s4) .pic :global(img) {
+    aspect-ratio: 4 / 3;
+  }
+  .s6 .pic :global(img) {
+    aspect-ratio: 2 / 1;
+  }
+  .s12 .pic :global(img) {
+    aspect-ratio: 5 / 2;
+  }
+
+  /* The featured article: the poster with its red plate, the one big uppercase title after the page's. */
+  .feat {
+    grid-column: 1 / 9;
+    grid-row: span 2;
+  }
+  .feat .meta {
+    margin-top: 20px;
+  }
+  h2 {
+    font-size: clamp(2.8rem, 5.4vw, 5rem);
+    margin-top: 6px;
+  }
+  .side {
+    grid-column: 9 / 13;
+  }
+  .s3 {
+    grid-column: span 3;
+  }
+  .s4 {
+    grid-column: span 4;
+  }
+  .s5 {
+    grid-column: span 5;
+  }
+  .s6 {
+    grid-column: span 6;
+  }
+  .s7 {
+    grid-column: span 7;
+  }
+  .s12 {
+    grid-column: 1 / -1;
+  }
+
+  /* Alone on the front: the poster on two thirds, kind, date and title beside it. */
+  .feat.solo {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .ph.solo {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 0 clamp(24px, 3vw, 44px);
+    align-items: end;
+  }
+  .ph.solo .meta {
+    margin-top: 0;
+  }
+
+  /* Articles without a photo are flat colour fields with the title in type. */
+  .tile {
+    justify-content: space-between;
+    gap: 28px;
+    padding: clamp(18px, 2vw, 26px);
+    min-height: clamp(200px, 20vw, 280px);
+  }
+  .tile .txt {
+    display: contents;
+  }
+  .tile h3 {
+    font-size: clamp(1.6rem, 2.1vw, 2rem);
+    margin-top: 0;
+  }
+  .tile.big h3 {
+    font-size: clamp(2rem, 3.4vw, 3.2rem);
+  }
+  .tile.feat {
+    min-height: clamp(300px, 34vw, 460px);
+  }
+  .tile:hover a {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+  .blue {
+    background: var(--blue);
+    color: var(--white);
+  }
+  .red {
+    background: var(--red-field);
+    color: var(--white);
+  }
+  .mist {
+    background: var(--mist);
+    color: var(--ink);
+  }
+  .mist .meta {
+    color: var(--red-ink);
+  }
+
+  @media (max-width: 1000px) {
+    .feat {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+    .side,
+    .s3,
+    .s4,
+    .s5,
+    .s7 {
+      grid-column: span 6;
+    }
+    .s6 {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 640px) {
+    li.feat,
+    li.side,
+    li.s3,
+    li.s4,
+    li.s5,
+    li.s6,
+    li.s7 {
+      grid-column: 1 / -1;
+    }
+    .ph.solo {
+      display: flex;
+    }
+    .ph.solo .meta {
+      margin-top: 20px;
+    }
+    .tile {
+      min-height: 170px;
+    }
+  }
+</style>

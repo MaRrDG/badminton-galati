@@ -199,6 +199,73 @@
       "cover": { "url": "/img/medalii.jpg", "width": 1280, "height": 579, "alt": "Sportivi ai clubului cu medaliile, la festivitatea de premiere" },
       "competitionId": "competition-2026-03-27-cr-u15-cr-u23",
       "results": [{ "athleteId": "athlete-zet-exemplu-ana", "discipline": "SF", "result": "aur" }]
+    },
+    {
+      "title": "Galați, Olimpiada Națională a Sportului Școlar – 2026",
+      "slug": "galati-olimpiada-nationala-a-sportului-scolar-2026",
+      "kind": "competitie",
+      "date": "2026-02-19"
+    },
+    {
+      "title": "Începem anul în forță!",
+      "slug": "incepem-anul-in-forta",
+      "kind": "viata-clubului",
+      "date": "2026-01-20"
+    },
+    {
+      "title": "Serbare de sfârșit de an 2025",
+      "slug": "serbare-de-sfarsit-de-an-2025",
+      "kind": "viata-clubului",
+      "date": "2025-12-20"
+    },
+    {
+      "title": "Un mediu sigur și de sprijin pentru tinerii jucători de badminton",
+      "slug": "un-mediu-sigur-si-de-sprijin-pentru-tinerii-jucatori-de-badminton",
+      "kind": "proiecte",
+      "date": "2025-11-26"
+    },
+    {
+      "title": "Cantonament de pregătire, Slănic Moldova",
+      "slug": "cantonament-de-pregatire-slanic-moldova",
+      "kind": "viata-clubului",
+      "date": "2024-08-28",
+      "cover": { "url": "/img/cantonament.jpg", "width": 1280, "height": 960, "alt": "Grupul din cantonament, în tricouri verzi", "position": "50% 60%" }
+    },
+    {
+      "title": "Cupa României Juniori U13 și Tineret U23, Bacău",
+      "slug": "cupa-romaniei-juniori-u13-si-tineret-u23-bacau",
+      "kind": "competitie",
+      "date": "2024-04-24"
+    },
+    {
+      "title": "Cupa României pentru Juniori U11 și U19",
+      "slug": "cupa-romaniei-pentru-juniori-u11-si-u19",
+      "kind": "competitie",
+      "date": "2024-04-11"
+    },
+    {
+      "title": "6 medalii pentru Siderurgistul la Cupa României U15",
+      "slug": "6-medalii-pentru-siderurgistul-la-cupa-romaniei-u15",
+      "kind": "competitie",
+      "date": "2024-03-16"
+    },
+    {
+      "title": "Campionatul Național U11",
+      "slug": "campionatul-national-u11",
+      "kind": "competitie",
+      "date": "2023-01-19"
+    },
+    {
+      "title": "Campionatul Național Cadeți U15",
+      "slug": "campionatul-national-cadeti-u15",
+      "kind": "competitie",
+      "date": "2023-01-12"
+    },
+    {
+      "title": "Campionatul Național U13",
+      "slug": "campionatul-national-u13",
+      "kind": "competitie",
+      "date": "2023-01-11"
     }
   ],
   "hallPhotos": [
