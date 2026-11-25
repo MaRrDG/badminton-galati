@@ -10,6 +10,8 @@ export const SERVERS = {
   'one-photo': { fixture: 'one-photo.json', port: 4332 },
   'no-athletes': { fixture: 'no-athletes.json', port: 4333 },
   'one-ranked': { fixture: 'one-ranked.json', port: 4334 },
+  // Two hall photos, landscape then portrait: they fit a column of 860px but not of 390px.
+  'mixed-strip': { fixture: 'mixed-strip.json', port: 4335 },
 } as const;
 
 export type ServerName = keyof typeof SERVERS;

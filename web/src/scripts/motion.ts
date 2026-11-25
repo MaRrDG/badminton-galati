@@ -12,10 +12,11 @@ export function initMotion(): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.registerPlugin(ScrollTrigger);
 
+  // The intro plays once per visit, outside matchMedia, so crossing 860px does not replay it.
+  heroLoad();
   const mm = gsap.matchMedia();
   mm.add({ wide: WIDE, narrow: NARROW }, (ctx) => {
     const wide = Boolean(ctx.conditions?.wide);
-    heroLoad();
     heroScrub(wide);
     const restoreRoster = rosterRoll();
     headingDrift(wide);
@@ -49,6 +50,7 @@ function heroLoad(): void {
  * 2. Hero scrub: lines slide apart, the poster grows and re-crops. Wide screens pin the hero for
  * 70% of a viewport; narrow screens scrub while the hero scrolls away.
  * The inner column is pinned, not the section, so sections stay direct children of <main>.
+ * Distances depend on the viewport width, so they are re-measured on every refresh.
  */
 function heroScrub(wide: boolean): void {
   const hero = document.querySelector<HTMLElement>('.hero');
@@ -56,8 +58,8 @@ function heroScrub(wide: boolean): void {
   if (!hero || !column) return;
   const tl = gsap.timeline({
     scrollTrigger: wide
-      ? { trigger: hero, pin: column, start: 'top top', end: '+=70%', scrub: 0.6, anticipatePin: 1 }
-      : { trigger: hero, start: 'top top', end: 'bottom 35%', scrub: 0.6 },
+      ? { trigger: hero, pin: column, start: 'top top', end: '+=70%', scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true }
+      : { trigger: hero, start: 'top top', end: 'bottom 35%', scrub: 0.6, invalidateOnRefresh: true },
   });
   const slide = (selector: string, share: number) => {
     const els = hero.querySelectorAll(selector);
@@ -109,31 +111,41 @@ function rosterRoll(): () => void {
   return () => els.forEach((el) => (el.textContent = el.dataset.roll ?? ''));
 }
 
-/** 4. Section headings drift sideways into place with scroll, alternating direction. */
+/**
+ * 4. Section headings drift sideways into place with scroll, alternating direction.
+ * The start offset depends on the viewport width, so it is re-measured on every refresh.
+ */
 function headingDrift(wide: boolean): void {
   gsap.utils.toArray<HTMLElement>('section:not(.hero) h2.display').forEach((h, i) => {
-    const amount = (wide ? Math.min(innerWidth * 0.07, 90) : 12) * (i % 2 ? -1 : 1);
+    const amount = () => (wide ? Math.min(innerWidth * 0.07, 90) : 12) * (i % 2 ? -1 : 1);
     gsap.fromTo(
       h,
       { x: amount },
-      { x: 0, ease: 'none', scrollTrigger: { trigger: h, start: 'top bottom', end: 'top 35%', scrub: 0.6 } },
+      {
+        x: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: h, start: 'top bottom', end: 'top 35%', scrub: 0.6, invalidateOnRefresh: true },
+      },
     );
   });
 }
 
 /**
  * 5. Hall: the photo strip travels sideways while its column is pinned, until the last photo's
- * right edge meets the column's. A strip that already fits is not pinned at all. The distance
- * is re-measured on every refresh (resize, and each strip image load), and the pin is created
- * or removed when the strip starts or stops overflowing.
+ * right edge meets the column's. A single photo, or a strip that already fits, is not pinned at
+ * all. The distance is re-measured on every refresh (resize; the photos declare their size, so
+ * loading them changes nothing), and the pin is created or removed when the strip starts or
+ * stops overflowing. While the page scroll moves the strip it is no keyboard stop of its own.
  * Returns a function that undoes it.
  */
 function hallStrip(wide: boolean, ctx: gsap.Context): () => void {
   const hall = document.querySelector<HTMLElement>('.hall');
   const track = hall?.querySelector<HTMLElement>('.track');
   const column = track?.parentElement;
-  if (!hall || !track || !column) return () => {};
+  if (!hall || !track || !column || track.children.length < 2) return () => {};
   hall.classList.add('js-rally');
+  const tabindex = track.getAttribute('tabindex');
+  track.removeAttribute('tabindex');
 
   const distance = () => {
     const cs = getComputedStyle(column);
@@ -143,7 +155,7 @@ function hallStrip(wide: boolean, ctx: gsap.Context): () => void {
 
   let tween: gsap.core.Tween | undefined;
   const sync = () => {
-    const travels = distance() > 0;
+    const travels = distance() > 1;
     if (travels === Boolean(tween)) return false;
     if (tween) {
       tween.scrollTrigger?.kill(true);
@@ -175,13 +187,10 @@ function hallStrip(wide: boolean, ctx: gsap.Context): () => void {
     if (sync()) ScrollTrigger.refresh();
   };
   ScrollTrigger.addEventListener('refresh', onRefresh);
-  const onImageLoad = () => ScrollTrigger.refresh();
-  const pending = [...track.querySelectorAll('img')].filter((img) => !img.complete);
-  pending.forEach((img) => img.addEventListener('load', onImageLoad, { once: true }));
 
   return () => {
     ScrollTrigger.removeEventListener('refresh', onRefresh);
-    pending.forEach((img) => img.removeEventListener('load', onImageLoad));
     hall.classList.remove('js-rally');
+    if (tabindex !== null) track.setAttribute('tabindex', tabindex);
   };
 }

@@ -7,6 +7,8 @@ interface Props {
 }
 
 const { text, photos } = Astro.props;
+// A strip that can scroll is a region keyboard users must reach; one photo never scrolls.
+const scrolls = photos.length > 1;
 ---
 
 <section class="hall" aria-labelledby="hall-h">
@@ -17,7 +19,7 @@ const { text, photos } = Astro.props;
     </div>
     {
       photos.length > 0 && (
-        <div class="track" role="region" aria-label="Fotografii din sală" tabindex="0">
+        <div class="track" role="region" aria-label="Fotografii din sală" tabindex={scrolls ? 0 : undefined}>
           {photos.map((photo) => (
             <figure>
               <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
@@ -66,6 +68,17 @@ const { text, photos } = Astro.props;
   img {
     height: clamp(200px, 38vh, 340px);
     width: auto;
+  }
+  /* A single photo fills the column instead of running past it. */
+  figure:only-child {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  figure:only-child img {
+    width: 100%;
+    height: auto;
+    max-height: clamp(200px, 38vh, 340px);
+    object-fit: cover;
   }
   figure:nth-child(3) {
     margin-right: 12px;
