@@ -5,9 +5,11 @@ interface Props {
   lines: string[];
   text: string;
   photo?: Img;
+  /** Whether the page has a roster (#sportivi) to link to. */
+  rosterLink: boolean;
 }
 
-const { lines, text, photo } = Astro.props;
+const { lines, text, photo, rosterLink } = Astro.props;
 
 /** As in mockup D: lines at odd positions alternate .l1 / .l3, lines at even positions are .l2. */
 const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3');
@@ -22,7 +24,7 @@ const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3'
       <p class="src">{text}</p>
       <p class="hero-act">
         <a class="hero-go" href="#proba">Vino la un antrenament de probă</a>
-        <a class="hero-more" href="#sportivi">Vezi toți sportivii</a>
+        {rosterLink && <a class="hero-more" href="#sportivi">Vezi toți sportivii</a>}
       </p>
     </div>
     {
@@ -124,6 +126,11 @@ const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3'
   @media (max-width: 860px) {
     .wrap {
       grid-template-columns: minmax(0, 1fr);
+    }
+    /* A long line wraps instead of running off a narrow screen. */
+    h1 span {
+      white-space: normal;
+      text-wrap: balance;
     }
     .poster {
       justify-self: start;

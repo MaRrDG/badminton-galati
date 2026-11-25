@@ -6,6 +6,7 @@ import {
   groupsHeading,
   pointsUnit,
   postKindLabel,
+  rosterLayout,
   rosterOrder,
   splitCalendar,
   visibleAthletes,
@@ -209,5 +210,38 @@ describe('groupsHeading', () => {
 
   test('no groups says so instead of a count', () => {
     expect(groupsHeading([])).toBe('Nicio grupă deocamdată');
+  });
+});
+
+describe('rosterLayout', () => {
+  const unranked = (a: Athlete): Athlete => ({ ...a, rankings: [] });
+  const shape = (athletes: Athlete[]) =>
+    rosterLayout(athletes).map(b => [b.kind, b.rows.map(r => `${r.athlete.id}:${r.size}`)]);
+
+  test('three ranked: one large row, then two sharing a row', () => {
+    expect(shape([bordeianu, pazargic, nistor])).toEqual([['lead', ['1:first']], ['pair', ['2:second', '3:third']]]);
+  });
+
+  test('one ranked: the unranked athletes after it get compact rows, never the medium pair', () => {
+    expect(shape([unranked(bordeianu), nistor, unranked(pazargic)]))
+      .toEqual([['lead', ['1:first']], ['rest', ['3:third', '2:third']]]);
+  });
+
+  test('two ranked and one unranked: the unranked one takes the small half of the pair', () => {
+    expect(shape([unranked(bordeianu), nistor, pazargic])).toEqual([['lead', ['1:first']], ['pair', ['2:second', '3:third']]]);
+  });
+
+  test('nobody ranked: rows of equal size', () => {
+    expect(shape([unranked(nistor), unranked(pazargic)])).toEqual([['even-list', ['1:even', '2:even']]]);
+  });
+
+  test('shows at most three athletes, and none without consent', () => {
+    const fourth = { ...bordeianu, id: '5', name: 'Zamfir Ion', rankings: [{ category: 'U11', discipline: 'SB', place: 70 }] } satisfies Athlete;
+    expect(shape([fourth, hidden, bordeianu, pazargic, nistor]).flatMap(([, rows]) => rows))
+      .toEqual(['1:first', '2:second', '3:third']);
+  });
+
+  test('no athletes, no rows', () => {
+    expect(rosterLayout([])).toEqual([]);
   });
 });

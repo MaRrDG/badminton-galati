@@ -8,6 +8,8 @@ export const SERVERS = {
   'empty-season': { fixture: 'empty-season.json', port: 4330 },
   'no-rankings': { fixture: 'no-rankings.json', port: 4331 },
   'one-photo': { fixture: 'one-photo.json', port: 4332 },
+  'no-athletes': { fixture: 'no-athletes.json', port: 4333 },
+  'one-ranked': { fixture: 'one-ranked.json', port: 4334 },
 } as const;
 
 export type ServerName = keyof typeof SERVERS;

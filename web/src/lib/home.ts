@@ -36,6 +36,36 @@ export function rosterOrder(a: Athlete[], limit = Infinity): Athlete[] {
   return withBest.slice(0, limit).map(entry => entry.athlete);
 }
 
+export type RosterSize = 'first' | 'second' | 'third' | 'even';
+export type RosterRow = { athlete: Athlete; best?: Ranking; size: RosterSize };
+export type RosterBlock = { kind: 'lead' | 'pair' | 'rest' | 'even-list'; rows: RosterRow[] };
+
+/**
+ * The homepage roster: the first `HOME_ROSTER` athletes of `rosterOrder`, grouped in blocks.
+ * With places the first row is large and the next two share a row, led by a medium second
+ * place; the pair is formed only when the second athlete is ranked too, so an unranked athlete
+ * never takes the medium row. Everyone else follows as compact rows. Without places no athlete
+ * has earned a larger row, so all rows are the same size.
+ */
+export function rosterLayout(a: Athlete[]): RosterBlock[] {
+  const ordered = rosterOrder(a, HOME_ROSTER);
+  if (ordered.length === 0) return [];
+  // Ranked athletes come first, so an unranked first athlete means nobody has a place.
+  const ranked = bestRanking(ordered[0]) !== undefined;
+  const rows = ordered.map((athlete, i): RosterRow => {
+    const best = bestRanking(athlete);
+    const size: RosterSize = !ranked ? 'even' : i === 0 ? 'first' : i === 1 && best ? 'second' : 'third';
+    return { athlete, ...(best ? { best } : {}), size };
+  });
+  if (!ranked) return [{ kind: 'even-list', rows }];
+  const pairEnd = rows[1]?.size === 'second' ? 3 : 1;
+  return ([
+    { kind: 'lead', rows: rows.slice(0, 1) },
+    { kind: 'pair', rows: rows.slice(1, pairEnd) },
+    { kind: 'rest', rows: rows.slice(pairEnd) },
+  ] satisfies RosterBlock[]).filter(b => b.rows.length > 0);
+}
+
 /** Newest first (ISO dates compare as strings), at most `HOME_POSTS`. */
 export function latestPosts(p: Post[]): Post[] {
   return [...p].sort((x, y) => y.date.localeCompare(x.date)).slice(0, HOME_POSTS);

@@ -1,6 +1,6 @@
 ---
 import { formatRangeRo } from '../../lib/dates';
-import { HOME_ROSTER, bestRanking, disciplineLabel, pointsUnit, rosterOrder } from '../../lib/home';
+import { disciplineLabel, pointsUnit, rosterLayout } from '../../lib/home';
 import type { Athlete, Ranking, RankingWeek } from '../../lib/types';
 
 interface Props {
@@ -18,24 +18,10 @@ function rowLine(best: Ranking | undefined, isFirst: boolean): string | undefine
   return best.points === undefined ? base : `${base}, ${best.points} ${pointsUnit(best.points)}`;
 }
 
-const ordered = rosterOrder(athletes, HOME_ROSTER);
-// Ranked athletes come first, so an unranked first athlete means nobody has a place.
-const ranked = ordered.length > 0 && bestRanking(ordered[0]) !== undefined;
-
-const rows = ordered.map((athlete, i) => {
-  const best = bestRanking(athlete);
-  const size = !ranked ? 'even' : i === 0 ? 'first' : i === 1 ? 'second' : 'third';
-  return { athlete, best, size, line: rowLine(best, ranked && i === 0) };
-});
-// With places: the first row is large, the next two share a row, any others follow as compact
-// rows. Without places no athlete has earned a larger row, so all rows are the same size.
-const blocks = ranked
-  ? [
-      { kind: 'lead', rows: rows.slice(0, 1) },
-      { kind: 'pair', rows: rows.slice(1, 3) },
-      { kind: 'rest', rows: rows.slice(3) },
-    ].filter((b) => b.rows.length > 0)
-  : [{ kind: 'even-list', rows }];
+const blocks = rosterLayout(athletes).map(({ kind, rows }) => ({
+  kind,
+  rows: rows.map((row) => ({ ...row, line: rowLine(row.best, row.size === 'first') })),
+}));
 ---
 
 <section class="roster" id="sportivi" aria-labelledby="ros-h">
