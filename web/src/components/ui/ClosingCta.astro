@@ -28,9 +28,17 @@ const { text, display, label, href, email = false } = Astro.props;
 </section>
 
 <style>
+  /* As the last section of a short page it takes the window's spare height (base.css); the
+     content then stays in the middle of the red field. */
   .cta {
     background: var(--red-field);
     color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cta > .wrap {
+    width: 100%;
   }
   .btn {
     display: inline-block;

@@ -51,7 +51,7 @@ const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3'
   h1 {
     position: relative;
     z-index: 3;
-    font-size: clamp(3rem, 6.2vw, 5.9rem);
+    font-size: clamp(3rem, 6.2vw, calc(5.9rem + var(--lift) * 0.02));
   }
   h1 span {
     display: block;
@@ -99,6 +99,25 @@ const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3'
   .wrap > :global(.poster img) {
     object-position: 50% 0;
     transform-origin: 50% 10%;
+  }
+
+  /* Large screens (past the approved 1440px): the hero is the first screen. Its column fills
+     the window under the header, the content sits in the middle of it, and the headline and
+     poster grow with the window (the headline also with its height, so four lines always fit).
+     The column is what the scrub pins, so while pinned it still fills the window and the pin
+     spacer below it is never seen as an empty field. Without JS or with reduced motion there
+     is no pin: the hero is exactly one screen. */
+  @media (min-width: 1441px) {
+    .wrap {
+      min-height: calc(100vh - var(--head-h) - clamp(32px, 5.5vh, 60px) - clamp(44px, 7vh, 76px));
+      min-height: calc(100svh - var(--head-h) - clamp(32px, 5.5svh, 60px) - clamp(44px, 7svh, 76px));
+    }
+    h1 {
+      font-size: clamp(3rem, min(6.2vw, 10.5vh), calc(5.9rem + var(--lift) * 0.02));
+    }
+    .wrap > :global(.poster) {
+      width: min(100%, calc(min(66vh, 580px + var(--lift) * 0.4) * 0.667));
+    }
   }
 
   @media (max-width: 860px) {

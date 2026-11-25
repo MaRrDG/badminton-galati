@@ -28,6 +28,19 @@
   --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
   --body: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
 
-  --gut: clamp(16px, 4vw, 48px);
-  --col: 1180px;
+  /* Layout. The approved design is drawn up to 1440px wide; past that, --lift is how far the
+     viewport is wider than 1440px (0 up to 1440, capped at 2560), and every value that grows on
+     large screens is its 1440 value plus a share of --lift. At 1440 and below nothing changes. */
+  --lift: clamp(0px, 100vw - 1440px, 1120px);
+  --gut: clamp(16px, 4vw, calc(48px + var(--lift) * 0.03)); /* 48 → 82px */
+  --col: calc(1180px + var(--lift) * 0.27); /* content column: 1180 → 1482px */
+  /* Body text size; the root font size (base.css) grows by the same share, so every rem size,
+     display caps included, scales with it: 1 → 1.15 at 2560. */
+  --text: calc(17px + var(--lift) * 0.00228);
+  /* The wide header's height (10 + 46 logo + 10 + 3 border), for the full-screen hero. */
+  --head-h: 69px;
+}
+
+html {
+  font-size: calc(100% + var(--lift) * 0.00214);
 }

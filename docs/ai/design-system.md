@@ -26,15 +26,55 @@ săptămâna N, ..."), the footer from the shell.
 | `--ink-muted` | `#5d6b8a` | Weekday letters, "fără competiții", quiet borders; 5.34:1 on white |
 | `--display` | Big Shoulders Display (800, 900) | Headings, uppercase, line-height 0.95 |
 | `--body` | Instrument Sans Variable | Body, 17px / 1.5 |
-| `--col` | `1180px` | Content column (`.wrap`) |
-| `--gut` | `clamp(16px, 4vw, 48px)` | Side gutter |
+| `--col` | `1180px` (+27% of `--lift`, 1482px at 2560) | Content column (`.wrap`) |
+| `--gut` | `clamp(16px, 4vw, 48px)` (cap +3% of `--lift`, 82px at 2560) | Side gutter |
+| `--lift` | `clamp(0px, 100vw - 1440px, 1120px)` | How far the viewport is wider than 1440px; 0 up to 1440 (see Large screens) |
+| `--text` | `17px` (+0.228% of `--lift`) | Body text size |
+| `--head-h` | `69px` | Height of the wide header, for the full-screen hero |
 
 Fonts are self-hosted through `@fontsource` packages (bundled into `/_astro/`); no Google Fonts
 request at runtime (e2e test "fonts are self-hosted"). Section headings: `h2.display`,
 `clamp(2.2rem, 4.6vw, 4.2rem)`; hero headline `clamp(3rem, 6.2vw, 5.9rem)` (display type capped
-near 6rem). One breakpoint: `max-width: 860px` (CSS) / `min-width: 861px` (motion).
+near 6rem up to 1440px). One layout breakpoint: `max-width: 860px` (CSS) / `min-width: 861px`
+(motion); past 1440px only the large-screen growth below.
 
 Straight edges everywhere. Photos are treated as posters with an offset red plate behind.
+
+## Large screens (wider than 1440px)
+
+The approved design is drawn and tested up to 1440px. Supported up to 3840px wide (1920×1080,
+2560×1440 with its ≈2560×1300 browser viewport, 3440×1440 ultrawide, 3840×2160 at 100%).
+At 1440px and below every page is pixel-identical to the approved design: all growth is a share
+of `--lift`, which is 0 there, or sits in `@media (min-width: 1441px)`.
+
+- **Column and gutters** grow with `--lift` up to 2560px (column 1180 → 1482px), then stop: on
+  ultrawide and 4K the content stays centred with wide margins; colour fields still run edge to
+  edge.
+- **Type**: the root font size grows by up to 15% (`html` in `tokens.css`) and `--text` with it,
+  so every rem size (display caps, small text, rem paddings) scales together; body text reaches
+  19.6px at 2560. Paragraph measures are in `ch`, so line lengths stay as approved (under ~75
+  characters for body text; one footnote on the athletes wall and the calendar intro run
+  ~85, as at 1440). The hero headline grows a little faster (`5.9rem + 2% of --lift`, ≈131px at
+  2560) and is also held to `10.5vh` so its four lines fit a short window.
+- **Hero height rule**: from 1441px the hero is the first screen. Its column (the element the
+  scrub pins) has `min-height: 100svh - --head-h - the hero's paddings` and centres its content,
+  so the page ends exactly at the window's bottom edge at scroll 0. The scrub pins that column
+  for 70% of a viewport; while pinned it still fills the window, so the pin spacer below it is
+  never seen as an empty field, and the next section's top reaches the bottom edge just as the
+  pin ends. Hero height = window − header + 70% (pin). Without JS or with reduced motion there is
+  no pin and the hero is exactly one screen. (Before this rule, at 2560×1300 the content was a
+  598px column at the top and the 910px pin spacer below it showed as a blue half-screen.) The
+  poster's height follows `66vh`, capped at `580px + 40% of --lift`.
+- **Photos never upscale**: from 1441px a `PlatePhoto` frame is capped at the photo's own width
+  (`--natural`, computed from `width`/`height` and the crop ratio). Hall strip photos are
+  `clamp(200px, 38vh, 340px + 15% of --lift)` tall (≤ 508px; the local photos are 720px tall);
+  whether the strip pins is still measured, so a strip that fits the wider column does not pin.
+- **Short pages fill the window** (all sizes): `body` is a `min-height: 100svh` flex column, and
+  the last child of `<main>` takes the spare height, so the footer sits on the window's bottom
+  edge with no body background below it. A page taller than the window is unchanged. The closing
+  CTA centres its content in the grown red field; on the 404 page the spare height is sky above
+  the court (the drawing keeps its coordinates; the floor line stays on the footer), and from
+  1441px the drawing is sized so header, text, court and footer make one screen.
 
 ## Section order and why
 

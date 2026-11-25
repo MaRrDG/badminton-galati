@@ -179,6 +179,46 @@ test('heading drift follows the new width after a resize', async ({ page }) => {
   expect(x).toBeCloseTo(1000 * 0.07, 0);
 });
 
+test.describe('the hero on a large screen (2560×1300)', () => {
+  /** The visible hero (under the header), its content block and the space above and below it. */
+  const heroLayout = (page: Page) => page.evaluate(() => {
+    const hero = document.querySelector('.hero')!.getBoundingClientRect();
+    const parts = [document.querySelector('.hero .wrap > div')!, document.querySelector('.hero .poster')!].map(e => e.getBoundingClientRect());
+    const top = Math.min(...parts.map(r => r.top)), bottom = Math.max(...parts.map(r => r.bottom));
+    return { height: hero.height, above: top - hero.top, below: innerHeight - bottom, innerHeight };
+  });
+
+  test('the first screen is one composition and the scrub ends into the next section', async ({ page }) => {
+    await page.setViewportSize({ width: 2560, height: 1300 }); await page.goto('/', { waitUntil: 'networkidle' });
+    const first = await heroLayout(page);
+    expect(first.above).toBeGreaterThan(0);
+    expect(first.below, JSON.stringify(first)).toBeLessThanOrEqual(first.above * 1.6);
+    // The hero is the window under the header plus the pin distance (70% of the window), no more.
+    expect(first.height).toBeLessThanOrEqual(first.innerHeight * 1.7 + 1);
+    // At the end of the pin the lines have moved their full distance and the next section's
+    // content has not come into view yet.
+    const end = await page.evaluate(() => document.querySelector('.hero')!.getBoundingClientRect().top + scrollY + innerHeight * 0.7);
+    await page.evaluate(y => scrollTo(0, y), end); await page.waitForTimeout(1500);
+    const x = (sel: string) => page.evaluate(s => new DOMMatrix(getComputedStyle(document.querySelector(s)!).transform).m41, sel);
+    expect(await x('.hero .l2')).toBeCloseTo(2560 * 0.15, 0);
+    expect(await x('.hero .l1')).toBeCloseTo(2560 * -0.05, 0);
+    expect(await page.evaluate(() => document.querySelector('#why-h')!.getBoundingClientRect().top)).toBeGreaterThan(1300);
+  });
+
+  for (const mode of ['reduced motion', 'no JavaScript'] as const)
+    test(`with ${mode} the hero is one balanced screen, not a pin's height`, async ({ browser }) => {
+      const ctx = await browser.newContext({ viewport: { width: 2560, height: 1300 },
+        ...(mode === 'reduced motion' ? { reducedMotion: 'reduce' as const } : { javaScriptEnabled: false }) });
+      const page = await ctx.newPage();
+      await page.goto('/');
+      const l = await heroLayout(page);
+      await expect(page.locator('.pin-spacer')).toHaveCount(0);
+      expect(l.height).toBeLessThanOrEqual(l.innerHeight);
+      expect(l.below, JSON.stringify(l)).toBeLessThanOrEqual(l.above * 1.6);
+      await ctx.close();
+    });
+});
+
 test('reduced motion shows final states', async ({ browser }) => {
   const ctx = await browser.newContext({ reducedMotion: 'reduce' }); const page = await ctx.newPage();
   await pinClock(page);

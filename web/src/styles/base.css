@@ -12,8 +12,25 @@ body {
   background: var(--white);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 17px;
+  font-size: var(--text);
   line-height: 1.5;
+}
+/* A page shorter than the window still fills it: the footer sits on the window's bottom edge
+   and the last section of <main> takes the extra height, so no body background shows. A page
+   taller than the window is laid out exactly as before. */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+main > :last-child {
+  flex-grow: 1;
 }
 img {
   display: block;

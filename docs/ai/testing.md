@@ -116,6 +116,12 @@ When you add a spec or a new source folder, update this table in the script's he
   the scene; no overflow at 380 and 1440.
   `rally.test.ts` plays two minutes per layout: the racket head meets the shuttle at every hit,
   net faults happen but stay rare.
+- Large screens (home fixture, no extra build): at 2560×1300 the hero content is balanced in the
+  first screen (space below ≤ 1.6× above), the hero is at most window + pin, one screen without
+  JS or with reduced motion, and the scrub ends before `#why-h` shows (`motion.spec`); no
+  overflow at 2560/3440 and a body line under 80 characters (`home.spec`); the 404 page is one
+  screen with the footer on the bottom edge at 1920/2560/3440 (`not-found.spec`); a short
+  profile at 2560×1600 fills to the footer (`athletes.spec`).
 - Shell: Romanian nav and footer, no overflow at several widths, self-hosted fonts, narrow menu
   with and without JS, focus ring colour equals text colour; the menu marks a page's section
   (`aria-current="page"` on the page itself, `"true"` under it); the footer links the parents'

@@ -131,6 +131,21 @@ test.describe('an athlete profile', () => {
     await expect(page.locator('.ident .initial')).toHaveClass(/c-blue/);
   });
 
+  test('a profile shorter than the window still fills it down to the footer', async ({ page }) => {
+    // A 2560×1600 screen is taller than this profile, so the last section takes the rest.
+    await page.setViewportSize({ width: 2560, height: 1600 });
+    await page.goto('/sportivi/nistor-cristian-ionut/');
+    const m = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollHeight,
+      footBottom: document.querySelector('footer')!.getBoundingClientRect().bottom,
+      lastBottom: document.querySelector('main')!.lastElementChild!.getBoundingClientRect().bottom,
+      footTop: document.querySelector('footer')!.getBoundingClientRect().top,
+    }));
+    expect(m.scroll).toBe(1600);
+    expect(Math.abs(m.footBottom - 1600)).toBeLessThanOrEqual(1);
+    expect(Math.abs(m.lastBottom - m.footTop)).toBeLessThanOrEqual(1);
+  });
+
   test('the place rolls on load and is not read twice', async ({ page }) => {
     await page.goto('/sportivi/nistor-cristian-ionut/');
     await expect(page.locator('.standing [data-roll] i')).toHaveCount(1); // the motion layer built its digit cell

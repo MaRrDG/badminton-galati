@@ -75,7 +75,7 @@ const scrolls = photos.length > 1;
     flex: none;
   }
   .track > :global(figure) :global(img) {
-    height: clamp(200px, 38vh, 340px);
+    height: clamp(200px, 38vh, calc(340px + var(--lift) * 0.15));
     width: auto;
   }
   /* The plate hangs below the photo without making the strip taller. */
@@ -96,7 +96,7 @@ const scrolls = photos.length > 1;
   .track > :global(figure:only-child) :global(img) {
     width: 100%;
     height: auto;
-    max-height: clamp(200px, 38vh, 340px);
+    max-height: clamp(200px, 38vh, calc(340px + var(--lift) * 0.15));
     object-fit: cover;
   }
   @media (max-width: 860px) {
