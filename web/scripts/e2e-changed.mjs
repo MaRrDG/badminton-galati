@@ -2,84 +2,117 @@
 // this branch, uncommitted and untracked files alike). Extra arguments go to Playwright;
 // `--base <ref>` compares against another ref.
 //
-// Playwright's own `--only-changed=<ref>` follows imports between test files only, so it
-// catches a changed spec or e2e helper but never a site source file: the specs reach the site
-// over HTTP. Site files are mapped to specs here instead. Paths are relative to web/.
+// The specs reach the site over HTTP, so no import graph links them to the site sources and
+// Playwright's own `--only-changed` cannot see a component or lib change. Changed files are
+// mapped to specs here instead. The rule is over-selection, never silence: a path that is not
+// known to be irrelevant runs every spec.
 //
-//   src/scripts/**                     motion, scroll-scan, home (hero settles, wrapped-line scrub)
-//   src/components/home/**             home, motion, scroll-scan (every section has a drifting heading)
+// Paths relative to the repository root:
+//   pnpm-lock.yaml, pnpm-workspace.yaml, package.json, .npmrc   every spec (dependencies)
+//   studio/, docs/, deploy/, scripts/, .superpowers/, *.md, .gitignore, .deploy.env.example
+//                                                               no e2e spec (not part of the site)
+//   any other path outside web/                                 every spec
+// Paths relative to web/:
+//   src/scripts/**                     motion, scroll-scan, home, build-output
+//   src/components/home/**             home, motion, scroll-scan, build-output
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
-//   src/components/Site*.astro         shell, home (no-JS content and overflow cover the whole page)
-//   src/lib/**                         home (content, consent, countdown), motion (what the motion
-//                                      paths get), build-output (the read token stays out)
-//   src/fixtures/home.json             every spec (the default server)
-//   src/fixtures/{sparse,mixed-strip}.json   home, motion, scroll-scan
-//   src/fixtures/quiet-season.json     home
-//   anything else that feeds the build or the runner (src/pages, src/layouts, src/styles,
-//   public, astro.config.mjs, package.json, tsconfig.json, playwright.config.ts,
-//   scripts/playwright.mjs)            every spec
-//   tests/e2e/**                       left to Playwright's --only-changed (spec + its imports)
-//   tests/unit/**, other scripts       no e2e spec
-import { execFileSync, spawnSync } from 'node:child_process';
+//   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan
+//   tests/e2e/<name>.spec.ts           that spec
+//   tests/unit/**, vitest.config.ts, .env.example, *.md   no e2e spec
+//   everything else (src/lib, Site*.astro, layouts, pages, styles, public, src/fixtures/home.json,
+//   tests/e2e helpers and setup, build and runner config, these scripts)   every spec
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const WEB = fileURLToPath(new URL('../', import.meta.url));
+const PLAYWRIGHT = fileURLToPath(new URL('../node_modules/.bin/playwright', import.meta.url));
 
 const ALL = 'all';
+const NONE = [];
 const SHELL = 'shell.spec.ts', HOME = 'home.spec.ts', MOTION = 'motion.spec.ts';
 const SCAN = 'scroll-scan.spec.ts', BUILD = 'build-output.spec.ts';
 
-/** First matching rule wins. */
-const RULES = [
-  [/^src\/scripts\//, [MOTION, SCAN, HOME]],
-  [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL]],
-  [/^src\/components\/home\//, [HOME, MOTION, SCAN]],
-  [/^src\/components\/Site[^/]*\.astro$/, [SHELL, HOME]],
-  [/^src\/lib\//, [HOME, MOTION, BUILD]],
-  [/^src\/fixtures\/home\.json$/, ALL],
-  [/^src\/fixtures\/(sparse|mixed-strip)\.json$/, [HOME, MOTION, SCAN]],
-  [/^src\/fixtures\/quiet-season\.json$/, [HOME]],
-  [/^tests\/e2e\//, []],
-  [/^tests\/unit\//, []],
-  [/^scripts\/e2e-changed\.mjs$/, []],
-  [/^(src|public)\//, ALL],
-  [/^(astro\.config\.mjs|package\.json|tsconfig\.json|playwright\.config\.ts|scripts\/playwright\.mjs)$/, ALL],
+/** Outside web/, relative to the repository root. First match wins; no match runs every spec. */
+const ROOT_RULES = [
+  [/^(pnpm-lock\.yaml|pnpm-workspace\.yaml|package\.json|\.npmrc)$/, ALL],
+  [/^(studio|docs|deploy|scripts|\.superpowers)\//, NONE],
+  [/^[^/]+\.md$/, NONE],
+  [/^(\.gitignore|\.deploy\.env\.example)$/, NONE],
 ];
+
+/** Inside web/, relative to web/. First match wins; no match runs every spec. */
+const WEB_RULES = [
+  [/^src\/scripts\//, [MOTION, SCAN, HOME, BUILD]],
+  [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
+  [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],
+  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN]],
+  [/^tests\/e2e\/([^/]+\.spec\.ts)$/, m => [m[1]]],
+  [/^tests\/unit\//, NONE],
+  [/^(vitest\.config\.ts|\.env\.example|[^/]+\.md)$/, NONE],
+];
+
+const fail = message => {
+  console.error(`e2e:changed: ${message}`);
+  process.exit(1);
+};
 
 const args = process.argv.slice(2);
 if (args[0] === '--') args.shift();
 let base = 'dev';
 const at = args.indexOf('--base');
-if (at !== -1) [, base] = args.splice(at, 2);
-
-const git = (...a) => execFileSync('git', a, { encoding: 'utf8' }).split('\n').filter(Boolean);
-const changed = [...git('diff', '--name-only', '--relative', base), ...git('ls-files', '--others', '--exclude-standard')];
-
-let all = false;
-const mapped = new Set();
-for (const file of changed) {
-  const rule = RULES.find(([re]) => re.test(file));
-  if (!rule) continue;
-  if (rule[1] === ALL) all = true;
-  else rule[1].forEach(s => mapped.add(s));
+if (at !== -1) {
+  base = args[at + 1];
+  args.splice(at, 2);
+  if (!base) fail('--base needs a git ref.');
 }
 
-const playwright = extra => spawnSync('playwright', ['test', ...extra, ...args], { stdio: 'inherit' }).status ?? 1;
+const git = (...a) => {
+  const r = spawnSync('git', a, { cwd: WEB, encoding: 'utf8' });
+  if (r.error) fail(`could not run git (${r.error.message}).`);
+  return r;
+};
+if (git('rev-parse', '--verify', '--quiet', `${base}^{commit}`).status !== 0) fail(`"${base}" is not a commit or branch here.`);
+const lines = r => {
+  if (r.status !== 0) fail(r.stderr.trim());
+  return r.stdout.split('\n').filter(Boolean);
+};
+const root = lines(git('rev-parse', '--show-toplevel'))[0];
+const changed = [
+  ...lines(git('-C', root, 'diff', '--name-only', base, '--')),
+  ...lines(git('-C', root, 'ls-files', '--others', '--exclude-standard')),
+];
 
-if (all) {
-  console.log(`e2e:changed: a change against ${base} feeds every page; running every spec.`);
+/** The specs a changed path selects, or ALL. */
+function specsFor(path) {
+  const [rules, rel] = path.startsWith('web/') ? [WEB_RULES, path.slice(4)] : [ROOT_RULES, path];
+  for (const [re, then] of rules) {
+    const m = rel.match(re);
+    if (m) return typeof then === 'function' ? then(m) : then;
+  }
+  return ALL;
+}
+
+const playwright = extra => {
+  const r = spawnSync(PLAYWRIGHT, ['test', ...extra, ...args], { cwd: WEB, stdio: 'inherit' });
+  if (r.error) fail(`could not start Playwright at ${PLAYWRIGHT} (${r.error.message}); run pnpm install.`);
+  return r.status ?? 1;
+};
+
+const specs = new Set();
+const everything = changed.filter(path => {
+  const s = specsFor(path);
+  if (s !== ALL) s.forEach(x => specs.add(x));
+  return s === ALL;
+});
+
+if (everything.length) {
+  console.log(`e2e:changed: ${everything.slice(0, 3).join(', ')}${everything.length > 3 ? ', …' : ''} changed against ${base}; running every spec.`);
   process.exit(playwright([]));
 }
-
-// The specs Playwright itself sees as changed (a spec, or a helper it imports).
-const listed = spawnSync('playwright', ['test', `--only-changed=${base}`, '--list', '--reporter=json'], { encoding: 'utf8' });
-if (listed.status !== 0) {
-  process.stderr.write(listed.stderr);
-  process.exit(listed.status ?? 1);
-}
-const own = JSON.parse(listed.stdout).suites.map(s => s.file).filter(f => f.endsWith('.spec.ts'));
-const specs = [...new Set([...mapped, ...own])].sort();
-
-if (specs.length === 0) {
+if (specs.size === 0) {
   console.log(`e2e:changed: no e2e spec is affected by the changes against ${base}.`);
   process.exit(0);
 }
-console.log(`e2e:changed: ${specs.join(', ')}`);
-process.exit(playwright(specs.map(s => `tests/e2e/${s}`)));
+const list = [...specs].sort();
+console.log(`e2e:changed: ${list.join(', ')}`);
+process.exit(playwright(list.map(s => `tests/e2e/${s}`)));
