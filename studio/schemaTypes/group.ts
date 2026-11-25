@@ -36,7 +36,7 @@ export const group = defineType({
       name: 'schedule',
       title: 'Program',
       type: 'string',
-      description: 'Zilele și orele antrenamentelor. Lasă gol până se stabilesc.',
+      description: 'Zilele și orele antrenamentelor, de exemplu „Luni și miercuri, 17:00–18:30”. Lasă gol până se stabilesc.',
     }),
     defineField({
       name: 'order',
@@ -47,7 +47,8 @@ export const group = defineType({
     }),
   ],
   preview: {
-    select: { title: 'name', subtitle: 'audience' },
+    select: { title: 'name', schedule: 'schedule' },
+    prepare: ({ title, schedule }) => ({ title, subtitle: schedule || 'Programul nu e completat încă' }),
   },
   orderings: [{ title: 'Ordinea de pe site', name: 'orderAsc', by: [{ field: 'order', direction: 'asc' }] }],
 });
