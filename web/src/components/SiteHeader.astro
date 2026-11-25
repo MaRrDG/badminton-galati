@@ -76,6 +76,9 @@ const current = Astro.url.pathname;
     padding: 9px 16px;
     cursor: pointer;
   }
+  .menu summary:focus-visible {
+    outline-color: var(--ink);
+  }
   .menu summary::-webkit-details-marker {
     display: none;
   }

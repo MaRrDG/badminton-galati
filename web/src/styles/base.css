@@ -23,10 +23,12 @@ img {
 a {
   color: inherit;
 }
+/* The ring takes the text colour: ink on light fields, white on blue and red. Controls that
+   sit on their own background set the colour of the field around them instead. */
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible {
-  outline: 3px solid var(--court);
+  outline: 3px solid currentColor;
   outline-offset: 3px;
 }
 h1,
@@ -83,6 +85,9 @@ h2.display {
 }
 .skip-link:focus {
   transform: none;
+}
+.skip-link:focus-visible {
+  outline-color: var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

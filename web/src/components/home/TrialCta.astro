@@ -20,7 +20,7 @@ const email = 'siderurgistul@badmintongalati.ro';
 
 <style>
   .cta {
-    background: var(--red);
+    background: var(--red-field);
     color: var(--white);
     padding: clamp(48px, 7vw, 96px) 0;
   }
@@ -48,6 +48,9 @@ const email = 'siderurgistul@badmintongalati.ro';
     font-size: 1.05rem;
     padding: 15px 26px;
     text-decoration: none;
+  }
+  .btn:focus-visible {
+    outline-color: var(--white);
   }
   .btn:hover {
     background: var(--ink);

@@ -8,7 +8,8 @@
 :root {
   --blue: #1549a8;
   --blue-deep: #0c2f74;
-  --red: #e23a45;
+  --red: #e23a45; /* accents: plates, the first rank numeral, small marks */
+  --red-field: #d63340; /* red sections that carry white text (4.77:1) */
   --red-ink: #c2222d; /* darker red for small text on white */
   --white: #ffffff;
   --mist: #e8eef8;
