@@ -36,7 +36,8 @@ Repo artefacts (code, comments, docs, commits) are English; site copy and Studio
   dashed pills, all-caps eyebrows, 01/02/03 markers, fade-in per section, charts without real
   data. Also: arrow-suffixed buttons, one accented word in a headline. See `docs/ai/design-system.md`.
 - **Motion** only the five approved moments (hero load, hero scrub, roster numerals, heading drift,
-  hall strip). `prefers-reduced-motion` shows final states; all content works without JS.
+  hall strip), plus the rally on the 404 page. `prefers-reduced-motion` shows final states; all
+  content works without JS.
 - Every `<img>` has `width` and `height` (motion distances depend on it).
 - Text on red fields uses `--red-field` (white 4.77:1); `--red` is for accents only (4.26:1).
 

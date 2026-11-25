@@ -31,7 +31,10 @@ No request to Sanity is made from the browser, and the read token never reaches 
 | `web/src/lib/sanity.ts` | `HOME_QUERY` (one GROQ request, already filters `consent == true`, slices 3 posts), `fetchHomeQuery()` (client with token, `useCdn: false`, `perspective: 'published'`), `toHomeData()` (null-tolerant mapping; drops images without url, size or alt) |
 | `web/src/lib/home.ts` | Pure homepage logic: consent filter, roster order and layout, calendar split, countdown wording, Romanian plurals, labels, `groupsHeading`. Caps `HOME_POSTS = 3`, `HOME_ROSTER = 3` |
 | `web/src/lib/dates.ts` | ISO date strings in the Europe/Bucharest calendar, Romanian formatting, `todayInBucharest()` |
-| `web/src/pages/index.astro` | The only page. Omits the roster section and the hero's "Vezi toți sportivii" link when no athlete is visible |
+| `web/src/pages/404.astro` | The not-found page: copy, ways out, and `components/notfound/RallyScene.astro` (the 404 net and two players as static SVG, once per framing) |
+| `web/src/lib/rally/` | The 404 rally without DOM: `court.ts` (framings, the net's digits and cords), `flight.ts` (shuttle drag, launch solvers), `figure.ts` (jointed silhouette to transforms), `rally.ts` (shots, footwork, net faults; `frame()` also yields the still frame at build time) |
+| `web/src/scripts/rally.ts` | `initRally()`: steps the rally per animation frame and writes transforms; taps ask a player to smash |
+| `web/src/pages/index.astro` | The homepage. Omits the roster section and the hero's "Vezi toți sportivii" link when no athlete is visible |
 | `web/src/layouts/Base.astro` | `<html lang="ro">`, head, skip link, header, footer |
 | `web/src/components/Site{Header,Footer}.astro` | Shell. Nav links to `/sportivi/`, `/program/`, `/calendar/`, `/noutati/`, `/contact/` point to pages that do not exist yet (plan 2) |
 | `web/src/components/home/*.astro` | One component per section: Hero, Why, Groups, CalendarBand, Roster, Hall, News, TrialCta |
@@ -85,7 +88,8 @@ Target: Mario's own server, behind his SSO, not public and not indexed. The firs
 
 - `deploy/docker-compose.yml`: one `nginx:alpine` service, container `badminton-galati`, bound to
   `127.0.0.1:3013`, `restart: always`, mounts `./dist` and `./nginx.conf` read-only.
-- `deploy/nginx.conf`: `try_files $uri $uri/ =404` with `index.html`, plain nginx 404, gzip,
+- `deploy/nginx.conf`: `try_files $uri $uri/ =404` with `index.html`, `error_page 404 /404.html`
+  (the site's 404 page, status kept, not cached), gzip,
   `/_astro/` cached for a year (`immutable`), everything else 5 minutes, `X-Robots-Tag: noindex,
   nofollow` on every response, relative redirects (`absolute_redirect off`).
 - `scripts/deploy.sh` (`pnpm deploy:test [--dry-run]`): reads `DEPLOY_HOST`, `DEPLOY_USER`,
