@@ -1,4 +1,6 @@
 ---
+import { isCurrent } from '../lib/nav';
+
 const items = [
   { label: 'Acasă', href: '/' },
   { label: 'Sportivi', href: '/sportivi/' },
@@ -7,7 +9,9 @@ const items = [
   { label: 'Noutăți', href: '/noutati/' },
   { label: 'Contact', href: '/contact/' },
 ];
-const current = Astro.url.pathname;
+const path = Astro.url.pathname;
+/** "page" on the entry's own page; "true" on a page under its section (an article, a profile). */
+const currentOf = (href: string) => (href === path ? 'page' : isCurrent(href, path) ? 'true' : undefined);
 ---
 
 <header class="site-header">
@@ -23,7 +27,7 @@ const current = Astro.url.pathname;
           {
             items.map((item) => (
               <li>
-                <a href={item.href} aria-current={item.href === current ? 'page' : undefined}>
+                <a href={item.href} aria-current={currentOf(item.href)}>
                   {item.label}
                 </a>
               </li>

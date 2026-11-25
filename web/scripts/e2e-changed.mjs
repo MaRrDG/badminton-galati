@@ -16,6 +16,8 @@
 //   src/pages/404.astro, src/components/notfound/**, src/lib/rally/**, src/scripts/rally.ts
 //                                      not-found, build-output (the 404 page and its rally)
 //   src/components/ui/**               every spec (shared by the homepage and every inner page)
+// Every inner-page rule below also selects inner-pages and shell (the sweep of every inner page
+// at every width, and the 380px / images / no-JS pass over them):
 //   src/pages/sportivi/**, src/components/athletes/**   athletes, build-output
 //   src/pages/calendar/**, src/components/calendar/**   calendar, home, build-output
 //   src/pages/noutati/index.astro, src/components/news/**   news, article
@@ -30,7 +32,7 @@
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
 //   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan, athletes, calendar,
 //                                                         news, article, program, parents, contact,
-//                                                         build-output
+//                                                         inner-pages, not-found, shell, build-output
 //   tests/e2e/<name>.spec.ts           that spec
 //   tests/unit/**, vitest.config.ts, .env.example, *.md   no e2e spec
 //   everything else (src/lib, Site*.astro, layouts, pages, styles, public, src/fixtures/home.json,
@@ -47,6 +49,8 @@ const SHELL = 'shell.spec.ts', HOME = 'home.spec.ts', MOTION = 'motion.spec.ts';
 const SCAN = 'scroll-scan.spec.ts', BUILD = 'build-output.spec.ts', NOT_FOUND = 'not-found.spec.ts';
 const ATHLETES = 'athletes.spec.ts', CALENDAR = 'calendar.spec.ts', NEWS = 'news.spec.ts', ARTICLE = 'article.spec.ts';
 const PROGRAM = 'program.spec.ts', PARENTS = 'parents.spec.ts', CONTACT = 'contact.spec.ts';
+/** The sweep of every inner page, and the shell's pass over them. */
+const INNER = ['inner-pages.spec.ts', SHELL];
 
 /** Outside web/, relative to the repository root. First match wins; no match runs every spec. */
 const ROOT_RULES = [
@@ -60,17 +64,17 @@ const ROOT_RULES = [
 const WEB_RULES = [
   [/^src\/(pages\/404\.astro|components\/notfound\/|lib\/rally\/|scripts\/rally\.ts)/, [NOT_FOUND, BUILD]],
   [/^src\/components\/ui\//, ALL],
-  [/^src\/(pages\/sportivi|components\/athletes)\//, [ATHLETES, BUILD]],
-  [/^src\/(pages\/calendar|components\/calendar)\//, [CALENDAR, HOME, BUILD]],
-  [/^src\/(pages\/noutati\/index\.astro$|components\/news\/)/, [NEWS, ARTICLE]],
-  [/^src\/(pages\/noutati\/\[slug\]|scripts\/(lightbox|share)\.ts$)/, [ARTICLE]],
-  [/^src\/(pages\/program|components\/program)\//, [PROGRAM]],
-  [/^src\/(pages\/pentru-parinti|components\/parents)\//, [PARENTS]],
-  [/^src\/((pages|components)\/contact\/|scripts\/trial-form\.ts$)/, [CONTACT]],
-  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, CALENDAR, NEWS, ARTICLE, PROGRAM, PARENTS, CONTACT, BUILD]],
+  [/^src\/(pages\/sportivi|components\/athletes)\//, [ATHLETES, BUILD, ...INNER]],
+  [/^src\/(pages\/calendar|components\/calendar)\//, [CALENDAR, HOME, BUILD, ...INNER]],
+  [/^src\/(pages\/noutati\/index\.astro$|components\/news\/)/, [NEWS, ARTICLE, ...INNER]],
+  [/^src\/(pages\/noutati\/\[slug\]|scripts\/(lightbox|share)\.ts$)/, [ARTICLE, ...INNER]],
+  [/^src\/(pages\/program|components\/program)\//, [PROGRAM, ...INNER]],
+  [/^src\/(pages\/pentru-parinti|components\/parents)\//, [PARENTS, ...INNER]],
+  [/^src\/((pages|components)\/contact\/|scripts\/trial-form\.ts$)/, [CONTACT, ...INNER]],
+  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, CALENDAR, NEWS, ARTICLE, PROGRAM, PARENTS, CONTACT, BUILD, ...INNER]],
   [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
   [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],
-  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, CALENDAR, NEWS, ARTICLE, PROGRAM, PARENTS, CONTACT, BUILD]],
+  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, CALENDAR, NEWS, ARTICLE, PROGRAM, PARENTS, CONTACT, NOT_FOUND, BUILD, ...INNER]],
   [/^tests\/e2e\/([^/]+\.spec\.ts)$/, m => [m[1]]],
   [/^tests\/unit\//, NONE],
   [/^(vitest\.config\.ts|\.env\.example|[^/]+\.md)$/, NONE],

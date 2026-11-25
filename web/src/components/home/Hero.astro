@@ -6,7 +6,7 @@ interface Props {
   lines: string[];
   text: string;
   photo?: Img;
-  /** Whether the page has a roster (#sportivi) to link to. */
+  /** Whether there is an athlete to show, so the athletes page is worth a link. */
   rosterLink: boolean;
 }
 
@@ -25,7 +25,7 @@ const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3'
       <p class="src">{text}</p>
       <p class="hero-act">
         <a class="hero-go" href="#proba">Vino la un antrenament de probă</a>
-        {rosterLink && <a class="hero-more" href="#sportivi">Vezi toți sportivii</a>}
+        {rosterLink && <a class="hero-more" href="/sportivi/">Vezi toți sportivii</a>}
       </p>
     </div>
     {photo && <PlatePhoto class="poster" img={photo} offset={18} ratio="2 / 3" loading="eager" priority />}

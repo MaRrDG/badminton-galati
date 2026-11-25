@@ -1,5 +1,5 @@
 ---
-import { CLUB_EMAIL as email } from '../lib/club';
+import { CLUB_EMAIL as email, FACEBOOK_URL } from '../lib/club';
 
 const links = [
   { label: 'Federația Română de Badminton', href: 'https://www.badminton.ro/' },
@@ -8,7 +8,7 @@ const links = [
 ];
 ---
 
-<footer class="site-footer" id="contact">
+<footer class="site-footer">
   <div class="wrap">
     <div>
       <h2>CS Siderurgistul Galați</h2>
@@ -23,6 +23,8 @@ const links = [
     <div>
       <h2>Contact</h2>
       <p><a href={`mailto:${email}`}>{email}</a></p>
+      <p><a href="/pentru-parinti/">Pentru părinți</a></p>
+      <p><a href={FACEBOOK_URL}>Facebook</a></p>
     </div>
     <div>
       <h2>Badminton</h2>

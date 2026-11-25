@@ -142,19 +142,26 @@ export function plannerRows(p: Planner): string {
   return ['auto', ...runs, '1px'].join(' ');
 }
 
+/** A stretch of the schedule line; `provisional` on hours given only as an example (hatched). */
+export type SchedulePart = { text: string; provisional?: boolean };
+
 /**
  * A group's week in one line: "Luni, miercuri, vineri, 17:00–18:30" when every day has the same
- * hours, otherwise "Luni 18:30–20:30, sâmbătă 10:00–12:00". Undefined without sessions.
+ * hours (and all are confirmed, or all are examples), otherwise "Luni 18:30–20:30, sâmbătă
+ * 10:00–12:00". The hours are parts of their own, so example hours can be hatched as on the
+ * timetable; the days stay plain. Empty without sessions.
  */
-export function scheduleLabel(sessions: Session[]): string | undefined {
-  if (sessions.length === 0) return undefined;
+export function scheduleParts(sessions: Session[]): SchedulePart[] {
+  if (sessions.length === 0) return [];
   const sorted = [...sessions].sort((a, b) => a.day - b.day || minutes(a.start) - minutes(b.start));
   const day = (d: number, i: number) => (i === 0 ? DAY_NAMES[d - 1] : DAY_NAMES[d - 1].toLowerCase());
-  if (sorted.every(s => span(s) === span(sorted[0]))) {
+  const hours = (s: Session): SchedulePart => ({ text: span(s), provisional: s.provisional === true });
+  const [first] = sorted;
+  if (sorted.every(s => span(s) === span(first) && (s.provisional === true) === (first.provisional === true))) {
     const days = [...new Set(sorted.map(s => s.day))];
-    return `${days.map(day).join(', ')}, ${span(sorted[0])}`;
+    return [{ text: `${days.map(day).join(', ')}, ` }, hours(first)];
   }
-  return sorted.map((s, i) => `${day(s.day, i)} ${span(s)}`).join(', ');
+  return sorted.flatMap((s, i) => [{ text: `${i === 0 ? '' : ', '}${day(s.day, i)} ` }, hours(s)]);
 }
 
 export type ProgramPage = {

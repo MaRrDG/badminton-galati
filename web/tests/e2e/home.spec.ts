@@ -120,6 +120,24 @@ for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${wi
   }
 });
 
+test('the homepage leads to the inner pages', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.hero').getByRole('link', { name: 'Vezi toți sportivii' })).toHaveAttribute('href', '/sportivi/');
+  const roster = page.locator('#sportivi');
+  for (const [name, slug] of [['Nistor Cristian-Ionuț', 'nistor-cristian-ionut'], ['Pazargic Ligia-Beatrice', 'pazargic-ligia-beatrice'], ['Bordeianu Nectarie-Ioan', 'bordeianu-nectarie-ioan']])
+    await expect(roster.getByRole('heading', { name }).getByRole('link', { name })).toHaveAttribute('href', `/sportivi/${slug}/`);
+  const groups = page.locator('#program');
+  for (const [name, slug] of [['Inițiere', 'initiere'], ['Performanță', 'performanta'], ['Elite', 'elite'], ['Amatori copii', 'amatori-copii'], ['Amatori adulți', 'amatori-adulti']])
+    await expect(groups.getByRole('link', { name, exact: true })).toHaveAttribute('href', `/program/#${slug}`);
+  const cta = page.locator('#proba');
+  await expect(cta.getByRole('link', { name: 'Cere un antrenament de probă' })).toHaveAttribute('href', '/contact/#formular');
+  await expect(cta).toContainText('sau scrieți la siderurgistul@badmintongalati.ro');
+  await expect(cta.getByRole('link', { name: 'siderurgistul@badmintongalati.ro' })).toHaveAttribute('href', 'mailto:siderurgistul@badmintongalati.ro');
+  await expect(page.getByRole('link', { name: 'Toate articolele' })).toHaveAttribute('href', '/noutati/');
+  await expect(page.getByRole('link', { name: 'Toți sportivii clubului' })).toHaveAttribute('href', '/sportivi/');
+  await expect(page.locator('main a[href^="#"]:not([href="#proba"])')).toHaveCount(0);
+});
+
 test('calendar: next event with countdown, then three played events', async ({ page }) => {
   await page.goto('/');
   const cal = page.locator('#calendar');
@@ -179,8 +197,14 @@ test.describe('groups with sessions', on('quiet-season'), () => {
   test('each group shows its week in one line', async ({ page }) => {
     await page.goto('/');
     const g = page.locator('#program');
-    await expect(g.getByRole('listitem').filter({ hasText: 'Inițiere' }).locator('.schedule')).toHaveText('Luni, miercuri, vineri, 17:00–18:30');
+    const initiere = g.getByRole('listitem').filter({ hasText: 'Inițiere' }).locator('.schedule');
+    await expect(initiere).toHaveText('Luni, miercuri, vineri, 17:00–18:30, oră dată ca exemplu');
     await expect(g.locator('.schedule')).toHaveCount(5);
+    // Example hours are hatched as on /program/: the hours, not the days.
+    await expect(initiere.locator('.sample')).toHaveText('17:00–18:30');
+    // One time for Inițiere and Amatori copii; the others list each day's time (Amatori adulți
+    // ends earlier on Mondays).
+    await expect(g.locator('.schedule .sample')).toHaveCount(1 + 4 + 3 + 1 + 3);
   });
 });
 
@@ -188,7 +212,7 @@ test.describe('no athlete may be shown', on('sparse'), () => {
   test('the roster and every link to it are left out', async ({ page }) => {
     const html = await (await page.goto('/'))!.text();
     await expect(page.locator('#sportivi')).toHaveCount(0);
-    await expect(page.locator('a[href="#sportivi"]')).toHaveCount(0);
+    await expect(page.locator('main a[href="#sportivi"], main a[href^="/sportivi/"]')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Vezi toți sportivii' })).toHaveCount(0);
     expect(html).not.toContain('Fără-Acord');
   });

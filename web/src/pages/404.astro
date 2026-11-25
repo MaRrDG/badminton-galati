@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import RallyScene from '../components/notfound/RallyScene.astro';
+import { getAthletesPage } from '../lib/content';
 import { makeLayout } from '../lib/rally/court';
 
 // The page's strip of floor has to meet the one inside each drawing, so it takes their measures.
@@ -11,12 +12,15 @@ const measures = (['wide', 'tall'] as const)
   })
   .join(';');
 
-// The section pages of the menu arrive with plan 2; until then these lead to the homepage sections.
+// The section pages of the menu. The athletes page only when its wall shows an athlete (the
+// wall holds consented athletes only); an empty wall is no way out.
+const { tiles } = await getAthletesPage();
 const ways = [
-  { label: 'Program', href: '/#program' },
-  { label: 'Calendar', href: '/#calendar' },
-  { label: 'Noutăți', href: '/#noutati' },
-  { label: 'Contact', href: '/#contact' },
+  ...(tiles.length > 0 ? [{ label: 'Sportivi', href: '/sportivi/' }] : []),
+  { label: 'Program', href: '/program/' },
+  { label: 'Calendar', href: '/calendar/' },
+  { label: 'Noutăți', href: '/noutati/' },
+  { label: 'Contact', href: '/contact/' },
 ];
 ---
 

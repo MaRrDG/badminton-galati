@@ -7,7 +7,7 @@ merge or push; keep e2e fast.
 
 | Layer | Where | Runs with |
 |---|---|---|
-| Web unit (Vitest) | `web/tests/unit/` (`home`, `dates`, `content`, `tokens`) | `pnpm -C web test` |
+| Web unit (Vitest) | `web/tests/unit/` (one file per `src/lib` module: `home`, `dates`, `content`, `nav`, `program`, …) | `pnpm -C web test` |
 | Studio unit (Vitest) | `studio/tests/schema.test.ts` (model + seed, no network) | `pnpm --filter studio test` |
 | E2E (Playwright, Chrome at `/usr/bin/google-chrome`) | `web/tests/e2e/*.spec.ts` against built previews | `pnpm e2e` |
 | Static checks | `pnpm -C web check` (astro check), `pnpm --filter studio typecheck`, `pnpm --filter studio validate` | |
@@ -72,19 +72,26 @@ A test runs on `home` unless tagged: `test.describe('…', on('sparse'), () => �
 |---|---|
 | `src/pages/404.astro`, `src/components/notfound/**`, `src/lib/rally/**`, `src/scripts/rally.ts` | not-found, build-output |
 | `src/components/ui/**` (shared by the homepage and every inner page) | all |
-| `src/pages/sportivi/**`, `src/components/athletes/**` | athletes, build-output |
-| `src/pages/calendar/**`, `src/components/calendar/**` | calendar, home, build-output |
-| `src/pages/noutati/index.astro`, `src/components/news/**` | news, article |
-| `src/scripts/**` | motion, scroll-scan, home, athletes, calendar, news, build-output |
-| `src/components/home/{Hero,CalendarBand,News,TrialCta}.astro` | home, motion, scroll-scan, shell |
-| `src/components/home/**` | home, motion, scroll-scan |
-| `src/components/Site*.astro` | shell, home |
-| `src/lib/**` | home, motion, build-output |
-| `src/fixtures/home.json` | all |
-| `src/fixtures/{sparse,mixed-strip,quiet-season}.json` | home, motion, scroll-scan, athletes, calendar, news, build-output |
-| `tests/e2e/**` | Playwright's own `--only-changed` (spec + importers) |
-| `tests/unit/**`, `scripts/e2e-changed.mjs` | none |
-| other `src/`, `public/`, `astro.config.mjs`, `package.json`, `tsconfig.json`, `playwright.config.ts`, `scripts/playwright.mjs` | all |
+| `src/pages/sportivi/**`, `src/components/athletes/**` | athletes, build-output, + inner |
+| `src/pages/calendar/**`, `src/components/calendar/**` | calendar, home, build-output, + inner |
+| `src/pages/noutati/index.astro`, `src/components/news/**` | news, article, + inner |
+| `src/pages/noutati/[slug].astro`, `src/scripts/{lightbox,share}.ts` | article, + inner |
+| `src/pages/program/**`, `src/components/program/**` | program, + inner |
+| `src/pages/pentru-parinti/**`, `src/components/parents/**` | parents, + inner |
+| `src/pages/contact/**`, `src/components/contact/**`, `src/scripts/trial-form.ts` | contact, + inner |
+| `src/scripts/**` | motion, scroll-scan, home, athletes, calendar, news, article, program, parents, contact, build-output, + inner |
+| `src/components/home/{Hero,CalendarBand,News,TrialCta}.astro` | home, motion, scroll-scan, shell, build-output |
+| `src/components/home/**` | home, motion, scroll-scan, build-output |
+| `src/fixtures/{sparse,mixed-strip,quiet-season}.json` | home, motion, scroll-scan, athletes, calendar, news, article, program, parents, contact, not-found, build-output, + inner |
+| `tests/e2e/<name>.spec.ts` | that spec |
+| `tests/unit/**`, `vitest.config.ts`, `.env.example`, `*.md` | none |
+| everything else (`src/lib/**`, `Site*.astro`, layouts, other pages, styles, `public/`, `src/fixtures/home.json`, e2e helpers and setup, build and runner config) | all |
+
+"+ inner" is `inner-pages` (every inner page at 1440, 1024, 861, 860 and 380 on `home` and
+`quiet-season`: no sideways scroll, no text off screen, no text on text or on a picture, no sticky
+column over the footer) and `shell` (every inner page at 380 with sized, described images and one
+display title; content without JavaScript). Outside `web/`: `studio/`, `docs/`, `deploy/`,
+`scripts/`, `.superpowers/`, root `*.md` select no spec; the lockfile and workspace files select all.
 
 When you add a spec or a new source folder, update this table in the script's header and rules.
 
@@ -110,7 +117,13 @@ When you add a spec or a new source folder, update this table in the script's he
   `rally.test.ts` plays two minutes per layout: the racket head meets the shuttle at every hit,
   net faults happen but stay rare.
 - Shell: Romanian nav and footer, no overflow at several widths, self-hosted fonts, narrow menu
-  with and without JS, focus ring colour equals text colour.
+  with and without JS, focus ring colour equals text colour; the menu marks a page's section
+  (`aria-current="page"` on the page itself, `"true"` under it); the footer links the parents'
+  page and Facebook.
+- Inner pages (`inner-pages.spec`): every route at five widths on `home` and `quiet-season`, with
+  reduced motion; no overflow, no text off screen or on other text or a picture, sticky columns
+  clear of the footer. Text boxes are trimmed to their line height (tight display type) and to
+  any clipping box (ellipsis labels); screen-reader-only text is skipped.
 - Unit: date formatting and Bucharest "today", Romanian plurals, roster order/layout, calendar
   split, fixture shape and parity with the seed, photo sizes and weight, WCAG token contrast.
 

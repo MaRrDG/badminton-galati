@@ -51,7 +51,7 @@ const blocks = rosterLayout(athletes).map(({ kind, rows }) => ({
                 </p>
               )}
               <div class="who">
-                <h3>{athlete.name}</h3>
+                <h3><a class="name" href={`/sportivi/${athlete.slug}/`}>{athlete.name}</a></h3>
                 {line && <p>{line}</p>}
                 {athlete.frbUrl && <a class="textlink" href={athlete.frbUrl}>Profilul FRB</a>}
               </div>
@@ -74,6 +74,13 @@ const blocks = rosterLayout(athletes).map(({ kind, rows }) => ({
 </section>
 
 <style>
+  /* The name leads to the athlete's page; it reads as a name, underlined only under the pointer. */
+  .name {
+    text-decoration: none;
+  }
+  .name:hover {
+    text-decoration: underline;
+  }
   .roster {
     background: var(--white);
     padding: clamp(52px, 7vw, 104px) 0;

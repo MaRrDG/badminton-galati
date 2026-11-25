@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { parseSiteData } from '../../src/lib/content';
-import { groupTone, plannerRows, programView, scheduleLabel, weekPlanner } from '../../src/lib/program';
+import { groupTone, plannerRows, programView, scheduleParts, weekPlanner } from '../../src/lib/program';
 import type { Group, Session } from '../../src/lib/types';
 import home from '../../src/fixtures/home.json';
 import quiet from '../../src/fixtures/quiet-season.json';
@@ -113,12 +113,33 @@ describe('plannerRows', () => {
   });
 });
 
-describe('scheduleLabel', () => {
+/** The schedule line as it reads. */
+const scheduleText = (sessions: Session[]) => scheduleParts(sessions).map(p => p.text).join('');
+
+describe('scheduleParts', () => {
   test('one time for every day, or each day with its time', () => {
-    expect(scheduleLabel(initiere.sessions)).toBe('Luni, miercuri, vineri, 17:00–18:30');
-    expect(scheduleLabel(performanta.sessions)).toBe('Luni 18:30–20:30, miercuri 18:30–20:30, vineri 18:30–20:30, sâmbătă 10:00–12:00');
-    expect(scheduleLabel([{ day: 6, start: '10:00', end: '12:00' }, { day: 2, start: '10:00', end: '12:00' }])).toBe('Marți, sâmbătă, 10:00–12:00');
-    expect(scheduleLabel([])).toBeUndefined();
+    expect(scheduleText(initiere.sessions)).toBe('Luni, miercuri, vineri, 17:00–18:30');
+    expect(scheduleText(performanta.sessions)).toBe('Luni 18:30–20:30, miercuri 18:30–20:30, vineri 18:30–20:30, sâmbătă 10:00–12:00');
+    expect(scheduleText([{ day: 6, start: '10:00', end: '12:00' }, { day: 2, start: '10:00', end: '12:00' }])).toBe('Marți, sâmbătă, 10:00–12:00');
+  });
+
+  test('marks the hours given only as an example, the days stay plain', () => {
+    expect(scheduleParts(initiere.sessions)).toEqual([
+      { text: 'Luni, miercuri, vineri, ' }, { text: '17:00–18:30', provisional: true },
+    ]);
+    expect(scheduleParts([{ day: 1, start: '10:00', end: '12:00' }, { day: 3, start: '10:00', end: '12:00' }])).toEqual([
+      { text: 'Luni, miercuri, ' }, { text: '10:00–12:00', provisional: false },
+    ]);
+    expect(scheduleParts([])).toEqual([]);
+  });
+
+  test('confirmed and example hours are never merged into one', () => {
+    const parts = scheduleParts([{ day: 1, start: '10:00', end: '12:00' }, { day: 3, start: '10:00', end: '12:00', provisional: true }]);
+    expect(parts).toEqual([
+      { text: 'Luni ' }, { text: '10:00–12:00', provisional: false },
+      { text: ', miercuri ' }, { text: '10:00–12:00', provisional: true },
+    ]);
+    expect(parts.map(p => p.text).join('')).toBe('Luni 10:00–12:00, miercuri 10:00–12:00');
   });
 });
 

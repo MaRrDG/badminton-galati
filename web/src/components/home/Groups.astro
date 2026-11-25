@@ -1,6 +1,7 @@
 ---
 import { groupsHeading } from '../../lib/home';
-import { scheduleLabel } from '../../lib/program';
+import { scheduleParts } from '../../lib/program';
+import Sample from '../ui/Sample.astro';
 import type { Group } from '../../lib/types';
 
 interface Props {
@@ -30,13 +31,19 @@ const tracks = [
             <h3>{title}</h3>
             <List>
               {groups.map((g) => {
-                const schedule = scheduleLabel(g.sessions);
+                const schedule = scheduleParts(g.sessions);
                 return (
                   <li>
-                    <b>{g.name}</b>
+                    <b><a class="name" href={`/program/#${g.slug}`}>{g.name}</a></b>
                     <span>
                       {g.audience}
-                      {schedule && <span class="schedule">{schedule}</span>}
+                      {schedule.length > 0 && (
+                        <span class="schedule">
+                          {schedule.map(({ text, provisional }) =>
+                            provisional ? <Sample note="oră dată ca exemplu">{text}</Sample> : text,
+                          )}
+                        </span>
+                      )}
                     </span>
                   </li>
                 );
@@ -50,6 +57,13 @@ const tracks = [
 </section>
 
 <style>
+  /* The name leads to the group on /program/; it reads as a name, underlined only under the pointer. */
+  .name {
+    text-decoration: none;
+  }
+  .name:hover {
+    text-decoration: underline;
+  }
   .groups {
     background: var(--blue);
     color: var(--white);

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { on } from './servers';
 
 const HEADLINE = 'Fluturașul a rămas în fileu';
 
@@ -31,10 +32,20 @@ test('the built 404 page has the headline, the ways out and the shell', async ({
   await expect(page.getByRole('heading', { level: 1, name: HEADLINE })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Înapoi acasă' })).toHaveAttribute('href', '/');
   const ways = page.getByRole('navigation', { name: 'Alte pagini' });
-  for (const name of ['Program', 'Calendar', 'Noutăți', 'Contact']) await expect(ways.getByRole('link', { name })).toBeVisible();
+  // The athletes page has athletes in this content, so it is one of the ways.
+  for (const [name, href] of [['Sportivi', '/sportivi/'], ['Program', '/program/'], ['Calendar', '/calendar/'], ['Noutăți', '/noutati/'], ['Contact', '/contact/']])
+    await expect(ways.getByRole('link', { name })).toHaveAttribute('href', href);
+  await expect(ways.locator('a[href*="#"]')).toHaveCount(0);
   await expect(page.getByRole('contentinfo')).toBeVisible();
   // The scene is decoration: the text carries the meaning.
   await expect(scene(page)).toHaveAttribute('aria-hidden', 'true');
+});
+
+test('with no athlete to show, the ways leave the athletes page out', on('sparse'), async ({ page }) => {
+  await page.goto('/404.html');
+  const ways = page.getByRole('navigation', { name: 'Alte pagini' });
+  await expect(ways.getByRole('link', { name: 'Program' })).toHaveAttribute('href', '/program/');
+  await expect(ways.getByRole('link', { name: 'Sportivi' })).toHaveCount(0);
 });
 
 test('an unknown address shows the page with status 404', async ({ page }) => {
@@ -79,7 +90,7 @@ test('without JavaScript the headline, the links and the still scene are there',
     await page.goto('/404.html');
     await expect(page.getByRole('heading', { level: 1, name: HEADLINE })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Înapoi acasă' })).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Alte pagini' }).getByRole('link')).toHaveCount(5);
+    await expect(page.getByRole('navigation', { name: 'Alte pagini' }).getByRole('link')).toHaveCount(6);
     await expect(scene(page)).toHaveCount(1);
     await expect(scene(page).locator('[data-player]')).toHaveCount(2);
     await expectShuttleInZero(page);
