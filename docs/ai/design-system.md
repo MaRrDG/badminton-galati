@@ -96,8 +96,8 @@ His rules:
 
 | Component | Use |
 |---|---|
-| `Photo` | One `<img>` with `width`/`height`/`alt`, `srcset` only when the image has one, `object-position` from `Img.position`; lazy by default, `loading="eager" priority` for the page's main photo |
-| `PlatePhoto` | `figure.plated` (red plate offset 12/14/16/18 px, optional crop `ratio`); the only red-plate implementation, also on the homepage (hero `class="poster"`, why, third hall photo, news) |
+| `Photo` | One `<img>` with `width`/`height`/`alt`, `srcset` only when the image has one, `object-position` from `Img.position`; lazy by default, `loading="eager" priority` for the page's main photo; `decorative` gives `alt=""` + `data-decorative` (a thumbnail beside its own title) |
+| `PlatePhoto` | `figure.plated` (red plate offset 12/14/16/18 px, optional crop `ratio`); the only red-plate implementation, also on the homepage (hero `class="poster"`, why, third hall photo, news); without `img` the default slot fills the frame (the athlete profile's `InitialTile`) |
 | `InitialTile` | A coloured field with the initials (`initialsOf`, tone from `toneAt`: blue, deep, red) where a photo is missing; sizes `tile`, `poster`, `coach` |
 | `PageHead` | The page title (`h1.display`); `white` (title left, lede right: athletes, news) or `blue` (a band, lede below: programme, parents, contact); slots `before` and default |
 | `SectionHeading` | `h2.h2s` (or `h3`): modest section heading |

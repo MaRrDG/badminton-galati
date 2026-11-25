@@ -179,7 +179,10 @@ test.describe('medals and articles', on('quiet-season'), () => {
     const article = page.locator('.arts a');
     await expect(article).toHaveAttribute('href', '/noutati/articol-de-test-cu-galerie/');
     await expect(article).toContainText('30 martie 2026');
-    await expect(article).toContainText('Articol de test cu galerie');
+    // The thumbnail repeats the title: decorative, so the link reads only the date and the title.
+    await expect(article.locator('img')).toHaveAttribute('alt', '');
+    await expect(article.locator('img')).toHaveAttribute('data-decorative', '');
+    await expect(article).toHaveAccessibleName('30 martie 2026 Articol de test cu galerie');
   });
 
   test('a photo, a group and no place', async ({ page }) => {

@@ -25,7 +25,7 @@ const { athlete, posts, medals } = profile;
             {posts.map(post => (
               <li>
                 <a class:list={{ bare: !post.cover }} href={`/noutati/${post.slug}/`}>
-                  {post.cover && <Photo img={post.cover} sizes="190px" />}
+                  {post.cover && <Photo img={post.cover} sizes="190px" decorative />}
                   <div>
                     <time datetime={post.date}>{formatDateRo(post.date)}</time>
                     <span>{post.title}</span>

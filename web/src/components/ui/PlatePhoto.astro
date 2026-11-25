@@ -3,7 +3,8 @@ import type { Img } from '../../lib/types';
 import Photo from './Photo.astro';
 
 interface Props {
-  img: Img;
+  /** The photo; without it the default slot fills the frame (an athlete's initials). */
+  img?: Img;
   /** How far the red plate sits below and to the right of the photo, in px. */
   offset?: 12 | 14 | 16 | 18;
   /** Crops the photo to this aspect ratio (CSS, e.g. "4 / 5"); without it the photo keeps its own. */
@@ -19,7 +20,7 @@ const { img, offset = 14, ratio, sizes, loading, priority, class: className } = 
 
 <figure class:list={['plated', className, { cropped: ratio }]} style={`--plate:${offset}px${ratio ? `;--ratio:${ratio}` : ''}`}>
   <div class="plate" aria-hidden="true"></div>
-  <div class="shot"><Photo img={img} sizes={sizes} loading={loading} priority={priority} /></div>
+  <div class="shot">{img ? <Photo img={img} sizes={sizes} loading={loading} priority={priority} /> : <slot />}</div>
 </figure>
 
 <style>

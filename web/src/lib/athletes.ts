@@ -128,7 +128,7 @@ export type AthleteProfile = {
   discipline?: string;
   groupName?: string;
   best?: Ranking;
-  /** Only with a place: "Locul 2 în țară" / "la U17, simplu băieți, cu 168 de puncte" / the FRB week. */
+  /** Only with a place: "Locul 2 în țară" / "la U17, simplu băieți, cu 168 de puncte" (points only when above 0) / the FRB week. */
   standing?: { place: number; lead: string; rest: string; source?: string };
   /** The articles whose results name the athlete, newest first. */
   posts: Post[];
@@ -156,7 +156,8 @@ export function athleteProfile(site: SiteData, athlete: Athlete, today: string):
 
   let standing: AthleteProfile['standing'];
   if (best) {
-    const points = best.points !== undefined ? `, cu ${best.points} ${pointsUnit(best.points)}` : '';
+    // No points clause without points: never "cu 0 de puncte".
+    const points = best.points ? `, cu ${best.points} ${pointsUnit(best.points)}` : '';
     const week = site.rankingWeek;
     standing = {
       place: best.place,

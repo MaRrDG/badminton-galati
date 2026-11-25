@@ -188,6 +188,7 @@
       "slug": "articol-de-test-cu-galerie",
       "kind": "competitie",
       "date": "2026-03-30",
+      "cover": { "url": "/img/medalii.jpg", "width": 1280, "height": 579, "alt": "Sportivi ai clubului cu medaliile, la festivitatea de premiere" },
       "competitionId": "competition-2026-03-27-cr-u15-cr-u23",
       "results": [{ "athleteId": "athlete-zet-exemplu-ana", "discipline": "SF", "result": "aur" }]
     }

@@ -20,25 +20,18 @@ const { athlete, nameLines, category, discipline, groupName, standing, tone } = 
       <h1 class="display" id="page-h"><span>{nameLines[0]}</span>{nameLines[1] && <> <span>{nameLines[1]}</span></>}</h1>
     </div>
 
-    {
-      athlete.photo ? (
-        <PlatePhoto
-          class="poster"
-          img={athlete.photo}
-          offset={16}
-          ratio="4 / 5"
-          loading="eager"
-          priority
-          sizes="(max-width: 860px) min(72vw, 320px), 470px"
-        />
-      ) : (
-        /* No photo yet: the initials on the athlete's colour, with the same plate. */
-        <figure class="poster initial-poster">
-          <div class="plate" aria-hidden="true" />
-          <InitialTile name={athlete.name} tone={tone} size="poster" />
-        </figure>
-      )
-    }
+    {/* Without a photo, the initials on the athlete's colour fill the same plated frame (4 / 5, as the tile). */}
+    <PlatePhoto
+      class="poster"
+      img={athlete.photo}
+      offset={16}
+      ratio="4 / 5"
+      loading="eager"
+      priority
+      sizes="(max-width: 860px) min(72vw, 320px), 470px"
+    >
+      <InitialTile name={athlete.name} tone={tone} size="poster" />
+    </PlatePhoto>
 
     <div class="body">
       <dl class="facts">
@@ -67,20 +60,6 @@ const { athlete, nameLines, category, discipline, groupName, standing, tone } = 
   .ident :global(.poster) {
     grid-area: photo;
     align-self: start;
-  }
-  /* The plate of PlatePhoto, for the initials (offset 16, as the photo). */
-  .initial-poster {
-    position: relative;
-    margin: 0 16px 16px 0;
-  }
-  .initial-poster .plate {
-    position: absolute;
-    inset: 0;
-    background: var(--red);
-    translate: 16px 16px;
-  }
-  .initial-poster :global(.initial) {
-    position: relative;
   }
   .head {
     grid-area: head;

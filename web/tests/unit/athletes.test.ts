@@ -170,6 +170,12 @@ describe('athleteProfile', () => {
     expect(p.tone).toBe('deep');
   });
 
+  test('zero points are left out, never "cu 0 de puncte"', () => {
+    const nistor = nistorOf(homeSite);
+    const zero = { ...nistor, rankings: [{ ...nistor.rankings[0], points: 0 }] };
+    expect(athleteProfile({ ...homeSite, athletes: [zero] }, zero, '2026-11-25').standing?.rest).toBe('la U17, simplu băieți');
+  });
+
   test('an unranked athlete: category from the birth year, the group, a medal from an article', () => {
     const z = athleteProfile(quietSite, zet, '2026-11-25');
     expect(z.nameLines).toEqual(['Zet', 'Exemplu-Ana']);
