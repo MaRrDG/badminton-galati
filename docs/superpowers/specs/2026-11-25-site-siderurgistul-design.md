@@ -98,7 +98,7 @@ S-au făcut patru schițe animate de homepage (în `.superpowers/brainstorm/…/
 - C „Tabela”: rezultatele ca erou. I-a plăcut structura, dar arăta a AI.
 - **D „Afiș + Tabela”** (aleasă): stilul și animațiile din B la scară cuminte, structura din C
   fără elementele de șablon. Fișierul `varianta-d-afis-tabela.html` e referința vizuală, în
-  forma de după corecturile lui Mario (hero fără tabelă cu cartonașe, grupe ca două liste).
+  forma de după corecturile lui Mario (hero cu motto-ul clubului, fără tabelă cu cartonașe; grupe ca două liste).
 
 ## Designul
 
@@ -114,9 +114,10 @@ Vine din ce are clubul deja, nu din ceva inventat:
 - **Muchii drepte.** Pozele reale tratate ca afiș, cu o placă roșie decalată în spate.
 - **Scară:** conținut într-o coloană de ~1180px, titluri plafonate la ~6rem, hero cel mult
   ~85% din înălțimea ecranului. Secțiunile alternează albastru, roșu, alb.
-- **Hero-ul spune un fapt real ca titlu de afiș**, de exemplu „Locul 2 la U17. Locul 3 la
-  U15. Din Galați.”, cu sursa și data dedesubt. Titlul se compune din datele FRB. Dacă nu
-  există date (sincronizare oprită), hero-ul folosește un titlu scris de club în panou.
+- **Hero-ul poartă motto-ul clubului**, cel de pe site-ul actual: „Ai reușit? Continuă!
+  N-ai reușit? Continuă!”, ca titlu de afiș, cu o propoziție despre club dedesubt. Textul se
+  editează din panou. Mario a respins varianta cu locurile din clasament în titlu; clasamentul
+  apare mai jos, în lista de sportivi.
 - **Grupele** apar ca două liste simple, una lângă alta: „Pentru cine vrea performanță”
   (Inițiere, Performanță, Elite) și „Pentru cine vrea doar să joace” (Amatori copii, Amatori
   adulți). Fiecare rând: numele grupei mare, pentru cine e, iar când există, zilele și orele.
@@ -150,7 +151,7 @@ lipsesc. Pozele au dimensiuni declarate, ca distanțele animațiilor să se calc
 
 **Păstrate din site-ul vechi**
 
-- **Acasă.** Structura din schița D: clasament, calendar, sportivi, grupe, sală, noutăți,
+- **Acasă.** Structura din schița D: motto, calendar, sportivi, grupe, sală, noutăți,
   antrenament de probă.
 - **Despre club.** Istoric, înființare 7 martie 2002, sala cu 4 terenuri de pe Bd. Cloșca,
   Balcaniadele din 2002 și 2023. O singură pagină în locul celor două duplicate.
@@ -221,10 +222,10 @@ bifare, o singură dată, și apar apoi peste tot.
 
 Deciziile de mai jos sunt ale mele, de confirmat de Mario:
 
-- **Lansarea nu așteaptă acordul FRB.** Fără date sincronizate, hero-ul are titlul scris de
-  club, lista de sportivi arată nume, grupă, poză și link spre profilul FRB, iar cifrele
-  calculate și pagina de rezultate pe bază de clasament lipsesc. Sincronizarea se adaugă
-  după, fără schimbări de design.
+- **Lansarea nu așteaptă acordul FRB.** Fără date sincronizate, lista de sportivi arată
+  nume, grupă, poză și link spre profilul FRB, iar cifrele calculate și pagina de rezultate
+  pe bază de clasament lipsesc. Hero-ul nu depinde de date. Sincronizarea se adaugă după,
+  fără schimbări de design.
 - **Ce ascunde lipsa acordului părintelui:** sportivul nu are fișă, nu apare în lista de
   sportivi, pe homepage sau în cifre, iar numele lui nu e link și nu e bifabil ca etichetă în
   articole. Datele lui din clasamentul FRB nu se afișează pe site-ul clubului, chiar dacă

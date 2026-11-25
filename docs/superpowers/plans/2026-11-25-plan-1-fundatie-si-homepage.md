@@ -4,7 +4,7 @@
 
 **Goal:** A working Astro site whose homepage matches mockup D, fed from a Sanity content model the club can edit, running locally and on a test address.
 
-**Architecture:** pnpm workspace with two packages: `web/` (Astro, static output) and `studio/` (Sanity Studio). All content reaches pages through one typed content layer (`web/src/lib/content.ts`) that can read either Sanity or local fixtures, so tests and CI never need the network. Homepage facts (hero headline, next competition, roster order) are computed by pure functions in `web/src/lib/`, unit-tested apart from the markup. Motion lives in one script and is layered on top of markup that is complete without it.
+**Architecture:** pnpm workspace with two packages: `web/` (Astro, static output) and `studio/` (Sanity Studio). All content reaches pages through one typed content layer (`web/src/lib/content.ts`) that can read either Sanity or local fixtures, so tests and CI never need the network. Homepage facts (next competition, roster order) are computed by pure functions in `web/src/lib/`, unit-tested apart from the markup. Motion lives in one script and is layered on top of markup that is complete without it.
 
 **Tech Stack:** Node 26, pnpm 10 (npm is broken on this machine: use pnpm only), Astro 7.x, Sanity 6.x with `@sanity/client` 8.x and `@sanity/image-url` 2.x, GSAP 3.15 + ScrollTrigger, Vitest 5, Playwright 1.65, fonts via `@fontsource/big-shoulders-display` and `@fontsource-variable/instrument-sans`. Astro 7 and Sanity 6 are recent: read their current docs before using an API from memory.
 
@@ -30,7 +30,7 @@ This is plan 1 of 5. Later plans, each written when its turn comes: (2) inner pa
 
 1. **Athlete without parental consent who is tagged or ranked.** Expected: absent from hero, roster and any count, as if not in the data. Pinned in Task 2 (`visibleAthletes`) and Task 4 (mapping).
 2. **No upcoming competition** (season ended, or calendar empty). Expected: the calendar block shows the most recent played events and no countdown, never "peste -3 zile" or an empty red band. Pinned in Task 2 (`nextCompetition`, `countdownLabel`) and Task 5.
-3. **No ranking data at all** (FRB sync off, which is the launch state). Expected: hero shows the club-written fallback headline; roster shows name and FRB link without a rank numeral. Pinned in Task 2 (`heroHeadline`) and Task 5.
+3. **No ranking data at all** (FRB sync off, which is the launch state). Expected: roster shows name and FRB link without a rank numeral and without an empty gap where it would be; the heading and intro make no claim about rankings. Pinned in Task 2 (`bestRanking`, `rosterOrder`) and Task 5.
 4. **Long names and narrow screens** ("Bordeianu Nectarie-Ioan" at 380px). Expected: no horizontal overflow, no clipped text. Pinned in Task 5 and Task 6.
 5. **Photo strip with few or mixed-ratio photos** (1 photo, portrait photos). Expected: the strip never pins for a zero or negative distance and the last photo always ends fully in view. Pinned in Task 6.
 
@@ -132,7 +132,7 @@ export type Post = { title: string; slug: string; kind: PostKind; date: string; 
 export type HomeData = {
   athletes: Athlete[]; rankingWeek?: RankingWeek; competitions: Competition[];
   groups: Group[]; posts: Post[]; hallPhotos: Img[];
-  heroFallback: string[]; heroPhoto: Img; hallText: string; groupsIntro: string; trialText: string;
+  heroLines: string[]; heroText: string; heroPhoto: Img; hallText: string; groupsIntro: string; trialText: string;
 };
 ```
 
@@ -141,7 +141,6 @@ export type HomeData = {
   - `visibleAthletes(a: Athlete[]): Athlete[]`
   - `bestRanking(a: Athlete): Ranking | undefined` (lowest `place`)
   - `rosterOrder(a: Athlete[]): Athlete[]` (consented only; ranked first by best place ascending, then unranked by name using Romanian collation)
-  - `heroHeadline(a: Athlete[], fallback: string[]): { lines: string[]; credits: string[] }`
   - `splitCalendar(c: Competition[], today: string): { next?: Competition; played: Competition[] }` (`played` newest first, max 3)
   - `countdownLabel(next: Competition, today: string): string | undefined`
   - `disciplineLabel(d: Discipline): string` → `simplu băieți`, `simplu fete`, `dublu băieți`, `dublu fete`, `dublu mixt`
@@ -163,26 +162,10 @@ const pazargic = { id:'2', name:'Pazargic Ligia-Beatrice', slug:'pazargic-ligia-
 const bordeianu = { id:'3', name:'Bordeianu Nectarie-Ioan', slug:'bordeianu-nectarie-ioan', consent:true,
   rankings:[{category:'U13',discipline:'DX',place:58}] };
 const hidden = { ...nistor, id:'4', name:'Fără Acord', consent:false, rankings:[{category:'U19',discipline:'SB',place:1}] };
-const fallback = ['Badminton','din 2002.','În Galați.'];
-
-test('headline states the two best national places', () => {
-  expect(heroHeadline([bordeianu, pazargic, nistor], fallback)).toEqual({
-    lines: ['Locul 2 la U17.', 'Locul 3 la U15.', 'Din Galați.'],
-    credits: ['Nistor Cristian-Ionuț, simplu băieți U17', 'Pazargic Ligia-Beatrice, simplu fete U15'] });
-});
-test('only top-10 places make the headline', () =>
-  expect(heroHeadline([bordeianu], fallback).lines).toEqual(fallback));
-test('one qualifying athlete gives two lines', () =>
-  expect(heroHeadline([nistor], fallback).lines).toEqual(['Locul 2 la U17.', 'Din Galați.']));
-test('no consent means not in headline or roster', () => {
-  expect(heroHeadline([hidden], fallback).lines).toEqual(fallback);
-  expect(rosterOrder([hidden, nistor]).map(a => a.name)).toEqual(['Nistor Cristian-Ionuț']);
-});
-test('no rankings at all gives the fallback and an unranked roster', () => {
-  const plain = { ...nistor, rankings: [] };
-  expect(heroHeadline([plain], fallback)).toEqual({ lines: fallback, credits: [] });
-  expect(bestRanking(plain)).toBeUndefined();
-});
+test('no consent means not in the roster', () =>
+  expect(rosterOrder([hidden, nistor]).map(a => a.name)).toEqual(['Nistor Cristian-Ionuț']));
+test('an athlete without rankings has no best ranking', () =>
+  expect(bestRanking({ ...nistor, rankings: [] })).toBeUndefined());
 test('roster order: best place first, unranked last by name', () =>
   expect(rosterOrder([bordeianu, { ...pazargic, rankings: [] }, nistor]).map(a => a.id)).toEqual(['1','3','2']));
 
@@ -212,7 +195,7 @@ test('countdown wording', () => {
 ```
 
 - [ ] **Step 2: Run, expect failure.** Run: `pnpm test` → FAIL (modules missing).
-- [ ] **Step 3: Implement `dates.ts` and `home.ts`.** All date maths on ISO date strings in the `Europe/Bucharest` calendar, never on local `Date` time-of-day. `heroHeadline` considers each consented athlete's best ranking, keeps places 1 to 10, takes the two lowest, and appends `Din Galați.`.
+- [ ] **Step 3: Implement `dates.ts` and `home.ts`.** All date maths on ISO date strings in the `Europe/Bucharest` calendar, never on local `Date` time-of-day.
 - [ ] **Step 4: Run tests.** Run: `pnpm test` → all pass.
 - [ ] **Step 5: Commit** `feat(web): homepage logic with tests`.
 
@@ -232,13 +215,13 @@ test('countdown wording', () => {
   - `group`: `name`, `audience`, `track` (`performanta` | `amatori`), `schedule` (string, optional), `order` (number)
   - `competition`: `title`, `city`, `start` (date), `end` (date), `home` (boolean), `post` (reference to `post`, optional)
   - `post`: `title`, `slug`, `kind` (`competitie` | `viata-clubului` | `proiecte`), `date`, `cover` (image with `alt`), `body` (portable text), `gallery[]` (images), `competition` (reference, optional), `results[]` of `{athlete (reference), discipline, result}` where `result` is `aur` | `argint` | `bronz` | free text place; all of `results` optional
-  - `siteSettings` (singleton): `heroFallback[]` (2 to 3 strings), `heroPhoto`, `hallText`, `hallPhotos[]`, `groupsIntro`, `trialText`, `rankingWeek` `{week, from, to}`
+  - `siteSettings` (singleton): `heroLines[]` (2 to 4 short strings, the motto, one per headline line), `heroText`, `heroPhoto`, `hallText`, `hallPhotos[]`, `groupsIntro`, `trialText`, `rankingWeek` `{week, from, to}`
 - All field titles and descriptions in the Studio are Romanian, written for a coach on a phone ("Poza principală", not "Cover image"). The `post` form lists `title`, `kind`, `date`, `cover`, `body`, `gallery` first; references and results come after, in a collapsed group "Legături".
 
 - [ ] **Step 1: Write the failing test** `schema.test.ts`: import the schema array and assert (a) the five type names exist, (b) `athlete.consent` has `initialValue === false`, (c) `post.kind` options are exactly `competitie`, `viata-clubului`, `proiecte`, (d) every image field declares a required `alt` sub-field.
 - [ ] **Step 2: Run, expect failure.** Run: `pnpm --filter studio test` → FAIL.
 - [ ] **Step 3: Create the Studio package and schemas.**
-- [ ] **Step 4: Write `seed.ndjson`** with the real facts: the three athletes above (all `consent: true` for the seed only, flagged in a comment line in the README as test data pending real consent), the five groups (Inițiere, Performanță, Elite → `performanta`; Amatori copii, Amatori adulți → `amatori`; audiences as in the mockup; no `schedule`), the 12 competitions of the 2026 calendar from the audit (dates, cities, `home: true` for Galați), the three posts (Novi Sad – 2026, 2026-06-30; București, Memorialul Rotaru U15 – 2026, 2026-05-13; București, Cupa României U15 – 2026, 2026-04-01; all `competitie`), `siteSettings` with `rankingWeek {46, 2026-11-09, 2026-11-15}`.
+- [ ] **Step 4: Write `seed.ndjson`** with the real facts: the three athletes above (all `consent: true` for the seed only, flagged in a comment line in the README as test data pending real consent), the five groups (Inițiere, Performanță, Elite → `performanta`; Amatori copii, Amatori adulți → `amatori`; audiences as in the mockup; no `schedule`), the 12 competitions of the 2026 calendar from the audit (dates, cities, `home: true` for Galați), the three posts (Novi Sad – 2026, 2026-06-30; București, Memorialul Rotaru U15 – 2026, 2026-05-13; București, Cupa României U15 – 2026, 2026-04-01; all `competitie`), `siteSettings` with `heroLines` [`Ai reușit?`, `Continuă!`, `N-ai reușit?`, `Continuă!`] (the club's own motto, from their current site), `heroText` "CS Siderurgistul Galați crește jucători de badminton din 7 martie 2002, în sala cu patru terenuri de pe Bulevardul Cloșca." and `rankingWeek {46, 2026-11-09, 2026-11-15}`.
 - [ ] **Step 5: Run tests and validate.** Run: `pnpm --filter studio test` → pass. Run the Sanity CLI schema validation → no errors. If the project exists: import the seed and open the Studio locally; confirm an athlete can be created and saved from a 390px-wide window.
 - [ ] **Step 6: Commit** `feat(studio): content model and seed data`.
 
@@ -291,15 +274,19 @@ test('mapping tolerates empty optional data', () => {
 **Interfaces:**
 - Consumes: `getHomeData()`, the functions of Task 2, `Base.astro`.
 - Produces: one section per component, in this order and with these ids: `Hero` (no id), `CalendarBand` `#calendar`, `Roster` `#sportivi`, `Groups` `#program`, `Hall`, `News` `#noutati`, `TrialCta` `#proba`. Each takes only the slice of `HomeData` it renders. Class hooks used by Task 6: hero lines `.l1 .l2 .l3`, `.poster`, `.poster img`; roster numerals `[data-roll]`; section headings `h2.display`; strip `.hall .track`.
-- Markup and styles come from `mockups/varianta-d.html` section by section. Hero: headline from `heroHeadline`, credits line, source line "Clasamentul FRB, săptămâna {week}, {range}" only when `rankingWeek` exists, primary action "Vino la un antrenament de probă" → `#proba`, secondary "Vezi toți sportivii" → `#sportivi`. Calendar: next event large with `countdownLabel`, then `played` with the word `jucat` and the mark `acasă` when `home`; link "Tot calendarul 2026". Roster: `rosterOrder`; the first row large, later rows smaller; numeral, name, discipline and category, points when known, link "Profilul FRB" when `frbUrl`; heading "Sportivii noștri, loc cu loc". Groups: heading "Cinci grupe, pe două drumuri", two lists titled "Pentru cine vrea performanță" and "Pentru cine vrea doar să joace"; `schedule` on the row when present. News: first post with cover, others as a list, each with kind label and date; link "Toate articolele". Links to pages that plan 2 will build point at their future paths (`/sportivi/`, `/calendar/`, `/noutati/`).
+- Markup and styles come from `mockups/varianta-d.html` section by section. Hero: one headline line per entry of `heroLines` (odd lines get class `.l1`/`.l3`, even lines `.l2`, as in the mockup), `heroText` below, primary action "Vino la un antrenament de probă" → `#proba`, secondary "Vezi toți sportivii" → `#sportivi`. Calendar: next event large with `countdownLabel`, then `played` with the word `jucat` and the mark `acasă` when `home`; link "Tot calendarul 2026". Roster: `rosterOrder`; the first row large, later rows smaller; numeral, name, discipline and category, points when known, link "Profilul FRB" when `frbUrl`; heading "Sportivii noștri, loc cu loc"; under it the source line "Clasamentul FRB, săptămâna {week}, {range}" only when `rankingWeek` exists. Groups: heading "Cinci grupe, pe două drumuri", two lists titled "Pentru cine vrea performanță" and "Pentru cine vrea doar să joace"; `schedule` on the row when present. News: first post with cover, others as a list, each with kind label and date; link "Toate articolele". Links to pages that plan 2 will build point at their future paths (`/sportivi/`, `/calendar/`, `/noutati/`).
 
 - [ ] **Step 1: Write failing e2e tests** (fixtures as source):
 
 ```ts
-test('hero states real places and their source', async ({ page }) => {
+test('hero carries the club motto', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Locul 2 la U17\.\s*Locul 3 la U15\.\s*Din Galați\./);
-  await expect(page.locator('.hero')).toContainText('Clasamentul FRB, săptămâna 46, 9–15 noiembrie 2026');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Ai reușit\?\s*Continuă!\s*N-ai reușit\?\s*Continuă!/);
+  await expect(page.locator('.hero')).not.toContainText('Locul');
+});
+test('roster names its source', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#sportivi')).toContainText('Clasamentul FRB, săptămâna 46, 9–15 noiembrie 2026');
 });
 test('sections appear in the agreed order', async ({ page }) => {
   await page.goto('/');
@@ -321,7 +308,7 @@ test('every image declares its size and has alt text', async ({ page }) => {
 test('all content is visible without JavaScript', async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false }); const page = await ctx.newPage();
   await page.goto('/');
-  for (const t of ['Locul 2 la U17.', 'Nistor Cristian-Ionuț', 'Amatori adulți', 'Novi Sad – 2026'])
+  for (const t of ['Ai reușit?', 'Nistor Cristian-Ionuț', 'Amatori adulți', 'Novi Sad – 2026'])
     await expect(page.getByText(t).first()).toBeVisible();
 });
 for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${width}`, async ({ page }) => {
@@ -334,7 +321,7 @@ for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${wi
 
 Plus two tests that swap the fixture through an env-selected file (`HOME_FIXTURE=empty-season.json`, `HOME_FIXTURE=no-rankings.json`, both created in this task):
 - no upcoming competition: `#calendar` shows three `jucat` rows, no element with the countdown, and no text matching `/peste -?\d+ zile/`;
-- no rankings: h1 equals the fallback lines, `.hero` has no "Clasamentul FRB", roster rows show names and no `[data-roll]`.
+- no rankings: `#sportivi` has no "Clasamentul FRB" line, roster rows show names and FRB links, and there is no `[data-roll]` element.
 
 - [ ] **Step 2: Run, expect failure.** `pnpm e2e` → FAIL.
 - [ ] **Step 3: Build the components** one section at a time, comparing each against the mockup in a browser at 1440 and 390.
