@@ -78,10 +78,26 @@ const faults = () => {
   lines.forEach(({ el }, i) => {
     for (const img of imgs) if (meet(shownBoxes[i], img.box, 2)) out.push(`text on picture: ${label(el)} / ${label(img.el)}`);
   });
-  // A sticky element never runs into the footer.
+  // A sticky element never runs into the footer, and fits the window: one taller than the
+  // window hides its own end while it sticks.
   const footer = document.querySelector('body > footer')!.getBoundingClientRect();
-  for (const e of document.querySelectorAll('main *'))
-    if (getComputedStyle(e).position === 'sticky' && shown(e) && meet(e.getBoundingClientRect(), footer, 0)) out.push(`sticky over footer: ${label(e)}`);
+  for (const e of document.querySelectorAll('main *')) {
+    if (getComputedStyle(e).position !== 'sticky' || !shown(e)) continue;
+    const r = e.getBoundingClientRect();
+    if (meet(r, footer, 0)) out.push(`sticky over footer: ${label(e)}`);
+    if (r.height > innerHeight + 0.5) out.push(`sticky taller than the window: ${label(e)} ${Math.round(r.height)} > ${innerHeight}`);
+  }
+  // A column squeezed to nothing: a grid or flex item narrower than NARROW px whose text wraps
+  // to three lines or more (a word or two per line). Short labels on one or two lines pass.
+  const NARROW = 120;
+  for (const e of document.querySelectorAll('main *')) {
+    const parent = e.parentElement;
+    if (!parent || !shown(e) || !/(grid|flex)$/.test(getComputedStyle(parent).display)) continue;
+    const r = e.getBoundingClientRect();
+    if (r.width <= 1 || r.width >= NARROW) continue;
+    const tops = new Set(lines.filter(l => e.contains(l.el)).map(l => Math.round(l.box.top / 4)));
+    if (tops.size >= 3) out.push(`narrow column: ${label(e)} ${Math.round(r.width)}px, ${tops.size} lines`);
+  }
   return [...new Set(out)];
 };
 
