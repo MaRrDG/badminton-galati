@@ -98,7 +98,7 @@ S-au făcut patru schițe animate de homepage (în `.superpowers/brainstorm/…/
 - C „Tabela”: rezultatele ca erou. I-a plăcut structura, dar arăta a AI.
 - **D „Afiș + Tabela”** (aleasă): stilul și animațiile din B la scară cuminte, structura din C
   fără elementele de șablon. Fișierul `varianta-d-afis-tabela.html` e referința vizuală, în
-  forma de după corecturile lui Mario (hero fără tabelă cu cartonașe, grupe ca trepte).
+  forma de după corecturile lui Mario (hero fără tabelă cu cartonașe, grupe ca două liste).
 
 ## Designul
 
@@ -117,8 +117,10 @@ Vine din ce are clubul deja, nu din ceva inventat:
 - **Hero-ul spune un fapt real ca titlu de afiș**, de exemplu „Locul 2 la U17. Locul 3 la
   U15. Din Galați.”, cu sursa și data dedesubt. Titlul se compune din datele FRB. Dacă nu
   există date (sincronizare oprită), hero-ul folosește un titlu scris de club în panou.
-- **Grupele** apar ca trepte: Inițiere, Performanță, Elite urcă de la stânga la dreapta,
-  iar Amatori copii și Amatori adulți stau separat dedesubt. Fără tabel.
+- **Grupele** apar ca două liste simple, una lângă alta: „Pentru cine vrea performanță”
+  (Inițiere, Performanță, Elite) și „Pentru cine vrea doar să joace” (Amatori copii, Amatori
+  adulți). Fiecare rând: numele grupei mare, pentru cine e, iar când există, zilele și orele.
+  Mario a respins tabelul cu chenare și varianta în trepte („nu prea se înțelege”).
 - **Emblema** clubului (cerc albastru, disc roșu, fluturaș alb) rămâne neschimbată. Trebuie
   cerută de la club în format vectorial; cea de pe site are 270px.
 
