@@ -75,10 +75,13 @@ export function frontLayout(posts: Post[]): NewsFront {
   return { feat, shape, side, rows, older: rest.slice(SIDE + IN_ROWS) };
 }
 
-/** "Toate" with the total, then each kind that has posts, with its count; nothing without posts. */
+/**
+ * "Toate" with the total, then each kind that has posts, with its count. With fewer than two
+ * kinds there is nothing to choose: no filter (as on the athletes and calendar pages).
+ */
 export function kindFilters(posts: Post[]): FilterOption[] {
-  if (posts.length === 0) return [];
   const kinds = POST_KINDS.map(kind => ({ kind, count: posts.filter(p => p.kind === kind).length })).filter(k => k.count > 0);
+  if (kinds.length < 2) return [];
   return [
     { value: 'toate', label: 'Toate', count: posts.length },
     ...kinds.map(({ kind, count }) => ({ value: kind, label: postKindLabel(kind), count })),

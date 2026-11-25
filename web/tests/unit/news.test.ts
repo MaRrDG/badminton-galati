@@ -110,11 +110,15 @@ describe('the news front', () => {
 
 describe('the kind filter', () => {
   test('"Toate" with the total, then the kinds that have posts', () => {
-    expect(kindFilters(homePosts).map(o => [o.label, o.count])).toEqual([['Toate', 3], ['Competiție', 3]]);
     expect(kindFilters(fifteen).map(o => [o.value, o.label, o.count])).toEqual([
       ['toate', 'Toate', 15], ['competitie', 'Competiție', 11], ['viata-clubului', 'Viața clubului', 3], ['proiecte', 'Proiecte', 1],
     ]);
     expect(kindFilters([])).toEqual([]);
+  });
+
+  test('with fewer than two kinds there is nothing to choose: no filter', () => {
+    expect(new Set(homePosts.map(p => p.kind)).size).toBe(1);
+    expect(kindFilters(homePosts)).toEqual([]);
   });
 
   test('the quiet-season fixture gives the mockup front', () => {

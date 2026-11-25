@@ -21,8 +21,9 @@ test('the featured article leads the front in big uppercase type', async ({ page
   await expect(feat.getByRole('link', { name: 'Novi Sad – 2026', exact: true })).toHaveAttribute('href', '/noutati/novi-sad-2026/');
   await expect(feat.locator('.plated img')).toHaveAttribute('loading', 'eager');
   await expect(page.locator('.front .side')).toHaveCount(2);
-  await expectFilterNames(page, ['Toate, 3', 'Competiție, 3']);
-  await expect(page.locator('.filter label sup')).toHaveText(['3', '3']);
+  // Every post is a competition: one kind, nothing to choose, so no filter.
+  await expect(page.locator('.filter')).toHaveCount(0);
+  await expect(page.getByRole('radio')).toHaveCount(0);
   // Every article title is an h2 under the page's h1; only the featured one is set big.
   await expect(page.locator('.front h2')).toHaveCount(3);
   await expect(page.locator('.front h3')).toHaveCount(0);
