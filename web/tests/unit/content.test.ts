@@ -281,6 +281,26 @@ describe('site data', () => {
     ['image position that is not text', { ...fixture, hallPhotos: [{ ...fixture.hallPhotos[0], position: 50 }] }, 'hallPhotos[0].position'],
   ] as const) test(`refuses ${name}`, () => expect(() => parseSiteData(patch, 't')).toThrow(path));
 
+  // The example flags: a boolean or absent; anything else is refused with its path, so a
+  // string "false" can never hatch (or un-hatch) a value by accident.
+  const group = (g: object) => ({ ...fixture, groups: [{ ...fixture.groups[0], ...g }] });
+  test('provisional and coachProvisional accept a boolean or nothing', () => {
+    for (const flag of [true, false]) {
+      expect(parseSiteData(session({ provisional: flag }), 't').groups[0].sessions[0].provisional).toBe(flag);
+      expect(parseSiteData(group({ coachProvisional: flag }), 't').groups[0].coachProvisional).toBe(flag);
+    }
+    const { coachProvisional: _c, ...plain } = fixture.groups[0] as typeof fixture.groups[0] & { coachProvisional?: boolean };
+    const absent = parseSiteData({ ...fixture, groups: [{ ...plain, sessions: [{ day: 1, start: '17:00', end: '18:30' }] }] }, 't').groups[0];
+    expect(absent.sessions[0].provisional).toBeUndefined();
+    expect(absent.coachProvisional).toBeUndefined();
+  });
+  for (const bad of ['true', 1, null] as const) {
+    test(`refuses provisional: ${JSON.stringify(bad)}`, () =>
+      expect(() => parseSiteData(session({ provisional: bad }), 't')).toThrow('t: groups[0].sessions[0].provisional must be true or false.'));
+    test(`refuses coachProvisional: ${JSON.stringify(bad)}`, () =>
+      expect(() => parseSiteData(group({ coachProvisional: bad }), 't')).toThrow('t: groups[0].coachProvisional must be true or false.'));
+  }
+
   test('getSiteData loads once per source and again when HOME_FIXTURE changes', async () => {
     process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'home.json';
     const first = getSiteData();
