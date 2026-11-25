@@ -16,7 +16,7 @@ Repo artefacts (code, comments, docs, commits) are English; site copy and Studio
   (club e-mail, Facebook, hall map), `types.ts`
 - `web/src/pages/` routes; `web/src/components/ui/` shared inner-page pieces; `components/home/`
   and one folder per inner page (`athletes`, `calendar`, `news`, `program`, `parents`, `contact`)
-- `web/src/scripts/`: `motion.ts` (homepage GSAP), `page-motion.ts` (inner-page GSAP), browser
+- `web/src/scripts/`: `motion.ts` (homepage GSAP), `page-motion.ts` → `page-moments.ts` (inner-page GSAP, loaded only when motion runs), browser
   helpers (calendar today, filters, form, share, lightbox, 404 rally)
 - `web/src/styles/tokens.css` every colour/type/layout value; `web/src/fixtures/*.json` offline content
 - `web/tests/unit`, `web/tests/e2e`, `web/scripts/` (test runners); `studio/schemaTypes`, `studio/seed`

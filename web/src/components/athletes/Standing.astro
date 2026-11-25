@@ -10,7 +10,7 @@ const { standing } = Astro.props;
 
 <div class="standing">
   {/* The numeral is a picture of the place: screen readers hear it in the lead next to it.
-      It rolls on load (page-motion.ts, place-roll) and holds the digits as text for no-JS
+      It rolls on load (page-moments.ts, place-roll) and holds the digits as text for no-JS
       and reduced motion. */}
   <p class="num" aria-hidden="true"><span data-roll={standing.place}>{standing.place}</span></p>
   <p class="what">{standing.lead} <span>{standing.rest}</span></p>

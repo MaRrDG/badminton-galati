@@ -109,9 +109,10 @@ shuttle caught in the 0). Two framings of one scene: `wide`, and `tall` at 860px
 The scene takes no input: no hint, no pointer or key handling, nothing focusable (Mario had the
 tap-to-smash removed).
 
-Hero lines may wrap below 860px (coach-editable motto must never clip). `initMotion()` returns at once
-under `prefers-reduced-motion: reduce` (`base.css` also turns off smooth scrolling). GSAP is bundled
-from npm, never a CDN. No other animation may be added without Mario's approval.
+Hero lines may wrap below 860px (coach-editable motto must never clip). Under
+`prefers-reduced-motion: reduce` the homepage does not even fetch `motion.ts` (a dynamic import in
+`pages/index.astro`), and `initMotion()` also returns at once (`base.css` also turns off smooth
+scrolling). GSAP is bundled from npm, never a CDN, in a chunk fetched only when motion runs. No other animation may be added without Mario's approval.
 
 ## Inner pages
 
@@ -180,9 +181,10 @@ breakpoint (861–1100px) is where two-column pages squeeze: a side column keeps
 and the text column gives way first. The inner-pages sweep (`testing.md`) checks 1440, 1024,
 861, 860 and 380 for this reason.
 
-### Motion: one moment per page (`web/src/scripts/page-motion.ts`)
+### Motion: one moment per page (`web/src/scripts/page-motion.ts`, `page-moments.ts`)
 
-A page calls `initPageMotion(moment)` once; it returns at once under reduced motion. Rolling
+A page calls `initPageMotion(moment)` once; it returns at once under reduced motion or when the
+moment's targets are not on the page, and only otherwise imports `page-moments.ts` (with GSAP). Rolling
 numerals share `digitBands()` (`scripts/roll.ts`) with the homepage roster.
 
 | Page | Moment | Behaviour | Source |

@@ -31,7 +31,6 @@ const hasRoster = home.athletes.length > 0;
 </Base>
 
 <script>
-  import { initMotion } from '../scripts/motion';
-
-  initMotion();
+  // GSAP and the motion layer are fetched only when motion runs; reduced motion shows the page as rendered.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) void import('../scripts/motion').then(m => m.initMotion());
 </script>

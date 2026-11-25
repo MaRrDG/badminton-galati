@@ -100,7 +100,7 @@ The menu (`SiteHeader.astro`) marks the current entry with `isCurrent()` (`lib/n
 | `web/src/components/{athletes,calendar,news,program,parents,contact}/` | The inner pages' own parts |
 | `web/src/components/notfound/RallyScene.astro` | The 404 net and two players as static SVG, once per framing |
 | `web/src/scripts/motion.ts` | `initMotion()`: the homepage's five motion moments (GSAP) |
-| `web/src/scripts/page-motion.ts` | `initPageMotion(moment)`: the one moment of each inner page (GSAP); `roll.ts` holds the digit bands shared with the homepage roster |
+| `web/src/scripts/page-motion.ts` | `initPageMotion(moment)`: the one moment of each inner page; checks reduced motion and the moment's targets, then imports `page-moments.ts` (the moments, with GSAP); `roll.ts` holds the digit bands shared with the homepage roster |
 | `web/src/scripts/rally.ts` | `initRally()`: steps the 404 rally per animation frame (no GSAP) |
 | `web/src/scripts/countdown.ts`, `calendar-today.ts`, `calendar-panel.ts` | The visitor's clock: countdown labels; the calendar's today, statuses and next event; the calendar's side panel |
 | `web/src/scripts/filter-status.ts`, `lightbox.ts`, `share.ts`, `trial-form.ts` | Filter count announcements; the article gallery's lightbox; the share row; the trial form's checks, states and sending |

@@ -22,7 +22,7 @@ const { athlete, best, caption, tone, filter } = tile;
         <InitialTile name={athlete.name} tone={tone} size="tile" />
       )
     }
-    {/* The place rolls in (page-motion.ts, tile-roll); the digits stay as text for no-JS and reduced motion. */}
+    {/* The place rolls in (page-moments.ts, tile-roll); the digits stay as text for no-JS and reduced motion. */}
     {best && <p class="mark"><b data-roll={best.place}>{best.place}</b> în țară</p>}
   </div>
   <div class="cap">

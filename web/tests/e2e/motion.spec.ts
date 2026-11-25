@@ -247,3 +247,21 @@ test('motion is bundled, not loaded from another site', async ({ page, baseURL }
   // And the motion layer did run: it marks the hall whose strip it moves.
   await expect(page.locator('.hall.js-rally')).toHaveCount(1);
 });
+
+// GSAP is fetched only when motion will run: under reduced motion the homepage and an inner
+// page request no script holding it; with motion they do (so the marker is a real one). A fresh
+// context per visit, so nothing comes from the cache.
+test('GSAP is loaded only when motion runs', async ({ browser, baseURL }) => {
+  const MARK = 'GreenSockGlobals';
+  for (const reducedMotion of ['reduce', 'no-preference'] as const)
+    for (const path of ['/', '/noutati/']) {
+      const ctx = await browser.newContext({ baseURL, reducedMotion });
+      const page = await ctx.newPage();
+      const bodies: Promise<string>[] = [];
+      page.on('response', r => { if (r.request().resourceType() === 'script' && r.status() === 200) bodies.push(r.text()); });
+      await page.goto(path, { waitUntil: 'networkidle' });
+      const withGsap = (await Promise.all(bodies)).some(b => b.includes(MARK));
+      expect(withGsap, `${path}, ${reducedMotion}`).toBe(reducedMotion === 'no-preference');
+      await ctx.close();
+    }
+});
