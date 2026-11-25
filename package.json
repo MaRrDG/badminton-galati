@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm -C web dev",
     "build": "pnpm -C web build",
-    "test": "pnpm -C web test",
+    "test": "pnpm -r test",
     "e2e": "pnpm -C web e2e"
   }
 }

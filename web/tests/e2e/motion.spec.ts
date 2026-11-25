@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { pinClock } from './clock';
-import { serverURL } from './servers';
+import { SERVERS, serverURL, type ServerName } from './servers';
 
 // GSAP runs on Date.now, so the clock is pinned but keeps running (see pinClock).
 test.beforeEach(async ({ page }) => {
@@ -188,15 +188,32 @@ test('reduced motion shows final states', async ({ browser }) => {
   await ctx.close();
 });
 
-test('motion never causes horizontal overflow mid-scroll', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 }); await page.goto('/');
-  const height = await page.evaluate(() => document.documentElement.scrollHeight);
-  for (let y = 0; y < height; y += 400) { await page.evaluate(v => scrollTo(0, v), y); await page.waitForTimeout(150);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0); }
-});
+// Sections clip sideways overflow, so a scrollWidth check could never fail; measure the text itself.
+for (const server of ['home', 'no-athletes'] as const) for (const [w, h] of [[390, 844], [1440, 900]] as const)
+  test(`hero lines and headings stay on screen while scrolling: ${server} at ${w}`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h }); await page.goto(serverURL(server), { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1500); // the hero intro
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    for (let y = 0; y < height; y += 450) {
+      await page.evaluate(v => scrollTo(0, v), y); await page.waitForTimeout(400);
+      const off = await page.evaluate(() => [...document.querySelectorAll('.hero h1 span, main h2.display')].flatMap(e => {
+        const range = document.createRange();
+        range.selectNodeContents(e);
+        const r = range.getBoundingClientRect();
+        const onScreen = r.bottom > 0 && r.top < innerHeight;
+        return onScreen && (r.left < -0.5 || r.right > innerWidth + 0.5)
+          ? [`${e.textContent!.trim()}: ${Math.round(r.left)}..${Math.round(r.right)}`] : [];
+      }));
+      expect(off, `${server} ${w}×${h} at y=${y}`).toEqual([]);
+    }
+  });
 
-test('no page errors', async ({ page }) => { const errs: string[] = []; page.on('pageerror', e => errs.push(e.message));
-  await page.goto('/'); await page.mouse.wheel(0, 8000); await page.waitForTimeout(800); expect(errs).toEqual([]); });
+for (const server of Object.keys(SERVERS) as ServerName[])
+  test(`no page errors: ${server}`, async ({ page }) => {
+    const errs: string[] = []; page.on('pageerror', e => errs.push(e.message));
+    await page.goto(serverURL(server)); await page.mouse.wheel(0, 8000); await page.waitForTimeout(800);
+    expect(errs).toEqual([]);
+  });
 
 test('motion is bundled, not loaded from another site', async ({ page }) => {
   const foreign: string[] = [];

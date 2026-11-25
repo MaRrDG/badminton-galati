@@ -48,11 +48,18 @@ test('groups are two plain lists', async ({ page }) => {
 
 test('every image declares its size and has alt text', async ({ page }) => {
   await page.goto('/');
-  // An empty alt is allowed only on the club logo, which is decorative next to the club's name.
-  const bad = await page.locator('img').evaluateAll(i => i.filter(e =>
-    !e.getAttribute('width') || !e.getAttribute('height') || e.getAttribute('alt') === null ||
-    (!e.getAttribute('alt') && !e.getAttribute('src')!.endsWith('/logo.jpg'))).length);
-  expect(bad).toBe(0);
+  // An empty alt is allowed only on an image marked decorative (data-decorative), and such an
+  // image must have exactly alt="".
+  const imgs = await page.locator('img').evaluateAll(i => i.map(e => ({
+    src: e.getAttribute('src'), width: e.getAttribute('width'), height: e.getAttribute('height'),
+    alt: e.getAttribute('alt'), decorative: e.hasAttribute('data-decorative'),
+  })));
+  expect(imgs.filter(i => i.decorative).length).toBeGreaterThan(0);
+  for (const img of imgs) {
+    expect(img.width && img.height, `${img.src} size`).toBeTruthy();
+    if (img.decorative) expect(img.alt, `${img.src} is decorative`).toBe('');
+    else expect(img.alt?.trim(), `${img.src} alt`).toBeTruthy();
+  }
 });
 
 test('the hero photo loads first, everything below the fold waits', async ({ page }) => {

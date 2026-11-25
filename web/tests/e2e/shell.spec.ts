@@ -1,4 +1,4 @@
-import { test, expect, type Locator } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 
 test('shell renders in Romanian with nav and footer', async ({ page }) => {
   await page.goto('/');
@@ -20,6 +20,31 @@ test('fonts are self-hosted', async ({ page }) => {
   page.on('request', (r) => hosts.add(new URL(r.url()).host));
   await page.goto('/');
   expect([...hosts].some((h) => h.includes('googleapis') || h.includes('gstatic'))).toBe(false);
+});
+
+test.describe('narrow menu', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  const links = ['Acasă', 'Sportivi', 'Program', 'Calendar', 'Noutăți', 'Contact'];
+
+  const opensAndCloses = async (page: Page) => {
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Meniu principal' });
+    for (const n of links) await expect(nav.getByRole('link', { name: n })).toBeHidden();
+    await nav.getByText('Meniu', { exact: true }).click();
+    for (const n of links) await expect(nav.getByRole('link', { name: n })).toBeVisible();
+    await nav.getByText('Meniu', { exact: true }).click();
+    await expect(nav.getByRole('link', { name: 'Acasă' })).toBeHidden();
+  };
+
+  test('links stay hidden until "Meniu" is clicked', async ({ page }) => {
+    await opensAndCloses(page);
+  });
+
+  test('works without JavaScript', async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    await opensAndCloses(await ctx.newPage());
+    await ctx.close();
+  });
 });
 
 test.describe('focus ring', () => {
