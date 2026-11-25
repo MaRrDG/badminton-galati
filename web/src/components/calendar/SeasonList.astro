@@ -137,7 +137,9 @@ const halves = [
       grid-template-columns: 1fr;
     }
   }
-  @media (max-width: 420px) {
+  /* Under 420px, and in the two-column list just above the breakpoint, the city goes under the
+     title so a long title is never squeezed beside it. */
+  @media (max-width: 420px), (min-width: 861px) and (max-width: 1000px) {
     .li {
       grid-template-columns: 6.4rem minmax(0, 1fr);
       column-gap: 10px;

@@ -245,16 +245,37 @@ test.describe('season over', on('quiet-season'), () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/calendar/');
     const shared = page.locator(block('CR U15 și CR U23'));
-    await expect(shared).toHaveAttribute('aria-label', 'CR U15 și CR U23, 27–29 martie, București, s-a jucat; Turneu de test, 28 martie, București, s-a jucat');
+    await expect(shared).toHaveAttribute('aria-label', 'CR U15 și CR U23, 27–29 martie, București, s-a jucat; Turneu de test pentru juniori, cu probe de simplu, dublu și dublu mixt, 28 martie, București, s-a jucat');
     await shared.click();
     const panel = page.locator('.panel');
     await expect(panel).toContainText('CR U15 și CR U23');
-    await panel.getByRole('button', { name: 'Turneu de test' }).click();
-    await expect(panel.locator('.pt')).toHaveText('Turneu de test');
+    await panel.getByRole('button', { name: 'Turneu de test pentru juniori, cu probe de simplu, dublu și dublu mixt' }).click();
+    await expect(panel.locator('.pt')).toHaveText('Turneu de test pentru juniori, cu probe de simplu, dublu și dublu mixt');
     await expect(panel.getByRole('button', { name: 'CR U15 și CR U23' })).toBeFocused();
-    await expect(page.locator('[data-panel-live]')).toHaveText('Turneu de test, 28 martie, București, s-a jucat');
+    await expect(page.locator('[data-panel-live]')).toHaveText('Turneu de test pentru juniori, cu probe de simplu, dublu și dublu mixt, 28 martie, București, s-a jucat');
     await panel.getByRole('button', { name: 'CR U15 și CR U23' }).click();
     await expect(panel.locator('.pt')).toHaveText('CR U15 și CR U23');
+  });
+
+  // Two list columns from 861px leave little room: there the city goes under the title (as at
+  // 420px and below), so a long title and a home row's city with its tag never squeeze each other.
+  test('list rows keep the title wide where the two list columns are narrow', async ({ page }) => {
+    const rows = () => page.locator('.li').evaluateAll(els => els.map(e => {
+      const t = e.querySelector('.lt')!.getBoundingClientRect();
+      const c = e.querySelector('.lc')!.getBoundingClientRect();
+      return { title: e.querySelector('.lt')!.textContent!, width: t.width, below: c.top >= t.bottom - 1 };
+    }));
+    for (const width of [861, 1000]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/calendar/');
+      for (const r of await rows()) {
+        expect(r.below, `${width}: city under "${r.title}"`).toBe(true);
+        expect(r.width, `${width}: width of "${r.title}"`).toBeGreaterThanOrEqual(220);
+      }
+    }
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/calendar/');
+    expect((await rows()).every(r => !r.below)).toBe(true);
   });
 
   test('pinning a played event shows its article in the panel', async ({ page }) => {
