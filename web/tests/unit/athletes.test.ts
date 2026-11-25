@@ -1,8 +1,11 @@
-import { describe, expect, test } from 'vitest';
-import { athleteCategory, athleteFilters, athletesCountLabel, athletesView, athleteWall } from '../../src/lib/athletes';
-import { parseSiteData } from '../../src/lib/content';
-import type { Athlete } from '../../src/lib/types';
+import { afterEach, describe, expect, test } from 'vitest';
+import {
+  athleteCategory, athleteFilters, athleteProfile, athletesCountLabel, athletesView, athleteWall, medalOf,
+} from '../../src/lib/athletes';
+import { getAthleteProfiles, parseSiteData } from '../../src/lib/content';
+import type { Athlete, Post } from '../../src/lib/types';
 import home from '../../src/fixtures/home.json';
+import quiet from '../../src/fixtures/quiet-season.json';
 
 // Plan 1's athletes (home.test.ts): the real names with their real FRB places.
 const nistor = {
@@ -123,5 +126,116 @@ describe('athletesView', () => {
     const site = parseSiteData({ ...home, athletes: [fictional('z', 'Zet Exemplu-Ana', 2015)] }, 't');
     expect(athletesView(site, '2026-11-25').tiles[0].category).toBe('U13');
     expect(athletesView(site, '2028-01-10').tiles[0].category).toBe('U15');
+  });
+});
+
+describe('medalOf', () => {
+  test('a medal word, trimmed and in any case; anything else is no medal', () => {
+    expect(medalOf(' Aur ')).toBe('aur');
+    expect(medalOf('ARGINT')).toBe('argint');
+    expect(medalOf('bronz')).toBe('bronz');
+    expect(medalOf('locul 5')).toBeUndefined();
+    expect(medalOf('')).toBeUndefined();
+  });
+});
+
+describe('athleteProfile', () => {
+  const homeSite = parseSiteData(home, 'home.json');
+  const quietSite = parseSiteData(quiet, 'quiet-season.json');
+  const nistorOf = (site: typeof homeSite) => site.athletes.find(a => a.slug === 'nistor-cristian-ionut')!;
+  const zet = quietSite.athletes.find(a => a.slug === 'zet-exemplu-ana')!;
+
+  test('a ranked athlete: name lines, place, its source, what is not known yet', () => {
+    const p = athleteProfile(homeSite, nistorOf(homeSite), '2026-11-25');
+    expect(p.nameLines).toEqual(['Nistor', 'Cristian-Ionuț']);
+    expect(p.category).toBe('U17');
+    expect(p.discipline).toBe('Simplu băieți');
+    expect(p.best).toEqual({ category: 'U17', discipline: 'SB', place: 2, points: 168 });
+    expect(p.standing).toEqual({
+      place: 2, lead: 'Locul 2 în țară', rest: 'la U17, simplu băieți, cu 168 de puncte',
+      source: 'Clasamentul FRB, săptămâna 46, 9–15 noiembrie 2026',
+    });
+    expect(p.groupName).toBeUndefined();
+    expect(p.posts).toEqual([]);
+    expect(p.medals).toEqual([]);
+    // The same colour as the athlete's tile on the wall.
+    expect(p.tone).toBe('blue');
+  });
+
+  test('without points or a ranking week, the standing says only what is known', () => {
+    const pazargic = homeSite.athletes.find(a => a.slug === 'pazargic-ligia-beatrice')!;
+    const { rankingWeek: _week, ...noWeek } = homeSite;
+    const p = athleteProfile(noWeek, pazargic, '2026-11-25');
+    expect(p.standing).toEqual({ place: 3, lead: 'Locul 3 în țară', rest: 'la U15, simplu fete' });
+    expect(p.tone).toBe('deep');
+  });
+
+  test('an unranked athlete: category from the birth year, the group, a medal from an article', () => {
+    const z = athleteProfile(quietSite, zet, '2026-11-25');
+    expect(z.nameLines).toEqual(['Zet', 'Exemplu-Ana']);
+    expect(z.category).toBe('U13');
+    expect(z.groupName).toBe('Inițiere');
+    expect(z.best).toBeUndefined();
+    expect(z.standing).toBeUndefined();
+    expect(z.discipline).toBeUndefined();
+    expect(z.posts.map(p => p.slug)).toEqual(['articol-de-test-cu-galerie']);
+    expect(z.medals).toEqual([
+      { year: 2026, rows: [{ medal: 'aur', discipline: 'SF', post: { title: 'Articol de test cu galerie', slug: 'articol-de-test-cu-galerie' } }] },
+    ]);
+    expect(athleteProfile(quietSite, nistorOf(quietSite), '2026-11-25').category).toBeUndefined();
+  });
+
+  test('articles newest first; medals by year, newest first, gold before silver before bronze', () => {
+    const post = (slug: string, date: string, results: Post['results']): Post => ({
+      title: `Titlu ${slug}`, slug, kind: 'competitie', date, body: [], gallery: [], results,
+    });
+    const id = zet.id;
+    const site = {
+      ...quietSite,
+      posts: [
+        post('c', '2025-05-01', [{ athleteId: id, result: 'aur' }]),
+        post('a', '2026-06-01', [{ athleteId: id, discipline: 'DX', result: 'Bronz' }, { athleteId: 'other', result: 'aur' }]),
+        post('none', '2026-07-01', [{ athleteId: 'other', result: 'aur' }]),
+        post('b', '2026-02-01', [{ athleteId: id, discipline: 'SF', result: 'argint' }, { athleteId: id, discipline: 'DF', result: 'aur' }]),
+        post('d', '2026-01-01', [{ athleteId: id, discipline: 'SF', result: 'locul 5' }]),
+      ],
+    };
+    const before = site.posts.map(p => p.slug);
+    const p = athleteProfile(site, zet, '2026-11-25');
+    expect(p.posts.map(x => x.slug)).toEqual(['a', 'b', 'd', 'c']);
+    expect(p.medals.map(y => [y.year, y.rows.map(r => [r.medal, r.discipline, r.post.slug])])).toEqual([
+      [2026, [['aur', 'DF', 'b'], ['argint', 'SF', 'b'], ['bronz', 'DX', 'a']]],
+      [2025, [['aur', undefined, 'c']]],
+    ]);
+    // The shared site data is never reordered.
+    expect(site.posts.map(x => x.slug)).toEqual(before);
+  });
+
+  test('a one-word name keeps an empty second line', () => {
+    const solo: Athlete = { id: 's', name: 'Zet', slug: 'zet', consent: true, rankings: [] };
+    expect(athleteProfile({ ...quietSite, athletes: [solo] }, solo, '2026-11-25').nameLines).toEqual(['Zet', '']);
+  });
+
+  test('refuses an athlete without consent', () => {
+    expect(() => athleteProfile(homeSite, { ...nistorOf(homeSite), consent: false }, '2026-11-25')).toThrow(/consent/);
+  });
+});
+
+describe('getAthleteProfiles', () => {
+  const saved = { CONTENT_SOURCE: process.env.CONTENT_SOURCE, HOME_FIXTURE: process.env.HOME_FIXTURE, BUILD_TODAY: process.env.BUILD_TODAY };
+  afterEach(() => {
+    for (const [k, v] of Object.entries(saved)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  });
+
+  test('one profile per consented athlete, never one for an athlete without consent', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.BUILD_TODAY = '2026-11-25';
+    process.env.HOME_FIXTURE = 'mixed-strip.json';
+    expect((await getAthleteProfiles()).map(p => p.athlete.slug))
+      .toEqual(['nistor-cristian-ionut', 'pazargic-ligia-beatrice', 'bordeianu-nectarie-ioan']);
+    process.env.HOME_FIXTURE = 'sparse.json';
+    expect(await getAthleteProfiles()).toEqual([]);
   });
 });

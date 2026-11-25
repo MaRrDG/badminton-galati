@@ -1,0 +1,169 @@
+---
+import Photo from '../ui/Photo.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { formatDateRo } from '../../lib/dates';
+import { disciplineLabel } from '../../lib/home';
+import type { AthleteProfile } from '../../lib/athletes';
+
+interface Props {
+  profile: AthleteProfile;
+}
+
+const { profile } = Astro.props;
+const { athlete, posts, medals } = profile;
+---
+
+<!-- Below the identity, on white: the articles (real content, first), then the quiet lines
+     for what is not known yet. Nothing empty here is louder than the block above. -->
+<section class="more" aria-label="Articole, turnee și medalii">
+  <div class="wrap">
+    {
+      posts.length > 0 && (
+        <div>
+          <SectionHeading id="arts-h">Apare în articolele clubului</SectionHeading>
+          <ul class="arts" aria-labelledby="arts-h">
+            {posts.map(post => (
+              <li>
+                <a class:list={{ bare: !post.cover }} href={`/noutati/${post.slug}/`}>
+                  {post.cover && <Photo img={post.cover} sizes="190px" />}
+                  <div>
+                    <time datetime={post.date}>{formatDateRo(post.date)}</time>
+                    <span>{post.title}</span>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    <div class="quiet">
+      <div>
+        <SectionHeading id="turnee-h">Turneele care contează</SectionHeading>
+        <p>
+          Apar aici după prima sincronizare cu clasamentul FRB.{
+            athlete.frbUrl && (
+              <>
+                {' '}Până atunci le găsești pe <a class="textlink" href={athlete.frbUrl}>Profilul FRB</a>.
+              </>
+            )
+          }
+        </p>
+      </div>
+      <div>
+        <SectionHeading id="medalii-h">Medalii</SectionHeading>
+        {
+          medals.length === 0 ? (
+            <p>Încă nu are medalii trecute în articolele clubului.</p>
+          ) : (
+            <ul class="medals" aria-labelledby="medalii-h">
+              {medals.map(({ year, rows }) => (
+                <li>
+                  {year}:{' '}
+                  {rows.map((row, i) => (
+                    <>
+                      {i > 0 && '; '}
+                      {row.medal}
+                      {row.discipline && `, ${disciplineLabel(row.discipline)}`} – <a href={`/noutati/${row.post.slug}/`}>{row.post.title}</a>
+                    </>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .more {
+    padding: clamp(40px, 5.4vw, 76px) 0 clamp(48px, 6vw, 88px);
+  }
+  .more .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 40px clamp(32px, 5.4vw, 80px);
+    align-items: start;
+  }
+  /* The mockup's quiet scale: smaller than the inner pages' usual section heading. */
+  .more :global(.h2s) {
+    font-size: 1.2rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+  .arts {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+  }
+  .arts li + li {
+    margin-top: clamp(14px, 2vw, 22px);
+  }
+  .arts a {
+    display: grid;
+    grid-template-columns: clamp(120px, 15vw, 190px) minmax(0, 1fr);
+    gap: clamp(14px, 2vw, 24px);
+    align-items: center;
+    text-decoration: none;
+  }
+  .arts a.bare {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .arts :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .arts time {
+    display: block;
+    color: var(--red-ink);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .arts span {
+    display: block;
+    margin-top: 4px;
+    font-size: clamp(1.12rem, 1.6vw, 1.32rem);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .arts a:hover span {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .quiet > div + div {
+    margin-top: clamp(24px, 3vw, 34px);
+  }
+  .quiet p {
+    margin-top: 6px;
+    max-width: 44ch;
+  }
+  .medals {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    max-width: 44ch;
+  }
+  .medals li + li {
+    margin-top: 4px;
+  }
+  .medals a {
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 860px) {
+    .more .wrap {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .arts a {
+      grid-template-columns: 112px minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+</style>

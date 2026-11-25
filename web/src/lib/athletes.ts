@@ -1,9 +1,11 @@
 // The athletes wall (/sportivi/): age categories, tile order, the category filter and its counts.
+// The athlete profile (/sportivi/[slug]/): name lines, facts, the standing, articles and medals.
+import { formatRangeRo } from './dates';
 import type { FilterOption } from './filter';
-import { bestRanking, disciplineLabel, visibleAthletes } from './home';
+import { bestRanking, disciplineLabel, newestFirst, pointsUnit, visibleAthletes } from './home';
 import { countRo } from './ro';
 import { toneAt, type Tone } from './tiles';
-import type { Athlete, Ranking, RankingWeek, SiteData } from './types';
+import type { Athlete, Discipline, Post, Ranking, RankingWeek, SiteData } from './types';
 
 /** Youth categories by age limit: U-n while the athlete is younger than n in the season year. */
 const YOUTH = [9, 11, 13, 15, 17, 19] as const;
@@ -103,4 +105,91 @@ export type AthletesPage = { tiles: WallTile[]; filters: FilterOption[]; ranking
 export function athletesView(site: SiteData, today: string): AthletesPage {
   const tiles = athleteWall(site.athletes, Number(today.slice(0, 4)));
   return { tiles, filters: athleteFilters(tiles), ...(site.rankingWeek ? { rankingWeek: site.rankingWeek } : {}) };
+}
+
+export type Medal = 'aur' | 'argint' | 'bronz';
+/** Medal order inside a year. */
+const MEDALS: readonly Medal[] = ['aur', 'argint', 'bronz'];
+
+/** The medal an article result names (" Aur " → "aur"); any other result ("locul 5") is none. */
+export function medalOf(result: string): Medal | undefined {
+  const word = result.trim().toLocaleLowerCase('ro');
+  return MEDALS.find(m => m === word);
+}
+
+export type MedalRow = { medal: Medal; discipline?: Discipline; post: Pick<Post, 'title' | 'slug'> };
+
+export type AthleteProfile = {
+  athlete: Athlete;
+  /** The family name, then the given names: the two lines of the page title. */
+  nameLines: [string, string];
+  category?: string;
+  /** The discipline of the best place, capitalised for the facts ("Simplu băieți"). */
+  discipline?: string;
+  groupName?: string;
+  best?: Ranking;
+  /** Only with a place: "Locul 2 în țară" / "la U17, simplu băieți, cu 168 de puncte" / the FRB week. */
+  standing?: { place: number; lead: string; rest: string; source?: string };
+  /** The articles whose results name the athlete, newest first. */
+  posts: Post[];
+  /** Medals from those results, by the article's year (newest first), gold before silver before bronze. */
+  medals: { year: number; rows: MedalRow[] }[];
+  /** The colour of the initials when there is no photo: the same as the athlete's tile on the wall. */
+  tone: Tone;
+};
+
+const capitalised = (s: string) => s.charAt(0).toLocaleUpperCase('ro') + s.slice(1);
+
+/**
+ * The profile of one consented athlete, built on `today` (YYYY-MM-DD; the category without a
+ * place is counted in its year). Throws for an athlete without consent, so no page can be
+ * made for one. Never reorders the site data.
+ */
+export function athleteProfile(site: SiteData, athlete: Athlete, today: string): AthleteProfile {
+  if (athlete.consent !== true) throw new Error(`No profile without consent (athlete ${athlete.id}).`);
+  const seasonYear = Number(today.slice(0, 4));
+  const [first = '', ...others] = athlete.name.split(' ').filter(Boolean);
+  const best = bestRanking(athlete);
+  const category = athleteCategory(athlete, seasonYear);
+  const groupName = site.groups.find(g => g.id === athlete.groupId)?.name;
+  const tone = athleteWall(site.athletes, seasonYear).find(t => t.athlete.id === athlete.id)?.tone ?? toneAt(0);
+
+  let standing: AthleteProfile['standing'];
+  if (best) {
+    const points = best.points !== undefined ? `, cu ${best.points} ${pointsUnit(best.points)}` : '';
+    const week = site.rankingWeek;
+    standing = {
+      place: best.place,
+      lead: `Locul ${best.place} în țară`,
+      rest: `la ${best.category}, ${disciplineLabel(best.discipline)}${points}`,
+      ...(week ? { source: `Clasamentul FRB, săptămâna ${week.week}, ${formatRangeRo(week.from, week.to)}` } : {}),
+    };
+  }
+
+  const posts = newestFirst(site.posts.filter(p => p.results.some(r => r.athleteId === athlete.id)));
+  const medals: AthleteProfile['medals'] = [];
+  for (const post of posts) {
+    const year = Number(post.date.slice(0, 4));
+    for (const r of post.results) {
+      const medal = r.athleteId === athlete.id ? medalOf(r.result) : undefined;
+      if (!medal) continue;
+      let group = medals.find(m => m.year === year);
+      if (!group) medals.push((group = { year, rows: [] }));
+      group.rows.push({ medal, ...(r.discipline ? { discipline: r.discipline } : {}), post: { title: post.title, slug: post.slug } });
+    }
+  }
+  // Posts are newest first, so the years are too; the sort is stable, so equal medals keep the post order.
+  for (const group of medals) group.rows.sort((x, y) => MEDALS.indexOf(x.medal) - MEDALS.indexOf(y.medal));
+
+  return {
+    athlete,
+    nameLines: [first, others.join(' ')],
+    ...(category !== undefined ? { category } : {}),
+    ...(best ? { discipline: capitalised(disciplineLabel(best.discipline)), best } : {}),
+    ...(groupName !== undefined ? { groupName } : {}),
+    ...(standing ? { standing } : {}),
+    posts,
+    medals,
+    tone,
+  };
 }

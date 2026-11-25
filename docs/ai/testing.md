@@ -79,7 +79,7 @@ A test runs on `home` unless tagged: `test.describe('â€¦', on('sparse'), () => â
 | `src/components/Site*.astro` | shell, home |
 | `src/lib/**` | home, motion, build-output |
 | `src/fixtures/home.json` | all |
-| `src/fixtures/{sparse,mixed-strip,quiet-season}.json` | home, motion, scroll-scan, athletes |
+| `src/fixtures/{sparse,mixed-strip,quiet-season}.json` | home, motion, scroll-scan, athletes, build-output |
 | `tests/e2e/**` | Playwright's own `--only-changed` (spec + importers) |
 | `tests/unit/**`, `scripts/e2e-changed.mjs` | none |
 | other `src/`, `public/`, `astro.config.mjs`, `package.json`, `tsconfig.json`, `playwright.config.ts`, `scripts/playwright.mjs` | all |

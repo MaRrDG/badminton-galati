@@ -20,7 +20,7 @@
 //   src/scripts/**                     motion, scroll-scan, home, athletes, build-output
 //   src/components/home/**             home, motion, scroll-scan, build-output
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
-//   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan, athletes
+//   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan, athletes, build-output
 //   tests/e2e/<name>.spec.ts           that spec
 //   tests/unit/**, vitest.config.ts, .env.example, *.md   no e2e spec
 //   everything else (src/lib, Site*.astro, layouts, pages, styles, public, src/fixtures/home.json,
@@ -53,7 +53,7 @@ const WEB_RULES = [
   [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, BUILD]],
   [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
   [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],
-  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES]],
+  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, BUILD]],
   [/^tests\/e2e\/([^/]+\.spec\.ts)$/, m => [m[1]]],
   [/^tests\/unit\//, NONE],
   [/^(vitest\.config\.ts|\.env\.example|[^/]+\.md)$/, NONE],

@@ -1,4 +1,4 @@
-import { athletesView, type AthletesPage } from './athletes';
+import { athleteProfile, athletesView, type AthleteProfile, type AthletesPage } from './athletes';
 import { isIsoDate, todayInBucharest } from './dates';
 import { byStart, latestPosts, newestFirst, visibleAthletes } from './home';
 import { fetchHomeQuery, slugifyRo, toHomeData } from './sanity';
@@ -65,6 +65,13 @@ export async function getHomeData(): Promise<HomeData> {
 /** The athletes wall (/sportivi/), with categories counted in the build year. */
 export async function getAthletesPage(): Promise<AthletesPage> {
   return athletesView(await getSiteData(), buildToday());
+}
+
+/** One profile per consented athlete (/sportivi/[slug]/); no page exists for anyone else. */
+export async function getAthleteProfiles(): Promise<AthleteProfile[]> {
+  const site = await getSiteData();
+  const today = buildToday();
+  return visibleAthletes(site.athletes).map(athlete => athleteProfile(site, athlete, today));
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */

@@ -21,6 +21,9 @@ export function initPageMotion(moment: PageMoment): void {
     case 'tile-roll':
       tileRoll();
       break;
+    case 'place-roll':
+      placeRoll();
+      break;
     case 'poster-reveal':
       posterReveal();
       break;
@@ -41,6 +44,19 @@ function posterReveal(): void {
     .timeline({ defaults: { ease: 'power4.out' }, scrollTrigger: { trigger: poster, start: 'top 85%', once: true } })
     .from(plate, { scaleY: 0, duration: 0.6 })
     .from(shot, { clipPath: 'inset(100% 0 0 0)', duration: 0.85 }, '-=.35');
+}
+
+/**
+ * The place numeral of an athlete profile (`.standing [data-roll]`) rolls through the digits
+ * to the place once, 0.3 s after load. The numeral is hidden from screen readers (the lead
+ * next to it says "Locul 2 în țară"), so the band needs no spoken copy.
+ */
+function placeRoll(): void {
+  const el = document.querySelector<HTMLElement>('.standing [data-roll]');
+  if (!el) return;
+  digitBands(el).forEach(({ band, end }, i) =>
+    gsap.fromTo(band, { yPercent: 0 }, { yPercent: end, duration: 1.3 + i * 0.25, delay: 0.3, ease: 'power3.out' }),
+  );
 }
 
 /**

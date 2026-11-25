@@ -182,6 +182,14 @@
       "slug": "bucuresti-cupa-romaniei-u15-2026",
       "kind": "competitie",
       "date": "2026-04-01"
+    },
+    {
+      "title": "Articol de test cu galerie",
+      "slug": "articol-de-test-cu-galerie",
+      "kind": "competitie",
+      "date": "2026-03-30",
+      "competitionId": "competition-2026-03-27-cr-u15-cr-u23",
+      "results": [{ "athleteId": "athlete-zet-exemplu-ana", "discipline": "SF", "result": "aur" }]
     }
   ],
   "hallPhotos": [

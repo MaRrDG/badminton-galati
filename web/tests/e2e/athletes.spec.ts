@@ -110,3 +110,102 @@ test.describe('a photo and a birth year', on('quiet-season'), () => {
     await expect(page.locator('.roster')).not.toContainText('Clasamentul FRB');
   });
 });
+
+test.describe('an athlete profile', () => {
+  test('a profile states place, source and what is not known yet', async ({ page }) => {
+    await page.goto('/sportivi/nistor-cristian-ionut/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Nistor\s+Cristian-Ionuț/);
+    await expect(page.locator('.facts')).toContainText('Grupa');
+    await expect(page.locator('.facts')).toContainText('de confirmat');
+    await expect(page.locator('.facts dt')).toHaveText(['Categoria', 'Proba', 'Grupa']);
+    await expect(page.locator('.facts dd')).toHaveText(['U17', 'Simplu băieți', 'de confirmat']);
+    await expect(page.locator('.standing')).toContainText('Locul 2 în țară la U17, simplu băieți, cu 168 de puncte');
+    await expect(page.locator('.standing')).toContainText('Clasamentul FRB, săptămâna 46, 9–15 noiembrie 2026');
+    await expect(page.getByRole('link', { name: 'Profilul FRB' }).first()).toHaveAttribute('href', 'https://badminton.ro/jucator/236/u17-sb-simplu-baieti/');
+    await expect(page.getByRole('link', { name: 'Toți sportivii' })).toHaveAttribute('href', '/sportivi/');
+    await expect(page.getByText('Apar aici după prima sincronizare cu clasamentul FRB.')).toBeVisible();
+    await expect(page.getByText('Încă nu are medalii trecute în articolele clubului.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Apare în articolele clubului' })).toHaveCount(0);
+    // No photo yet: the initials on a coloured field, the same colour as the tile on the wall.
+    await expect(page.locator('.ident .ini')).toHaveText('NC');
+    await expect(page.locator('.ident .initial')).toHaveClass(/c-blue/);
+  });
+
+  test('the place rolls on load and is not read twice', async ({ page }) => {
+    await page.goto('/sportivi/nistor-cristian-ionut/');
+    await expect(page.locator('.standing [data-roll] i')).toHaveCount(1); // the motion layer built its digit cell
+    await expect(page.locator('.standing .num')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  test('the longest name fits a 380px screen', async ({ browser, baseURL }) => {
+    const ctx = await browser.newContext({ baseURL, viewport: { width: 380, height: 800 } });
+    const page = await ctx.newPage();
+    await page.goto('/sportivi/bordeianu-nectarie-ioan/');
+    const lines = page.locator('h1 span');
+    await expect(lines).toHaveText(['Bordeianu', 'Nectarie-Ioan']);
+    for (const line of await lines.all()) {
+      const box = await line.evaluate(el => {
+        const r = document.createRange();
+        r.selectNodeContents(el);
+        const b = r.getBoundingClientRect();
+        return { left: b.left, right: b.right };
+      });
+      expect(box.left).toBeGreaterThanOrEqual(0);
+      expect(box.right).toBeLessThanOrEqual(380);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await ctx.close();
+  });
+
+  test('reduced motion and no-JS show the place as text', async ({ browser, baseURL }) => {
+    for (const options of [{ reducedMotion: 'reduce' as const }, { javaScriptEnabled: false }]) {
+      const ctx = await browser.newContext({ baseURL, ...options });
+      const page = await ctx.newPage();
+      await page.goto('/sportivi/nistor-cristian-ionut/');
+      await expect(page.locator('[data-roll]')).toHaveText('2');
+      await ctx.close();
+    }
+  });
+});
+
+test.describe('medals and articles', on('quiet-season'), () => {
+  test('a medal from an article links to it, and the article is listed', async ({ page }) => {
+    await page.goto('/sportivi/zet-exemplu-ana/');
+    const medals = page.locator('.medals li');
+    await expect(medals).toHaveText(['2026: aur, simplu fete – Articol de test cu galerie']);
+    await expect(medals.getByRole('link')).toHaveAttribute('href', '/noutati/articol-de-test-cu-galerie/');
+    await expect(page.getByText('Încă nu are medalii')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Apare în articolele clubului' })).toBeVisible();
+    const article = page.locator('.arts a');
+    await expect(article).toHaveAttribute('href', '/noutati/articol-de-test-cu-galerie/');
+    await expect(article).toContainText('30 martie 2026');
+    await expect(article).toContainText('Articol de test cu galerie');
+  });
+
+  test('a photo, a group and no place', async ({ page }) => {
+    await page.goto('/sportivi/zet-exemplu-ana/');
+    const img = page.locator('.ident img');
+    await expect(img).toHaveAttribute('fetchpriority', 'high');
+    await expect(img).toHaveCSS('object-position', '50% 18%');
+    await expect(page.locator('.facts dd')).toHaveText(['U13', 'Inițiere']);
+    await expect(page.locator('.standing, [data-roll]')).toHaveCount(0);
+    // No FRB profile: the tournaments line ends without the link.
+    await expect(page.getByRole('link', { name: 'Profilul FRB' })).toHaveCount(0);
+    await expect(page.getByText('Apar aici după prima sincronizare cu clasamentul FRB.', { exact: true })).toBeVisible();
+  });
+
+  test('without a photo or a place, the initials and nothing loud', async ({ page }) => {
+    await page.goto('/sportivi/nistor-cristian-ionut/');
+    await expect(page.locator('.facts dd')).toHaveText(['de confirmat', 'de confirmat']);
+    await expect(page.locator('.facts dt')).toHaveText(['Categoria', 'Grupa']);
+    await expect(page.locator('.standing')).toHaveCount(0);
+    await expect(page.locator('.ident .ini')).toHaveText('NC');
+    await expect(page.getByRole('link', { name: 'Profilul FRB' })).toHaveCount(2);
+  });
+});
+
+test.describe('no consent, no page', on('mixed-strip'), () => {
+  test('the address answers 404', async ({ page }) => {
+    expect((await page.goto('/sportivi/fara-acord-zamfira/'))!.status()).toBe(404);
+  });
+});
