@@ -66,6 +66,11 @@ export function rosterLayout(a: Athlete[]): RosterBlock[] {
   ] satisfies RosterBlock[]).filter(b => b.rows.length > 0);
 }
 
+/** All posts, newest first (ISO dates compare as strings); the order of equal dates is kept. */
+export function newestFirst(p: Post[]): Post[] {
+  return [...p].sort((x, y) => y.date.localeCompare(x.date));
+}
+
 /** Newest first (ISO dates compare as strings), at most `HOME_POSTS`. */
 export function latestPosts(p: Post[]): Post[] {
   return [...p].sort((x, y) => y.date.localeCompare(x.date)).slice(0, HOME_POSTS);

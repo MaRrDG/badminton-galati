@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { buildToday, getHomeData, parseHomeData } from '../../src/lib/content';
+import { buildToday, getHomeData, getSiteData, parseHomeData, parseSiteData } from '../../src/lib/content';
 import { todayInBucharest } from '../../src/lib/dates';
 import { HOME_QUERY, toHomeData } from '../../src/lib/sanity';
 import fixture from '../../src/fixtures/home.json';
@@ -51,9 +51,9 @@ const rawSample = {
     rankingWeek: { week: 46, from: '2026-11-09', to: '2026-11-15' },
   },
   athletes: [rawAthlete],
-  groups: [{ name: 'Inițiere', audience: 'Copii', track: 'performanta', schedule: null }],
+  groups: [{ _id: 'group-initiere', name: 'Inițiere', audience: 'Copii', track: 'performanta', schedule: null }],
   competitions: [
-    { _id: 'c1', title: 'CN U9 și CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false, postSlug: null },
+    { _id: 'c1', title: 'CN U9 și CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false },
   ],
   posts: [{ title: 'Novi Sad – 2026', slug: 'novi-sad-2026', kind: 'competitie', date: '2026-06-30', cover: rawImg('cover') }],
 };
@@ -87,7 +87,7 @@ describe('fixtures', () => {
   });
 
   test('fixtures drop athletes without consent too', () => {
-    const withHidden = { ...fixture, athletes: [...fixture.athletes, { ...fixture.athletes[0], id: 'x', consent: false }] };
+    const withHidden = { ...fixture, athletes: [...fixture.athletes, { ...fixture.athletes[0], id: 'x', slug: 'x', consent: false }] };
     expect(parseHomeData(withHidden, 'home.json').athletes).toHaveLength(fixture.athletes.length);
   });
 
@@ -162,6 +162,104 @@ describe('fixtures', () => {
   });
 });
 
+/** Test-only athletes on fictional names: tests never attach invented facts to real people. */
+const hidden = { id: 'athlete-fara-acord-zamfira', name: 'Fără-Acord Zamfira', slug: 'fara-acord-zamfira', consent: false, rankings: [] };
+const shown = { id: 'athlete-zet-exemplu-ana', name: 'Zet Exemplu-Ana', slug: 'zet-exemplu-ana', consent: true, rankings: [] };
+const CR_U15_U23 = 'competition-2026-03-27-cr-u15-cr-u23';
+/** A fictional article linked to a real competition of the calendar. */
+const linkedPost = (slug: string, date: string) => ({ title: `Articol de test ${date}`, slug, kind: 'competitie', date, competitionId: CR_U15_U23 });
+
+describe('site data', () => {
+  test('the site keeps every post; the homepage still gets the newest three', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'home.json';
+    const site = await getSiteData();
+    expect(site.posts).toHaveLength(3);
+    expect(site.coaches.map(c => c.name)).toEqual(['Dorel Badiu', 'Iulian Călin', 'Adrian Panfil']);
+    expect(site.info).toEqual({ parents: {}, contact: {} });
+    expect(site.competitions.find(c => c.title === 'CR Echipe Seniori și Cupa U15')!.categories).toEqual(['U15', 'Seniori', 'Echipe']);
+    expect((await getHomeData()).posts).toHaveLength(3);
+  });
+
+  test('new list fields default to empty lists', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'sparse.json';
+    const site = await getSiteData();
+    expect(site.coaches).toEqual([]);
+    expect(site.info).toEqual({ parents: {}, contact: {} });
+    for (const g of site.groups) expect(g.sessions).toEqual([]);
+    for (const c of site.competitions) expect(c.categories).toEqual([]);
+    for (const p of site.posts) expect([p.body, p.gallery, p.results]).toEqual([[], [], []]);
+  });
+
+  test('groups take the seed ids and slugs; a fixture without them gets the same from the name', () => {
+    const expected = [
+      ['group-initiere', 'initiere'], ['group-performanta', 'performanta'], ['group-elite', 'elite'],
+      ['group-amatori-copii', 'amatori-copii'], ['group-amatori-adulti', 'amatori-adulti'],
+    ];
+    expect(parseSiteData(fixture, 'home.json').groups.map(g => [g.id, g.slug])).toEqual(expected);
+    const bare = fixture.groups.map(({ id: _id, slug: _slug, ...g }) => g);
+    expect(parseSiteData({ ...fixture, groups: bare }, 't').groups.map(g => [g.id, g.slug])).toEqual(expected);
+  });
+
+  test('a tag naming an athlete without consent is dropped', () => {
+    const s = parseSiteData({ ...fixture, athletes: [...fixture.athletes, hidden, shown],
+      posts: [{ ...fixture.posts[0], results: [{ athleteId: hidden.id, result: 'aur' }, { athleteId: shown.id, result: 'locul 5' }] }] }, 't');
+    expect(s.posts[0].results.map(r => r.athleteId)).toEqual([shown.id]);
+    expect(s.athletes.map(a => a.id)).not.toContain(hidden.id);
+  });
+
+  test('the site keeps all posts, newest first', () => {
+    const post = (date: string) => ({ title: `Articol ${date}`, slug: `a-${date}`, kind: 'proiecte', date });
+    const s = parseSiteData({ ...fixture, posts: ['2026-03-01', '2026-06-30', '2025-12-24', '2026-05-13', '2026-04-01'].map(post) }, 't');
+    expect(s.posts.map(p => p.date)).toEqual(['2026-06-30', '2026-05-13', '2026-04-01', '2026-03-01', '2025-12-24']);
+  });
+
+  test('a competition gets the slug of the newest post linked to it', () => {
+    const s = parseSiteData({ ...fixture, posts: [linkedPost('mai-vechi', '2026-03-30'), linkedPost('mai-nou', '2026-04-02'), ...fixture.posts] }, 't');
+    expect(s.competitions.find(c => c.id === CR_U15_U23)!.postSlug).toBe('mai-nou');
+    expect(s.competitions.filter(c => c.postSlug !== undefined)).toHaveLength(1);
+  });
+
+  test('a fixture postSlug on a competition is ignored', () => {
+    const competitions = fixture.competitions.map(c => (c.id === CR_U15_U23 ? { ...c, postSlug: 'x' } : c));
+    const c = parseSiteData({ ...fixture, competitions }, 't').competitions.find(x => x.id === CR_U15_U23)!;
+    expect(c.postSlug).toBeUndefined();
+    expect(c).not.toHaveProperty('postSlug');
+  });
+
+  const session = (s: object) => ({ ...fixture, groups: [{ ...fixture.groups[0], sessions: [{ day: 1, start: '17:00', end: '18:30', ...s }] }] });
+  for (const [name, patch, path] of [
+    ['duplicate athlete slug', { ...fixture, athletes: [{ ...shown, slug: 'a' }, { ...hidden, slug: 'a' }] }, 'athletes[1].slug'],
+    ['duplicate post slug', { ...fixture, posts: [fixture.posts[0], { ...fixture.posts[1], slug: fixture.posts[0].slug }] }, 'posts[1].slug'],
+    ['duplicate group slug', { ...fixture, groups: [fixture.groups[0], { ...fixture.groups[1], slug: fixture.groups[0].slug }] }, 'groups[1].slug'],
+    ['unknown competitionId', { ...fixture, posts: [{ ...fixture.posts[0], competitionId: 'nope' }] }, 'posts[0].competitionId'],
+    ['session ending before it starts', session({ start: '18:30', end: '17:00' }), 'groups[0].sessions[0]'],
+    ['session ending when it starts', session({ start: '18:30', end: '18:30' }), 'groups[0].sessions[0]'],
+    ['time written 9:00', session({ start: '9:00' }), 'groups[0].sessions[0].start'],
+    ['day outside the week', session({ day: 8 }), 'groups[0].sessions[0].day'],
+    ['unknown category', { ...fixture, competitions: [{ ...fixture.competitions[0], categories: ['U10'] }] }, 'competitions[0].categories[0]'],
+    ['image position that is not text', { ...fixture, hallPhotos: [{ ...fixture.hallPhotos[0], position: 50 }] }, 'hallPhotos[0].position'],
+  ] as const) test(`refuses ${name}`, () => expect(() => parseSiteData(patch, 't')).toThrow(path));
+
+  test('getSiteData loads once per source and again when HOME_FIXTURE changes', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'home.json';
+    const first = getSiteData();
+    expect(getSiteData()).toBe(first);
+    process.env.HOME_FIXTURE = 'sparse.json';
+    const other = getSiteData();
+    expect(other).not.toBe(first);
+    expect((await first).athletes).toHaveLength(3);
+    expect((await other).athletes).toEqual([]);
+  });
+
+  test('a failed load is not remembered', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'nu-exista.json';
+    const failed = getSiteData();
+    await expect(failed).rejects.toThrow(/nu-exista/);
+    expect(getSiteData()).not.toBe(failed);
+    await expect(getSiteData()).rejects.toThrow(/nu-exista/);
+  });
+});
+
 describe('Sanity source', () => {
   test('CONTENT_SOURCE=sanity without a project id names the missing variable', async () => {
     process.env.CONTENT_SOURCE = 'sanity';
@@ -221,16 +319,28 @@ describe('toHomeData', () => {
     const d = toHomeData({
       ...rawSample,
       athletes: [{ ...rawAthlete, photo: rawImg('nistor'), rankings: null }, { ...rawAthlete, _id: 'b', frbUrl: null, rankings: [{ category: 'U15', discipline: 'SF', place: 3, points: null }] }],
-      competitions: [{ ...rawSample.competitions[0], postSlug: 'novi-sad-2026' }],
     });
     expect(d.athletes[0]).toEqual({ id: 'athlete-a', name: 'Nistor Cristian-Ionuț', slug: 'nistor-cristian-ionut', consent: true, frbUrl: rawAthlete.frbUrl, photo: rawImg('nistor'), rankings: [] });
     expect(d.athletes[1]).not.toHaveProperty('frbUrl');
     expect(d.athletes[1].rankings).toEqual([{ category: 'U15', discipline: 'SF', place: 3 }]);
-    expect(d.groups).toEqual([{ name: 'Inițiere', audience: 'Copii', track: 'performanta' }]);
-    expect(d.competitions[0]).toEqual({ id: 'c1', title: 'CN U9 și CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false, postSlug: 'novi-sad-2026' });
-    expect(d.posts[0]).toEqual({ title: 'Novi Sad – 2026', slug: 'novi-sad-2026', kind: 'competitie', date: '2026-06-30', cover: rawImg('cover') });
+    expect(d.groups).toEqual([{ id: 'group-initiere', slug: 'initiere', name: 'Inițiere', audience: 'Copii', track: 'performanta', sessions: [] }]);
+    expect(d.competitions[0]).toEqual({ id: 'c1', title: 'CN U9 și CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false, categories: [] });
+    expect(d.posts[0]).toEqual({ title: 'Novi Sad – 2026', slug: 'novi-sad-2026', kind: 'competitie', date: '2026-06-30', cover: rawImg('cover'), body: [], gallery: [], results: [] });
+    expect(d.coaches).toEqual([]);
+    expect(d.info).toEqual({ parents: {}, contact: {} });
     expect(d.rankingWeek).toEqual({ week: 46, from: '2026-11-09', to: '2026-11-15' });
     expect(d.whyPoints).toEqual([{ title: 'Dormi mai bine', text: 'Reduce stresul.' }]);
+  });
+
+  test('the mapped result passes the site check', () => {
+    const site = parseSiteData(toHomeData(rawSample), 't');
+    expect(site.groups[0]).toMatchObject({ id: 'group-initiere', slug: 'initiere' });
+    expect(site.competitions[0].categories).toEqual([]);
+  });
+
+  test('group slugs follow the Studio rule', () => {
+    const d = toHomeData({ ...rawSample, groups: [{ _id: 'g', name: 'Amatori adulți', audience: 'Adulți', track: 'amatori', schedule: null }] });
+    expect(d.groups[0].slug).toBe('amatori-adulti');
   });
 
   test('a result without settings fails with a readable message', () => {
