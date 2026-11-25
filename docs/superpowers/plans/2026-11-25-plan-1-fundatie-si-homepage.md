@@ -25,7 +25,7 @@ This is plan 1 of 5. Later plans, each written when its turn comes: (2) inner pa
 - Motion: only the five moments listed in the spec. No fade-in per section. `prefers-reduced-motion` shows final states. All content visible with JavaScript disabled.
 - Every `<img>` carries `width` and `height` attributes.
 - Secrets (Sanity tokens, passwords) never enter git. `.env*` is ignored.
-- Commits: `type(scope): subject`, ending with the attribution trailer the session provides. Work on branch `dev`. Never push without asking Mario.
+- Commits: `type(scope): subject`, made with the repository's configured personal identity; no `Co-Authored-By`, session links or any AI/agent attribution (rule changed by Mario on 2026-11-25; history rewritten to match). Work on branch `dev`. Never push without asking Mario.
 
 ## Review Focus
 
