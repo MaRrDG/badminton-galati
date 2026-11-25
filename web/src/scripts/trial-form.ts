@@ -164,7 +164,7 @@ export function initTrialForm(form: HTMLFormElement, opts: Options): void {
 
   function delivered(r: TrialRequest): void {
     const thanks = el('p', `Mulțumim, ${r.name}. Clubul te contactează la `);
-    thanks.append(el('b', formatPhoneRo(r.phone)), ' ca să stabiliți ziua probei.');
+    thanks.append(el('b', formatPhoneRo(r.phone)), ' ca să stabiliți împreună ziua probei.');
     let when: HTMLElement;
     if (replyDays) when = el('p', `Te sunăm în cel mult ${replyDays} zile.`);
     else {

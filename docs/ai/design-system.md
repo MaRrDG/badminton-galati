@@ -13,7 +13,8 @@ descriptions, the 404 page) addresses the visitor as "tu", warm and direct like 
 contactează". Never "dumneavoastră" or the polite plural ("Scrieți", "vă"). Owner's decision,
 2026-11-26. Exception: the "De confirmat de club" lines speak to the club, so they keep the plural
 ("primiți", "răspundeți"). A verb whose subject is the visitor and the club together stays plural
-("ca să stabiliți ziua").
+("ca să stabiliți împreună ziua probei"). The consent box stays in the first person ("Sunt de
+acord … să mă contacteze"): it is the visitor speaking.
 
 ## Tokens (`web/src/styles/tokens.css`, the only place values live)
 
@@ -49,7 +50,7 @@ request at runtime (e2e test "fonts are self-hosted"). Section headings: `h2.dis
 `clamp(2.2rem, 4.6vw, 4.2rem)`; hero headline `clamp(3rem, 6.2vw, 5.9rem)` (display type capped
 near 6rem up to 1440px). One layout breakpoint: `max-width: 860px` (CSS) / `min-width: 861px`
 (motion); past 1440px only the large-screen growth below. One exception: the header's menu
-switches at 900px (`max-width: 899px` shows "Meniu"), because its seven entries (Acasă, Sportivi,
+switches at 900px (`width < 900px` shows "Meniu", range syntax), because its seven entries (Acasă, Sportivi,
 Program, Calendar, Noutăți, Pentru părinți, Contact) and the club's name need about 830px on one
 line; from 861 to 899px the pages are wide but the menu is still the "Meniu" drop-down.
 
@@ -127,10 +128,10 @@ Hero lines may wrap below 860px (coach-editable motto must never clip). Under
 `pages/index.astro`), and `initMotion()` also returns at once (`base.css` also turns off smooth
 scrolling). GSAP is bundled from npm, never a CDN, in a chunk fetched only when motion runs.
 **Late code:** when that chunk resolves more than 1000 ms after the page script started
-(`lib/motion-budget.ts`, `introOnTime`), the load-time intros are skipped and the page stays as
+(measured from the first contentful paint when the browser reports it; `lib/motion-budget.ts`, `introOnTime`), the load-time intros are skipped and the page stays as
 rendered (it has painted its final state by then; an intro would snap back to the start): the
-hero load here; on the inner pages place-roll, season-fill, feature-reveal, and poster-reveal or
-sessions-settle when their target is already in view. Scroll-driven moments are set up anyway. No other animation may be added without Mario's approval.
+hero load here; on the inner pages place-roll, season-fill, feature-reveal, and poster-reveal,
+sessions-settle or tile-roll (per tile) when their target is already in view. Scroll-driven moments are set up anyway. No other animation may be added without Mario's approval.
 
 ## Inner pages
 

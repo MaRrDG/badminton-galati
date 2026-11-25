@@ -17,13 +17,13 @@ no-JS, focus, built output). Put a rule in `web/src/lib/` and unit-test it there
 
 ## Commands and timings
 
-Measured on the dev machine (16 cores, 8 workers); full-suite rows from the plan 2a full run
-(2026-11-26), single-spec rows from the test-speed work on 2026-11-25:
+Measured on the dev machine (16 cores, 8 workers); full-suite rows from the full run after the owner's decisions
+(2026-11-26, tu voice, menu, home mark, late motion), single-spec rows from the test-speed work on 2026-11-25:
 
 | Command | What | Time |
 |---|---|---|
-| `pnpm test` | all unit tests, both workspaces (334 web + 14 studio) | ~3 s |
-| `pnpm e2e` | 198 tests + 4 setup builds | 37.0 s cold (`rm -rf web/dist-e2e` first, plan 2a fix wave); budget 45 s |
+| `pnpm test` | all unit tests, both workspaces (338 web + 14 studio) | ~3 s |
+| `pnpm e2e` | 210 tests + 4 setup builds | 37.9 s cold (`rm -rf web/dist-e2e` first, 2026-11-26); budget 45 s |
 | `pnpm e2e -- shell.spec.ts` | one spec, builds `home` only | 5.4 s cold, 4.2 s warm |
 | `pnpm e2e -- -g "single photo"` | by title; builds `sparse` only | not measured |
 | `pnpm test:changed` | `vitest run --changed dev` in both workspaces | ≤ the full unit run |
@@ -102,7 +102,8 @@ When you add a spec or a new source folder, update this table in the script's he
 - Read token never in the built output of any server; no HTML comment in any built page; the
   trial form's `data-who` fallback never shares a CSS selector list with `:has()` (`build-output.spec`).
 - Motion code that arrives 1.5 s late (route delayed) never fades the hero headline after the
-  first paint, and the scrub is still set up; on time, the intro plays (`motion.spec`).
+  first paint, and the scrub is still set up; the inner pages' moment chunk 1.5 s late leaves the
+  first athlete tile's place and the contact poster as painted; on time, each intro plays (`motion.spec`).
 - GSAP is not requested under reduced motion (homepage and `/noutati/`, `motion.spec`); a fault in
   the calendar's today logic leaves the panel and motion working (`calendar.spec`).
 - Countdown follows the visitor's clock, not the build date (clock overridden), and disappears

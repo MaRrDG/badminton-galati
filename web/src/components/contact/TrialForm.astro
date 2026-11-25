@@ -15,7 +15,7 @@ const { replyDays } = Astro.props;
 // to the endpoint first.
 const endpoint = process.env.TRIAL_ENDPOINT?.trim() || undefined;
 const action = `mailto:${CLUB_EMAIL}?subject=${encodeURIComponent('Cerere antrenament de probă')}`;
-const consent = 'Ești de acord ca CS Siderurgistul Galați să-ți folosească numele și telefonul doar ca să te contacteze despre această cerere.';
+const consent = 'Sunt de acord ca CS Siderurgistul Galați să-mi folosească numele și telefonul doar ca să mă contacteze despre această cerere.';
 ---
 
 <div class="form-col" id="formular">

@@ -105,8 +105,9 @@ const currentOf = (href: string) => (href === path ? 'page' : isCurrent(href, pa
 
   /* Narrow: the list drops down under the header when "Meniu" is open. Works without JavaScript.
      The menu switches at 900px, not at the site's 860px: its seven entries and the club's name
-     need about 830px on one line, so from 861 to 899px the header keeps "Meniu". */
-  @media (max-width: 899px) {
+     need about 830px on one line, so from 861 to 899px the header keeps "Meniu". Range syntax, so
+     no fractional width falls between the two queries. */
+  @media (width < 900px) {
     .menu ul {
       position: absolute;
       top: 100%;
@@ -124,7 +125,7 @@ const currentOf = (href: string) => (href === path ? 'page' : isCurrent(href, pa
 
   /* Wide: the list is always shown and the toggle is hidden. Browsers without
      ::details-content keep the toggle, so the links stay reachable. */
-  @media (min-width: 900px) {
+  @media (width >= 900px) {
     @supports selector(::details-content) {
       .menu summary {
         display: none;

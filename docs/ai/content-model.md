@@ -113,7 +113,7 @@ work (schema, seed, GROQ projection, mapping in `toHomeData()`).
 | `Post.results[]{athleteId, discipline?, result}` | Results in the article; only consented athletes are kept | Article "Sportivi în articol"; profile "Apare în articolele clubului" and medals (`aur`, `argint`, `bronz`) | yes (`resultRow`), not read |
 | `info.parents{age, equipment, cost, firstWeeks, registration}` | The club's answers to parents' questions (blank lines split paragraphs) | `/pentru-parinti/`; each missing answer is a `Tbc` line | no |
 | `info.programNote` | A note under the timetable | `/program/` | no |
-| `info.contact{phone, directions, replyDays}` | Club phone, how to get to the hall, reply time in days | `/contact/` panel and the sent state ("Vă sunăm în cel mult N zile."); each missing one is a `Tbc` | no |
+| `info.contact{phone, directions, replyDays}` | Club phone, how to get to the hall, reply time in days | `/contact/` panel and the sent state ("Te sunăm în cel mult N zile."); each missing one is a `Tbc` | no |
 | `info.venuePhoto` | The hall itself (the courts) | `/pentru-parinti/` "Unde e sala?" (fallback: the first hall photo that is not the opening one), `/contact/` (fallback: the first hall photo). No photo is ever chosen by file name | projected from `siteSettings`, no field yet |
 | `info.parentsPhoto` | Children and coaches together | Opens `/pentru-parinti/`; fallback: first hall photo | projected from `siteSettings`, no field yet |
 | `Img.position`, `Img.srcset` | CSS `object-position`; a `srcset` when the source has sizes | Every `Photo` | plan 2b (hotspot, image URL builder) |

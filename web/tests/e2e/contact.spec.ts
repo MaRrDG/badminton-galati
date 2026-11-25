@@ -13,7 +13,7 @@ async function fillGood(page: Page) {
   await page.getByLabel('Numele părintelui').fill('Ana Ionescu');
   await page.getByLabel('Telefon', { exact: true }).fill('+40 745-123-456');
   await page.getByLabel('Vârsta copilului').fill('8');
-  await page.getByLabel(/Ești de acord/).check();
+  await page.getByLabel(/Sunt de acord/).check();
 }
 
 /** Mailto navigations are caught before they leave the page; the last one is kept in `__mailto`. */
@@ -83,7 +83,7 @@ test.describe('the error state', () => {
     await page.goto('/contact/');
     await fillGood(page);
     await page.getByLabel('Telefon', { exact: true }).fill('0745 12');
-    await page.getByLabel(/Ești de acord/).uncheck();
+    await page.getByLabel(/Sunt de acord/).uncheck();
     await send(page);
     const sum = summary(page);
     await expect(sum).toContainText('Verifică două lucruri:');
@@ -93,7 +93,7 @@ test.describe('the error state', () => {
 
     // Fixing them clears the old marks before the request goes.
     await page.getByLabel('Telefon', { exact: true }).fill('+40 (0)745 123 456');
-    await page.getByLabel(/Ești de acord/).check();
+    await page.getByLabel(/Sunt de acord/).check();
     await send(page);
     await expect(sent(page)).toContainText('Am deschis un e-mail către club');
     await expect(page.locator('[aria-invalid]')).toHaveCount(0);
@@ -138,7 +138,7 @@ test.describe('without an endpoint (every build until plan 2b)', () => {
     await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele tău');
     await page.getByLabel('Numele tău').fill('Dan Popa');
     await page.getByLabel('Telefon', { exact: true }).fill('0745 123 456');
-    await page.getByLabel(/Ești de acord/).check();
+    await page.getByLabel(/Sunt de acord/).check();
     await send(page);
     await expect(sent(page)).toContainText('Am deschis un e-mail către club');
     expect(await lastMailto(page)).toBe(
@@ -178,7 +178,7 @@ test.describe('with an endpoint (plan 2b)', () => {
     await send(page);
     const box = sent(page);
     await expect(box.getByRole('heading', { name: 'Cererea a ajuns la club' })).toBeFocused();
-    await expect(box).toContainText('Mulțumim, Ana Ionescu. Clubul te contactează la 0745 123 456 ca să stabiliți ziua probei.');
+    await expect(box).toContainText('Mulțumim, Ana Ionescu. Clubul te contactează la 0745 123 456 ca să stabiliți împreună ziua probei.');
     await expect(box.locator('.tbc')).toContainText('De confirmat de club: în câte zile răspundeți');
     await expect(box.getByRole('link', { name: 'ce e bine să știi înainte de primul antrenament' })).toHaveAttribute('href', '/pentru-parinti/');
     await expect(page.locator('[role="alert"], [role="status"]')).toHaveCount(0);
