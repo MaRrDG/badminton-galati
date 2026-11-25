@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pentru părinți | CS Siderurgistul Galați</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1549a8;
+  --blue-deep:#0c2f74;
+  --red:#e23a45;
+  --red-field:#d63340;
+  --red-ink:#c2222d;
+  --white:#ffffff;
+  --mist:#e8eef8;
+  --court:#f39a1e;
+  --ink:#0a1f4d;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+  --gut:clamp(16px,4vw,48px);
+  --col:1180px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;padding-bottom:44px}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid currentColor;outline-offset:3px}
+h1,h2,h3,p,figure{margin:0}
+.wrap{max-width:calc(var(--col) + 2 * var(--gut));margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+.display{font-family:var(--display);font-weight:900;line-height:.95;text-transform:uppercase}
+h2.display{font-size:clamp(2.2rem,4.6vw,4.2rem)}
+.textlink{font-weight:600;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:var(--gut);top:0;z-index:100;background:var(--ink);color:var(--white);font-weight:600;padding:10px 16px;transform:translateY(-120%)}
+.skip-link:focus{transform:none}
+.skip-link:focus-visible{outline-color:var(--ink)}
+main>section{overflow-x:clip}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* ---------- header (SiteHeader.astro) ---------- */
+.site-header{background:var(--white);border-bottom:3px solid var(--ink);position:relative;z-index:20}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1}
+.brand img{flex:none;width:46px;height:46px;border-radius:50%}
+.menu summary{display:block;list-style:none;background:var(--ink);color:var(--white);font:600 .95rem var(--body);padding:11px 18px;cursor:pointer}
+.menu summary:focus-visible{outline-color:var(--ink)}
+.menu summary::-webkit-details-marker{display:none}
+.menu ul{list-style:none;margin:0;padding:0}
+.menu a{text-decoration:none;font-weight:500;font-size:.98rem;border-bottom:3px solid transparent}
+.menu a:hover,.menu a[aria-current]{border-bottom-color:var(--red)}
+@media (max-width:860px){
+  .menu ul{position:absolute;top:100%;right:var(--gut);min-width:200px;background:var(--ink);color:var(--white);padding:8px 20px}
+  .menu a{display:block;padding:11px 0}
+}
+@media (min-width:861px){
+  @supports selector(::details-content){
+    .menu summary{display:none}
+    .menu::details-content{content-visibility:visible;display:contents}
+    .menu ul{display:flex;gap:clamp(14px,2.2vw,32px)}
+    .menu a{display:inline-block;padding:6px 0}
+  }
+}
+
+/* ---------- compact page header: the hero's poster, at inner-page scale ---------- */
+.pagehead{background:var(--blue);color:var(--white);padding:clamp(28px,4.4vw,60px) 0 clamp(34px,5vw,68px)}
+.pagehead .wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:26px clamp(28px,5vw,80px);align-items:end}
+.pagehead h1{font-size:clamp(3rem,6.4vw,5.6rem)}
+.pagehead .lead{margin-top:clamp(14px,1.8vw,22px);max-width:50ch;font-size:clamp(1.02rem,1.3vw,1.14rem)}
+
+/* ---------- modest section headings: body face, sentence case ---------- */
+.h2s{font-family:var(--body);font-weight:700;font-size:clamp(1.45rem,2.1vw,1.8rem);line-height:1.2;color:var(--ink);letter-spacing:-.01em}
+.pagehead.solo .wrap{grid-template-columns:minmax(0,1fr)}
+.pagehead.solo .lead{max-width:60ch}
+
+/* ---------- unconfirmed content: orange hatching means "not confirmed yet" everywhere ---------- */
+.sample{background-color:var(--white);background-image:repeating-linear-gradient(-45deg,rgba(243,154,30,.5) 0 2px,rgba(243,154,30,0) 2px 6px);color:var(--ink);padding:0 .3em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hatch{display:inline-block;width:14px;height:14px;vertical-align:-1px;margin-right:8px;border:1px solid var(--court);background-image:repeating-linear-gradient(-45deg,rgba(243,154,30,.75) 0 2px,rgba(243,154,30,0) 2px 5px)}
+.tbc{font-size:.92rem;line-height:1.45;color:#3a4866;max-width:62ch}
+.tbc b{font-weight:600;color:var(--ink)}
+.tbc::before{content:"";display:inline-block;width:12px;height:12px;vertical-align:-1px;margin-right:8px;border:1px solid var(--court);background-image:repeating-linear-gradient(-45deg,rgba(243,154,30,.75) 0 2px,rgba(243,154,30,0) 2px 5px)}
+.tbc+.tbc,p+.tbc,.tbc+p{margin-top:10px}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-block;background:var(--white);color:var(--ink);font-weight:600;font-size:1.05rem;padding:16px 26px;text-decoration:none;border:0;cursor:pointer;font-family:var(--body);min-height:52px}
+.btn:hover{background:var(--ink);color:var(--white)}
+
+/* ---------- trial CTA (red field) ---------- */
+.cta{background:var(--red-field);color:var(--white);padding:clamp(44px,6vw,84px) 0}
+.cta .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px clamp(24px,5vw,72px);align-items:end}
+.cta h2{font-size:clamp(2.4rem,5.4vw,4.8rem);max-width:13ch}
+.cta p{margin-top:1em;max-width:46ch;font-size:1.05rem}
+.cta .alt{margin-top:14px;font-size:.98rem}
+.cta .btn{margin-top:1.3em}
+
+/* ---------- footer (SiteFooter.astro) ---------- */
+.site-footer{background:var(--blue-deep);color:var(--white);padding:clamp(32px,4.5vw,56px) 0;font-size:.98rem}
+.site-footer .wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}
+.site-footer h2{font-family:var(--display);font-weight:800;font-size:1.4rem;line-height:1.1;margin-bottom:.4em}
+.site-footer p+p{margin-top:.35em}
+.site-footer a{overflow-wrap:anywhere}
+
+/* ---------- mock bar (not part of the site) ---------- */
+.vbar{position:fixed;left:0;right:0;bottom:0;z-index:50;height:44px;background:var(--ink);color:var(--white);display:flex;align-items:center;gap:18px;font-size:.88rem;padding:0 14px;overflow-x:auto;white-space:nowrap}
+.vbar b{font-weight:600;margin-right:6px}
+.vbar a{opacity:.85}
+.vbar a[aria-current]{opacity:1;font-weight:600;text-decoration-thickness:2px}
+
+@media (max-width:860px){
+  .pagehead .wrap,.cta .wrap{grid-template-columns:1fr}
+  .pagehead{padding-bottom:clamp(30px,6vw,44px)}
+      .site-footer .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .site-footer .wrap{grid-template-columns:1fr}
+}
+
+.pagehead.solo{padding:clamp(26px,3.6vw,48px) 0 clamp(28px,3.8vw,50px)}
+
+/* ---------- a calm reading page ---------- */
+.letter{padding:clamp(36px,5vw,72px) 0 clamp(52px,7vw,100px);font-size:1.06rem;line-height:1.6}
+.letter a:not(.textlink){font-weight:600;text-underline-offset:3px}
+
+.opening{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:32px clamp(32px,6vw,96px);align-items:start;margin-bottom:clamp(44px,6vw,80px)}
+.said{font-size:clamp(1.3rem,1.9vw,1.6rem);font-weight:600;line-height:1.35;color:var(--blue);max-width:30ch}
+.said-by{margin-top:12px;max-width:56ch}
+.reading{display:grid;grid-template-columns:minmax(0,68ch) minmax(0,1fr);gap:32px clamp(40px,7vw,120px);align-items:start}
+.toc-wrap{grid-column:2;grid-row:1;position:sticky;top:20px;max-width:22rem}
+.toc{background:var(--mist);padding:18px 22px 16px}
+.toc h2{font-size:1rem;font-weight:700;margin-bottom:6px}
+.toc ul{margin:0;padding-left:1.1em}
+.toc li{break-inside:avoid;padding:3px 0}
+.toc a{font-weight:500!important}
+
+.poster{position:relative;margin:0 14px 14px 0}
+.poster .plate{position:absolute;inset:0;background:var(--red);translate:14px 14px;transform-origin:50% 100%}
+.poster .shot{position:relative;overflow:hidden}
+.poster img{width:100%;height:auto}
+
+.text{grid-column:1;grid-row:1;max-width:68ch}
+.q{scroll-margin-top:16px}
+.q+.q,.text+.q{margin-top:clamp(36px,4.6vw,56px)}
+.qh{font-family:var(--body);font-weight:700;font-size:clamp(1.35rem,1.9vw,1.6rem);line-height:1.25;margin-bottom:10px;color:var(--ink)}
+.q p{max-width:68ch}
+.q p+p{margin-top:12px}
+
+.steps{margin:4px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:0 0 0 2.4em;max-width:64ch}
+.steps li+li{margin-top:12px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:.1em;width:1.6em;height:1.6em;display:grid;place-items:center;background:var(--blue);color:var(--white);font-weight:700;font-size:.9rem;line-height:1}
+.steps .tbc{display:block;margin-top:4px}
+
+.wide{max-width:none}
+.q-intro{max-width:60ch}
+.coaches{list-style:none;margin:18px 0 14px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,190px));gap:24px clamp(20px,3vw,40px)}
+.coaches li{display:flex;flex-direction:column}
+.tile{aspect-ratio:4/5;display:grid;place-items:center;color:var(--white);font-weight:700;font-size:clamp(1.8rem,2.6vw,2.3rem);letter-spacing:.04em;margin-bottom:12px}
+.t1{background:var(--blue)}
+.t2{background:var(--blue-deep)}
+.t3{background:var(--red-field)}
+.coaches b{font-weight:700;font-size:1.12rem;line-height:1.3}
+.coaches span{font-size:.96rem}
+
+.venue{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px clamp(28px,5vw,72px);align-items:center;background:var(--mist);padding:clamp(20px,3vw,40px);margin-top:clamp(48px,6vw,80px)!important}
+.framed{margin:0 14px 14px 0;box-shadow:14px 14px 0 var(--red)}
+.framed img{width:100%;height:auto}
+.links{display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:14px!important}
+.links .textlink{display:inline-block;padding:6px 0}
+
+@media (max-width:860px){
+  .opening,.venue{grid-template-columns:1fr}
+  .opening .poster{order:-1;max-width:460px}
+  .reading{grid-template-columns:1fr}
+  .toc-wrap,.text{grid-column:1;grid-row:auto;position:static;max-width:none}
+  .coaches{grid-template-columns:1fr;gap:12px}
+  .coaches li{display:grid;grid-template-columns:76px minmax(0,1fr);grid-template-rows:auto auto;column-gap:16px;align-content:center}
+  .tile{grid-row:1/3;aspect-ratio:1;margin:0;font-size:1.5rem}
+  .coaches b{align-self:end}
+  .coaches span{align-self:start}
+}
+</style>
+<style id="no-sketch-notes">.note,.mock,section.states{display:none!important}</style></head>
+<body>
+<a class="skip-link" href="#continut">Sari la conținut</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="../img/logo.jpg" width="46" height="46" alt="" data-decorative><span>CS Siderurgistul Galați</span></a>
+    <nav aria-label="Meniu principal">
+      <details class="menu">
+        <summary>Meniu</summary>
+        <ul>
+          <li><a href="#">Acasă</a></li>
+          <li><a href="sportivi-lista.html">Sportivi</a></li>
+          <li><a href="program.html">Program</a></li>
+          <li><a href="calendar.html">Calendar</a></li>
+          <li><a href="noutati-lista.html">Noutăți</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </details>
+    </nav>
+  </div>
+</header>
+
+<main id="continut">
+<section class="pagehead solo" aria-labelledby="ph-h">
+  <div class="wrap">
+    <div>
+      <h1 class="display" id="ph-h">Pentru părinți</h1>
+      <p class="lead">Ce e bine să știți înainte de primul antrenament, în ordinea în care vă vin întrebările.</p>
+    </div>
+  </div>
+</section>
+
+<section class="letter" aria-label="Întrebări și răspunsuri">
+  <div class="wrap">
+    <div class="opening">
+      <div class="opening-text">
+        <p class="said">„Asigurăm un climat prietenos pentru toate categoriile de vârstă.”</p>
+        <p class="said-by">Așa își descrie clubul antrenamentele, din 7 martie 2002 încoace. Mai jos găsiți răspunsurile la întrebările pe care și le pune orice părinte înainte să-și aducă copilul în sală.</p>
+      </div>
+      <figure class="poster">
+        <div class="plate" aria-hidden="true"></div>
+        <div class="shot"><img src="../img/cantonament.jpg" width="1280" height="960" alt="Copii și antrenori ai clubului în tricouri verzi, în cantonament" fetchpriority="high"></div>
+      </figure>
+    </div>
+
+    <div class="reading">
+    <aside class="toc-wrap">
+      <nav class="toc" aria-labelledby="toc-h">
+          <h2 id="toc-h">Întrebările de pe pagină</h2>
+          <ul>
+            <li><a href="#varsta">De la ce vârstă poate începe copilul?</a></li>
+            <li><a href="#echipament">Ce îi trebuie la primul antrenament?</a></li>
+            <li><a href="#cost">Cât costă?</a></li>
+            <li><a href="#inceput">Cum arată primele săptămâni?</a></li>
+            <li><a href="#dupa">Ce urmează după?</a></li>
+            <li><a href="#antrenori">Cine sunt antrenorii?</a></li>
+            <li><a href="#sala">Unde e sala?</a></li>
+          </ul>
+        </nav>
+    </aside>
+    <div class="text">
+      <section class="q" id="varsta" aria-labelledby="q1">
+        <h2 class="qh" id="q1">De la ce vârstă poate începe copilul?</h2>
+        <p class="tbc"><b>De confirmat de club:</b> vârsta minimă de la care primiți copii la Inițiere și dacă un copil mai mare poate începe direct acolo.</p>
+        <p>Copiii încep la grupa de <a href="/files/program.html#initiere">Inițiere</a>. Dacă vrea doar să joace, fără competiții, există grupa <a href="/files/program.html#amatori-copii">Amatori copii</a>.</p>
+      </section>
+
+      <section class="q" id="echipament" aria-labelledby="q2">
+        <h2 class="qh" id="q2">Ce îi trebuie la primul antrenament?</h2>
+        <p>De la club primește asistență calificată, instructaj și echipamentul minim necesar.</p>
+        <p class="tbc"><b>De confirmat de club:</b> ce înseamnă echipamentul minim (rachetă, fluturași?) și ce aduce copilul de acasă: încălțăminte, haine, apă.</p>
+      </section>
+
+      <section class="q" id="cost" aria-labelledby="q3">
+        <h2 class="qh" id="q3">Cât costă?</h2>
+        <p class="tbc"><b>De confirmat de club:</b> taxa lunară la fiecare grupă, dacă antrenamentul de probă se plătește, dacă există reducere pentru frați și cum se plătește.</p>
+      </section>
+
+      <section class="q" id="inceput" aria-labelledby="q4">
+        <h2 class="qh" id="q4">Cum arată primele săptămâni?</h2>
+        <ol class="steps">
+          <li><b>Ne scrieți.</b> Completați <a href="/files/contact.html#formular">formularul de probă</a> sau trimiteți-ne un e-mail, iar clubul vă contactează ca să stabiliți ziua.</li>
+          <li><b>Antrenamentul de probă.</b> Copilul încearcă un antrenament în sală, iar dumneavoastră cunoașteți antrenorul.</li>
+          <li><b>Primele săptămâni la Inițiere.</b> <span class="tbc"><b>De confirmat de club:</b> de câte ori pe săptămână vine copilul și ce învață în prima lună.</span></li>
+          <li><b>Alegeți drumul.</b> Împreună cu antrenorul vedeți dacă merge spre Performanță și competiții sau joacă de plăcere la Amatori copii.</li>
+        </ol>
+      </section>
+
+      <section class="q" id="dupa" aria-labelledby="q5">
+        <h2 class="qh" id="q5">Ce urmează după?</h2>
+        <p><b>Legitimarea.</b> Ca să joace în competițiile oficiale, copilul e legitimat la Federația Română de Badminton, prin club.</p>
+        <p class="tbc"><b>De confirmat de club:</b> ce acte sunt necesare pentru legitimare, cât costă și când se face.</p>
+        <p><b>Competițiile.</b> Federația organizează campionate naționale pe categorii de vârstă, de la U9 la U19, iar unele se joacă la Galați. Le găsiți în <a href="calendar.html">calendarul competițiilor</a>, iar pe cei care merg deja la ele, pe pagina <a href="sportivi-lista.html">sportivilor clubului</a>.</p>
+      </section>
+
+      <section class="q" id="antrenori" aria-labelledby="q6">
+        <h2 class="qh" id="q6">Cine sunt antrenorii?</h2>
+        <p class="q-intro">Clubul e condus de cei trei antrenori ai săi. Le puteți scrie la adresa clubului, <a href="mailto:siderurgistul@badmintongalati.ro">siderurgistul@badmintongalati.ro</a>.</p>
+        <ul class="coaches">
+          <li><div class="tile t1" aria-hidden="true">DB</div><b>Dorel Badiu</b><span>președinte și antrenor</span></li>
+          <li><div class="tile t2" aria-hidden="true">IC</div><b>Iulian Călin</b><span>vicepreședinte și antrenor</span></li>
+          <li><div class="tile t3" aria-hidden="true">AP</div><b>Adrian Panfil</b><span>vicepreședinte și antrenor</span></li>
+        </ul>
+        <p class="tbc"><b>De confirmat de club:</b> câte o fotografie și o frază despre fiecare antrenor: de când antrenează și cu ce grupe lucrează.</p>
+      </section>
+    </div>
+    </div>
+
+    <section class="q wide venue" id="sala" aria-labelledby="q7">
+      <figure class="framed"><img src="../img/sala-turneu-2.jpg" width="1280" height="720" alt="Meciuri pe cele patru terenuri ale sălii Siderurgistul" loading="lazy" decoding="async"></figure>
+      <div>
+        <h2 class="qh" id="q7">Unde e sala?</h2>
+        <p><b>Sala Siderurgistul, Bd. Cloșca, Galați.</b> Are patru terenuri de badminton și aici se antrenează toate grupele. În aceeași sală s-a jucat Balcaniada din 2002 și cea din 2023.</p>
+        <p class="links"><a class="textlink" href="https://www.google.com/maps/search/?api=1&amp;query=45.4194907,28.0277769">Sala pe hartă</a><a class="textlink" href="/files/contact.html#drum">Cum ajungeți</a></p>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="cta" id="proba" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div>
+      <h2 class="display" id="cta-h">Vino la un antrenament de probă</h2>
+      <p>Cel mai simplu răspuns la toate întrebările de mai sus e o oră în sală. Lăsați-ne vârsta copilului și un număr de telefon.</p>
+    </div>
+    <div>
+      <a class="btn" href="/files/contact.html#formular">Cere un antrenament de probă</a>
+      <p class="alt">sau scrieți la <a href="mailto:siderurgistul@badmintongalati.ro">siderurgistul@badmintongalati.ro</a></p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div><h2>CS Siderurgistul Galați</h2><p>Club de badminton înființat la 7 martie 2002.</p><p>Afiliat la Federația Română de Badminton.</p></div>
+    <div><h2>Sala</h2><p>Sala Siderurgistul, Bd. Cloșca, Galați</p><p>Patru terenuri de badminton</p></div>
+    <div><h2>Contact</h2><p><a href="mailto:siderurgistul@badmintongalati.ro">siderurgistul@badmintongalati.ro</a></p><p><a href="pentru-parinti.html">Pentru părinți</a></p></div>
+    <div><h2>Badminton</h2><p><a href="https://www.badminton.ro/">Federația Română de Badminton</a></p><p><a href="https://www.badmintoneurope.com/">Badminton Europe</a></p><p><a href="https://bwfbadminton.com/">BWF</a></p></div>
+  </div>
+</footer>
+
+<nav class="vbar" aria-label="Schițe"><b>Schiță — Pentru părinți</b> <a href="sportivi-lista.html">Sportivi</a> <a href="sportiv-fisa.html">Fișă sportiv</a> <a href="calendar.html">Calendar</a> <a href="noutati-lista.html">Noutăți</a> <a href="articol.html">Articol</a> <a href="program.html">Program</a> <a href="pentru-parinti.html" aria-current="page">Pentru părinți</a> <a href="contact.html">Contact</a></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  if(!window.gsap||!window.ScrollTrigger||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  gsap.registerPlugin(ScrollTrigger);
+  /* the opening photo arrives like the homepage poster: plate grows, photo unclips (once) */
+  gsap.timeline({defaults:{ease:'power4.out'},scrollTrigger:{trigger:'.opening .poster',start:'top 85%',once:true}})
+    .from('.opening .plate',{scaleY:0,duration:.6})
+    .from('.opening .shot',{clipPath:'inset(100% 0 0 0)',duration:.85},'-=.35');
+
+})();
+</script>
+</body>
+</html>

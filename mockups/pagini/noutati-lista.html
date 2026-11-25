@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noutăți — CS Siderurgistul Galați</title>
+<link rel="icon" href="../img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap&subset=latin-ext" rel="stylesheet">
+<style>
+:root{
+  --blue:#1549a8;--blue-deep:#0c2f74;--red:#e23a45;--red-field:#d63340;--red-ink:#c2222d;
+  --white:#fff;--mist:#e8eef8;--court:#f39a1e;--ink:#0a1f4d;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+  --gut:clamp(16px,4vw,48px);--col:1180px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;padding-bottom:44px}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid currentColor;outline-offset:3px}
+h1,h2,h3,p,figure{margin:0}
+.wrap{max-width:calc(var(--col) + 2 * var(--gut));margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+.display{font-family:var(--display);font-weight:900;line-height:.95;text-transform:uppercase}
+.textlink{font-weight:600;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:var(--gut);top:0;z-index:100;background:var(--ink);color:var(--white);font-weight:600;padding:10px 16px;transform:translateY(-120%)}
+.skip-link:focus{transform:none}
+main > section{overflow-x:clip}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* ---------- header (SiteHeader.astro) ---------- */
+.site-header{background:var(--white);border-bottom:3px solid var(--ink);position:relative;z-index:20}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1}
+.brand img{flex:none;width:46px;height:46px;border-radius:50%}
+.menu summary{display:block;list-style:none;background:var(--ink);color:var(--white);font:600 .95rem var(--body);padding:9px 16px;cursor:pointer}
+.menu summary:focus-visible{outline-color:var(--ink)}
+.menu summary::-webkit-details-marker{display:none}
+.menu ul{list-style:none;margin:0;padding:0}
+.menu a{text-decoration:none;font-weight:500;font-size:.98rem;border-bottom:3px solid transparent}
+.menu a:hover,.menu a[aria-current]{border-bottom-color:var(--red)}
+@media (max-width:860px){
+  .menu ul{position:absolute;top:100%;right:var(--gut);min-width:200px;background:var(--ink);color:var(--white);padding:8px 20px}
+  .menu a{display:block;padding:11px 0}
+}
+@media (min-width:861px){
+  @supports selector(::details-content){
+    .menu summary{display:none}
+    .menu::details-content{content-visibility:visible;display:contents}
+    .menu ul{display:flex;gap:clamp(14px,2.2vw,32px)}
+    .menu a{display:inline-block;padding:6px 0}
+  }
+}
+
+/* ---------- footer (SiteFooter.astro) ---------- */
+.site-footer{background:var(--blue-deep);color:var(--white);padding:clamp(32px,4.5vw,56px) 0;font-size:.98rem}
+.site-footer .wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}
+.site-footer h2{font-family:var(--display);font-weight:800;font-size:1.4rem;line-height:1.1;margin-bottom:.4em}
+.site-footer p+p{margin-top:.35em}
+.site-footer a{overflow-wrap:anywhere}
+@media (max-width:860px){.site-footer .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.site-footer .wrap{grid-template-columns:1fr}}
+
+/* ---------- inner page header: compact, no hero ---------- */
+.pagehead{background:var(--blue);color:var(--white);padding:clamp(30px,4.2vw,56px) 0 clamp(34px,4.6vw,62px)}
+.pagehead h1{font-size:clamp(2.8rem,6vw,5.6rem)}
+.pagehead .lede{margin-top:14px;max-width:52ch;font-size:1.05rem}
+
+/* ---------- filter: plain links, the active one underlined in red like the menu ---------- */
+.ft{display:block;position:relative;top:-12px;height:0;scroll-margin-top:0}
+.filter{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px clamp(16px,2vw,28px);padding:18px 0 14px;border-bottom:3px solid var(--ink)}
+.filter > span{font-weight:600;font-size:.95rem;margin-right:4px}
+.filter a{text-decoration:none;font-weight:600;font-size:1.02rem;padding:4px 0;border-bottom:4px solid transparent}
+.filter a:hover{border-bottom-color:rgba(10,31,77,.35)}
+.filter sup{font-size:.72em;font-weight:500;margin-left:3px;vertical-align:.45em}
+
+/* ---------- note for the club: only in the mockups ---------- */
+.note{font-size:.9rem;line-height:1.45;border-left:4px solid var(--court);padding:4px 0 4px 12px;max-width:62ch}
+.note b{font-weight:600}
+
+/* ---------- mockup bar ---------- */
+.vbar{position:fixed;left:0;right:0;bottom:0;z-index:50;height:44px;background:var(--ink);color:var(--white);display:flex;align-items:center;gap:18px;font-size:.88rem;padding:0 16px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin}
+.vbar b{font-weight:600;margin-right:6px}
+.vbar a{opacity:.85}
+.vbar a:hover{opacity:1}
+@media (min-width:1100px){.vbar{justify-content:center}}
+
+
+.nl{padding:clamp(28px,4vw,56px) 0 0}
+.ft{position:absolute;top:0;left:0}
+
+/* ---------- head ---------- */
+.nl-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 48px}
+.nl-head h1{font-size:clamp(2.8rem,5.6vw,5rem)}
+.nl-head p{max-width:42ch}
+.filter{border-bottom:0;padding:20px 0 clamp(26px,3vw,40px)}
+
+/* ---------- the front: one composed grid ---------- */
+.front{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(32px,3.4vw,48px) clamp(18px,2.2vw,30px);list-style:none;margin:0;padding:0}
+.front > li{min-width:0;display:flex}
+.front a{display:flex;flex-direction:column;width:100%;text-decoration:none}
+.meta{font-size:.92rem;font-weight:600}
+.front h2,.front h3{font-family:var(--display);font-weight:800;line-height:1.02;text-wrap:balance}
+.front h3{font-size:clamp(1.45rem,1.9vw,1.75rem);margin-top:4px}
+
+/* photo items: photo, then type and date, then the title */
+.ph img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.ph .meta{margin-top:12px;color:var(--red-ink)}
+.ph a:hover h3{color:var(--blue)}
+
+/* the featured article: the poster with the red plate */
+.feat{grid-column:1/9;grid-row:span 2}
+.feat .fig{position:relative;margin:0 16px 16px 0}
+.feat .plate{position:absolute;inset:0;background:var(--red);translate:16px 16px;transform-origin:50% 100%}
+.feat .shot{position:relative;overflow:hidden;background:var(--blue-deep)}
+.feat img{aspect-ratio:3/2}
+.feat .meta{margin-top:20px}
+.feat h2{font-weight:900;text-transform:uppercase;line-height:.95;font-size:clamp(2.8rem,5.4vw,5rem);margin-top:6px}
+.feat a:hover h2{color:var(--blue)}
+
+/* type tiles: articles without a photo are flat colour fields */
+.tile a{padding:clamp(18px,2vw,26px);min-height:clamp(200px,20vw,280px);justify-content:space-between;gap:28px}
+.tile h3{font-size:clamp(1.6rem,2.1vw,2rem);margin-top:0}
+.tile.blue a{background:var(--blue);color:var(--white)}
+.tile.red a{background:var(--red-field);color:var(--white)}
+.tile.mist a{background:var(--mist);color:var(--ink)}
+.tile.mist .meta{color:var(--red-ink)}
+.tile.big h3{font-size:clamp(2rem,3.4vw,3.2rem)}
+.tile a:hover h3{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px}
+.tile a:focus-visible{outline-color:var(--ink)}
+
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}
+.side{grid-column:9/13}
+.ph.tall img{aspect-ratio:4/3}
+.ph.pano img{aspect-ratio:2/1}
+
+/* ---------- older articles: a quiet band ---------- */
+.older{background:var(--mist);margin-top:clamp(56px,7vw,96px);padding:clamp(36px,4.4vw,60px) 0 clamp(44px,5vw,72px)}
+.older h2{font-weight:600;font-size:1.15rem;margin-bottom:18px}
+.older ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px clamp(20px,3vw,40px)}
+.older a{display:block;text-decoration:none}
+.older .meta{color:var(--red-ink)}
+.older li b{display:block;font-family:var(--display);font-weight:800;font-size:1.4rem;line-height:1.05;margin-top:4px}
+.older a:hover li b,.older li a:hover b{color:var(--blue)}
+.nl .note{margin-top:28px}
+
+/* ---------- filter without JavaScript (:target): the other types step back ---------- */
+.nl:has(#competitie:target) [data-kind]:not([data-kind="competitie"]),
+.nl:has(#viata-clubului:target) [data-kind]:not([data-kind="viata-clubului"]),
+.nl:has(#proiecte:target) [data-kind]:not([data-kind="proiecte"]){opacity:.18;filter:grayscale(1)}
+.nl:not(:has(#competitie:target,#viata-clubului:target,#proiecte:target)) .filter a[href="#toate"],
+.nl:has(#competitie:target) .filter a[href="#competitie"],
+.nl:has(#viata-clubului:target) .filter a[href="#viata-clubului"],
+.nl:has(#proiecte:target) .filter a[href="#proiecte"]{border-bottom-color:var(--red)}
+
+@media (max-width:1000px){
+  .feat{grid-column:1/-1;grid-row:auto}
+  .side{grid-column:span 6}
+  .s3{grid-column:span 6}.s4,.s5,.s7{grid-column:span 6}.s6{grid-column:1/-1}
+  .older ol{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .front > li,.side,.s3,.s4,.s5,.s6,.s7{grid-column:1/-1}
+  .tile a{min-height:170px}
+  .older ol{grid-template-columns:1fr}
+}
+</style>
+<style id="no-sketch-notes">.note,.mock,section.states{display:none!important}</style></head>
+<body>
+<a class="skip-link" href="#continut">Sari la conținut</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="../img/logo.jpg" width="46" height="46" alt=""><span>CS Siderurgistul Galați</span></a>
+    <nav aria-label="Meniu principal">
+      <details class="menu">
+        <summary>Meniu</summary>
+        <ul>
+          <li><a href="/">Acasă</a></li>
+          <li><a href="sportivi-lista.html">Sportivi</a></li>
+          <li><a href="program.html">Program</a></li>
+          <li><a href="calendar.html">Calendar</a></li>
+          <li><a href="noutati-lista.html" aria-current="page">Noutăți</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </details>
+    </nav>
+  </div>
+</header>
+
+
+<main id="continut" class="nl">
+  <span class="ft" id="toate"></span><span class="ft" id="competitie"></span><span class="ft" id="viata-clubului"></span><span class="ft" id="proiecte"></span>
+  <div class="wrap">
+    <div class="nl-head">
+      <h1 class="display">Noutăți</h1>
+      <p>Articolele clubului, de la competiții, din viața clubului și despre proiecte.</p>
+    </div>
+    <nav class="filter" aria-label="Arată după tip">
+      <span>Tipul</span>
+      <a href="#toate">Toate<sup>15</sup></a>
+      <a href="#competitie">Competiție<sup>11</sup></a>
+      <a href="#viata-clubului">Viața clubului<sup>3</sup></a>
+      <a href="#proiecte">Proiecte<sup>1</sup></a>
+    </nav>
+
+    <ol class="front">
+      <li class="ph feat" data-kind="competitie"><a href="articol.html">
+        <div class="fig"><span class="plate" aria-hidden="true"></span><div class="shot"><img src="../img/echipa-u15.jpg" width="1280" height="854" alt="Echipa clubului în treninguri roșii, la un turneu" loading="eager"></div></div>
+        <p class="meta">Competiție, <time datetime="2026-06-30">30 iunie 2026</time></p>
+        <h2>Novi Sad – 2026</h2>
+      </a></li>
+      <li class="ph side" data-kind="competitie"><a href="articol.html">
+        <img src="../img/meci-dublu.jpg" width="1280" height="720" alt="Meci de dublu în sală" loading="lazy" decoding="async">
+        <p class="meta">Competiție, <time datetime="2026-05-13">13 mai 2026</time></p>
+        <h3>București, Memorialul Rotaru U15 – 2026</h3>
+      </a></li>
+      <li class="ph side" data-kind="competitie"><a href="articol.html">
+        <img src="../img/smash.jpg" width="800" height="1200" alt="Sportiv al clubului în săritură, cu racheta ridicată spre fluturaș" loading="lazy" decoding="async" style="object-position:50% 22%">
+        <p class="meta">Competiție, <time datetime="2026-04-01">1 aprilie 2026</time></p>
+        <h3>București, Cupa României U15 – 2026</h3>
+      </a></li>
+
+      <li class="ph s5" data-kind="competitie"><a href="articol.html">
+        <img src="../img/sala-turneu-2.jpg" width="1280" height="720" alt="Meciuri pe terenurile sălii" loading="lazy" decoding="async">
+        <p class="meta">Competiție, <time datetime="2026-02-19">19 februarie 2026</time></p>
+        <h3>Galați, Olimpiada Națională a Sportului Școlar – 2026</h3>
+      </a></li>
+      <li class="tile red s3" data-kind="viata-clubului"><a href="articol.html">
+        <p class="meta">Viața clubului, <time datetime="2026-01-20">20 ianuarie 2026</time></p>
+        <h3>Începem anul în forță!</h3>
+      </a></li>
+      <li class="ph tall s4" data-kind="viata-clubului"><a href="articol.html">
+        <img src="../img/festivitate.jpg" width="1280" height="720" alt="Sportivi aliniați la o festivitate în sală" loading="lazy" decoding="async">
+        <p class="meta">Viața clubului, <time datetime="2025-12-20">20 decembrie 2025</time></p>
+        <h3>Serbare de sfârșit de an 2025</h3>
+      </a></li>
+
+      <li class="tile blue big s5" data-kind="proiecte"><a href="articol.html">
+        <p class="meta">Proiecte, <time datetime="2025-11-26">26 noiembrie 2025</time></p>
+        <h3>Un mediu sigur și de sprijin pentru tinerii jucători de badminton</h3>
+      </a></li>
+      <li class="ph s7" data-kind="viata-clubului"><a href="articol.html">
+        <img src="../img/cantonament.jpg" width="1280" height="960" alt="Grupul din cantonament, în tricouri verzi" loading="lazy" decoding="async" style="object-position:50% 60%">
+        <p class="meta">Viața clubului, <time datetime="2024-08-28">28 august 2024</time></p>
+        <h3>Cantonament de pregătire, Slănic Moldova</h3>
+      </a></li>
+
+      <li class="tile mist s3" data-kind="competitie"><a href="articol.html">
+        <p class="meta">Competiție, <time datetime="2024-04-24">24 aprilie 2024</time></p>
+        <h3>Cupa României Juniori U13 și Tineret U23, Bacău</h3>
+      </a></li>
+      <li class="tile red s3" data-kind="competitie"><a href="articol.html">
+        <p class="meta">Competiție, <time datetime="2024-04-11">11 aprilie 2024</time></p>
+        <h3>Cupa României pentru Juniori U11 și U19</h3>
+      </a></li>
+      <li class="ph pano s6" data-kind="competitie"><a href="articol.html">
+        <img src="../img/medalii.jpg" width="1280" height="579" alt="Sportivi cu medalii după o competiție" loading="lazy" decoding="async">
+        <p class="meta">Competiție, <time datetime="2024-03-16">16 martie 2024</time></p>
+        <h3>6 medalii pentru Siderurgistul la Cupa României U15</h3>
+      </a></li>
+    </ol>
+  </div>
+
+  <section class="older" aria-labelledby="older-h">
+    <div class="wrap">
+      <h2 id="older-h">Mai vechi</h2>
+      <ol>
+        <li data-kind="competitie"><a href="articol.html"><span class="meta">Competiție, <time datetime="2024-03-17">17 martie 2024</time></span><b>Gălățenii Sara Bordeianu și Ionuț Nistor … ONSȘ</b></a></li>
+        <li data-kind="competitie"><a href="articol.html"><span class="meta">Competiție, <time datetime="2023-01-19">19 ianuarie 2023</time></span><b>Campionatul Național U11</b></a></li>
+        <li data-kind="competitie"><a href="articol.html"><span class="meta">Competiție, <time datetime="2023-01-12">12 ianuarie 2023</time></span><b>Campionatul Național Cadeți U15</b></a></li>
+        <li data-kind="competitie"><a href="articol.html"><span class="meta">Competiție, <time datetime="2023-01-11">11 ianuarie 2023</time></span><b>Campionatul Național U13</b></a></li>
+      </ol>
+      <p class="note"><b>Notă de schiță.</b> Doar Novi Sad și cantonamentul au fotografii proprii. Fotografiile de la Memorialul Rotaru, Cupa României U15 – 2026, ONSȘ 2026, serbare și „6 medalii” sunt puse din arhiva clubului, ca exemplu; articolele fără fotografie devin câmpuri de culoare. Titlul din 17 martie 2024 e prescurtat cu „…” și trebuie luat întreg de pe site-ul vechi.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div><h2>CS Siderurgistul Galați</h2><p>Club de badminton înființat la 7 martie 2002.</p><p>Afiliat la Federația Română de Badminton.</p></div>
+    <div><h2>Sala</h2><p>Sala Siderurgistul, Bd. Cloșca, Galați</p><p>Patru terenuri de badminton</p></div>
+    <div><h2>Contact</h2><p><a href="mailto:siderurgistul@badmintongalati.ro">siderurgistul@badmintongalati.ro</a></p></div>
+    <div><h2>Badminton</h2><p><a href="https://www.badminton.ro/">Federația Română de Badminton</a></p><p><a href="https://www.badmintoneurope.com/">Badminton Europe</a></p><p><a href="https://bwfbadminton.com/">BWF</a></p></div>
+  </div>
+</footer>
+
+
+<nav class="vbar" aria-label="Schițe">
+  <b>Schiță — Noutăți</b>
+  <a href="sportivi-lista.html">Sportivi</a>
+  <a href="sportiv-fisa.html">Fișa sportivului</a>
+  <a href="calendar.html">Calendar</a>
+  <a href="articol.html">Articol</a>
+  <a href="program.html">Program</a>
+  <a href="pentru-parinti.html">Pentru părinți</a>
+  <a href="contact.html">Contact</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  /* the filter works with CSS (:target); this only tells screen readers which link is on */
+  function mark(){var h=location.hash,links=document.querySelectorAll('.filter a'),on=false;
+    links.forEach(function(a){var m=a.getAttribute('href')===h;if(m){a.setAttribute('aria-current','true');on=true}else a.removeAttribute('aria-current')});
+    if(!on)links[0].setAttribute('aria-current','true');}
+  mark();addEventListener('hashchange',mark);
+
+  /* the one moment: the featured article's red plate rises and the photo unclips, as in the homepage hero */
+  if(!window.gsap||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  gsap.timeline({defaults:{ease:'power4.out'}})
+    .from('.feat .plate',{scaleY:0,duration:.7})
+    .from('.feat .shot',{clipPath:'inset(100% 0 0 0)',duration:.9},'-=.45');
+})();
+</script>
+</body>
+</html>
