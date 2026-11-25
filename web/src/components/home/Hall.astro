@@ -61,6 +61,7 @@ const scrolls = photos.length > 1;
     display: flex;
     gap: clamp(12px, 1.4vw, 20px);
     overflow-x: auto;
+    overflow-y: hidden;
     padding-bottom: 6px;
   }
   /* The motion layer adds .js-rally and moves the strip itself. */
@@ -80,6 +81,12 @@ const scrolls = photos.length > 1;
   /* The plate hangs below the photo without making the strip taller. */
   .track > :global(.plated) {
     margin-bottom: 0;
+  }
+  /* While the strip scrolls by itself (no JS, reduced motion) the plate ends at its padding edge
+     (12px offset - 6px padding), as the old box-shadow was clipped there; a plate reaching past
+     it would give the strip a vertical scroll range. */
+  .hall:not(.js-rally) .track > :global(.plated) :global(.plate) {
+    bottom: 6px;
   }
   /* A single photo fills the column instead of running past it. */
   .track > :global(figure:only-child) {

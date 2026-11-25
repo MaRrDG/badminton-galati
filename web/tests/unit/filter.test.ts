@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { filterCss } from '../../src/lib/filter';
+import { filterBarCss, filterCss } from '../../src/lib/filter';
 
 describe('filterCss', () => {
   test('hides the items of other values while one is checked', () => {
@@ -30,5 +30,23 @@ describe('filterCss', () => {
     expect(() => filterCss('.x', 'cat', ['u"17'], { effect: 'hide' })).toThrow();
     expect(() => filterCss('.x', 'cat', ['U17'], { effect: 'hide' })).toThrow();
     expect(() => filterCss('.x', 'c"at', ['u17'], { effect: 'hide' })).toThrow();
+  });
+});
+
+describe('filterBarCss', () => {
+  const options = [{ value: 'toti', label: 'Toți' }, { value: 'u17', label: 'U17' }];
+
+  test('the "all" option shows its count first and filters nothing', () => {
+    const css = filterBarCss('.roster', 'cat', options, { effect: 'hide', status: true });
+    expect(css).toContain('.roster [data-count-for]:not([data-count-for="toti"]){display:none}');
+    expect(css).toContain('[value="u17"]:checked');
+    expect(css).not.toContain('[value="toti"]:checked');
+  });
+
+  test('refuses an unsafe value in any option, the first one too', () => {
+    const bad = [{ value: ']</style>', label: 'Toți' }, ...options.slice(1)];
+    expect(() => filterBarCss('.roster', 'cat', bad, { effect: 'hide' })).toThrow();
+    expect(() => filterBarCss('.roster', 'cat', bad, { effect: 'hide', status: true })).toThrow();
+    expect(() => filterBarCss('.roster', 'c"at', options, { effect: 'hide' })).toThrow();
   });
 });

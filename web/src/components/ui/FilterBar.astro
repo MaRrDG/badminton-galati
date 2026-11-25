@@ -1,5 +1,5 @@
 ---
-import { filterCss, type FilterOption } from '../../lib/filter';
+import { filterBarCss, type FilterOption } from '../../lib/filter';
 
 interface Props {
   legend: string;
@@ -20,12 +20,7 @@ interface Props {
 }
 
 const { legend, legendVisible = false, name, scope, options, effect, container, variant, status = false } = Astro.props;
-const [all] = options;
-const css = [
-  // Before any choice (and without :has()), the count of the "all" option shows.
-  ...(status && all ? [`${scope} [data-count-for]:not([data-count-for="${all.value}"]){display:none}`] : []),
-  filterCss(scope, name, options.slice(1).map(o => o.value), { effect, container }),
-].join('\n');
+const css = filterBarCss(scope, name, options, { effect, container, status });
 ---
 
 <div class:list={['filterbar', variant]}>

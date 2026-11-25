@@ -82,6 +82,16 @@ test('the homepage draws every red plate with one component', async ({ page }) =
   expect(shadowed).toEqual([]);
 });
 
+test('the plate under a hall photo gives the strip no vertical scroll', async ({ browser }) => {
+  // Without the motion layer (reduced motion, no JS) the strip is a sideways scroller of its own.
+  const ctx = await browser.newContext({ reducedMotion: 'reduce' }); const page = await ctx.newPage();
+  await page.goto('/');
+  await expect(page.locator('.hall .track .plated')).toHaveCount(1);
+  const { scrollHeight, clientHeight } = await page.locator('.hall .track').evaluate(t => ({ scrollHeight: t.scrollHeight, clientHeight: t.clientHeight }));
+  expect(scrollHeight).toBe(clientHeight);
+  await ctx.close();
+});
+
 test('all content is visible without JavaScript', async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false }); const page = await ctx.newPage();
   await page.goto('/');

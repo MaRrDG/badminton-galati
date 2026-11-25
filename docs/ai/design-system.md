@@ -101,7 +101,7 @@ His rules:
 | `InitialTile` | A coloured field with the initials (`initialsOf`, tone from `toneAt`: blue, deep, red) where a photo is missing; sizes `tile`, `poster`, `coach` |
 | `PageHead` | The page title (`h1.display`); `white` (title left, lede right: athletes, news) or `blue` (a band, lede below: programme, parents, contact); slots `before` and default |
 | `SectionHeading` | `h2.h2s` (or `h3`): modest section heading |
-| `FilterBar` | Radios + `:has()` CSS from `filterCss()` (`lib/filter.ts`), works without JS; variants `chips`, `links`, `swatches`; effect `hide` or `dim` (no reflow); optional count line announced by `initFilterStatus()` (`scripts/filter-status.ts`). Items carry `data-f`, counts `data-count-for` |
+| `FilterBar` | Radios + `:has()` CSS from `filterBarCss()` and `filterCss()` (`lib/filter.ts`), works without JS; variants `chips`, `links`, `swatches`; effect `hide` or `dim` (no reflow); optional count line announced by `initFilterStatus()` (`scripts/filter-status.ts`). Items carry `data-f`, counts `data-count-for`. Filter values (and the radio name) must be lowercase slugs: pages that take values from content (e.g. "U17") slugify them first; a non-slug value fails the build on purpose |
 | `Tbc` | "**De confirmat de club:** …" with the hatched court-orange square (`.tbc` in `base.css`) |
 | `ClosingCta` | Red closing section `#proba` "Vino la un antrenament de probă"; `display` big uppercase (programme, parents) or modest (athletes); `email` adds the club address |
 
