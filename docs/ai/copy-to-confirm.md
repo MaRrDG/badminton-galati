@@ -68,7 +68,7 @@ the line. Placeholders in braces are filled from data.
 | "Copiii încep la Inițiere. Cine vrea competiții merge mai departe spre Performanță și Elite; cine vrea doar să joace are grupele de amatori." | Group guide intro (names the groups) | Mockup |
 | "Sub fiecare grupă e numele antrenorului ei." (confirmed coaches) / "Sub fiecare grupă e numele antrenorului ei, tot ca exemplu până confirmă clubul." (example coaches) | Group guide | Mockup / 2a |
 | "Orele sunt exemple, clubul le confirmă." "Zilele, orele și antrenorii de pe această pagină arată doar cum va arăta programul; tot ce e hașurat portocaliu nu e încă real." | Page note, shown whenever hours or coaches are examples (a sketch note in the mockup) | Mockup, shipped by ruling |
-| "Lăsați-ne vârsta copilului și un număr de telefon, iar clubul vă contactează ca să stabiliți ziua." | Closing section | Mockup |
+| "Spuneți-ne cine vine și un număr de telefon, iar clubul vă contactează ca să stabiliți ziua." | Closing section (fits a child or an adult; the mockup asked for the child's age) | 2a |
 | "Sala Siderurgistul, Bd. Cloșca, Galați · patru terenuri ·", "Ce grupă i se potrivește", "Întrebări de părinte: vârstă, echipament, cost", "Alegeți grupa copilului", "Toate grupele", "Pentru cine vrea performanță", "Pentru cine vrea doar să joace" | Timetable and guide | Mockup |
 | "15 antrenamente pe săptămână", "3 antrenamente pe săptămână la Inițiere" | Count line (screen readers only) | 2a |
 
@@ -94,7 +94,7 @@ the line. Placeholders in braces are filled from data.
 | Text | Where | Source |
 |---|---|---|
 | "Pentru un antrenament de probă, completați formularul. Pentru orice altă întrebare, scrieți-ne la {e-mail}." | Lede | Mockup |
-| "Cereți un antrenament de probă pentru copil sau scrieți-ne. Sala Siderurgistul, Bd. Cloșca, Galați." | Meta description | 2a |
+| "Cereți un antrenament de probă, pentru copil sau pentru dumneavoastră, ori scrieți-ne. Sala Siderurgistul, Bd. Cloșca, Galați." | Meta description (fits a child or an adult) | 2a |
 | "Toate câmpurile sunt obligatorii, în afară de mesaj." | Form intro | Mockup |
 | "Cine vine la antrenament?", "Copilul meu", "Eu", "Numele părintelui", "Numele dumneavoastră", "Telefon", "Vârsta copilului", "Mesaj (opțional)", "Trimite cererea" | Labels | Mockup / 2a (the "Eu" path) |
 | "Clubul vă contactează la acest număr.", "În ani, între 3 și 18. Ne ajută să alegem grupa potrivită.", "De exemplu, ce zile vă convin sau dacă a mai jucat badminton." | Hints; **the age range 3–18 needs the club's confirmation** | Mockup / 2a |
