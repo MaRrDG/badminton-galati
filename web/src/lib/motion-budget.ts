@@ -2,7 +2,7 @@
 // chunk fetched on demand; on a slow connection the page has long painted its final state by
 // then, and an intro starting from its start state would make it snap back and animate again.
 
-/** How late (ms after the page script started) the motion code may arrive for a load intro to play. */
+/** How late (ms after the first contentful paint, else after the page script started) the motion code may arrive for a load intro to play. */
 export const LOAD_INTRO_BUDGET_MS = 1000;
 
 /** True when the motion code that resolved at `resolvedAt` came within `budget` of `startedAt` (both `performance.now()`). */

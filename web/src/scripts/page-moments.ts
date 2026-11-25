@@ -15,7 +15,7 @@ export function runPageMoment(moment: PageMoment, { intro = true }: { intro?: bo
   gsap.registerPlugin(ScrollTrigger);
   switch (moment) {
     case 'tile-roll':
-      tileRoll();
+      tileRoll(intro);
       break;
     case 'place-roll':
       if (intro) placeRoll();
@@ -140,8 +140,9 @@ function placeRoll(): void {
  * once, when the tile comes into view. The bands start on the final digits, so a tile that
  * never scrolls into view still reads right. Screen readers hear the place from a hidden copy
  * of the digits, not the band. Under reduced motion none of this runs, the filter included.
+ * With `intro` false (late code) the tiles already in view keep their final digits.
  */
-function tileRoll(): void {
+function tileRoll(intro: boolean): void {
   gsap.utils.toArray<HTMLElement>('.wall [data-roll]').forEach(el => {
     const place = el.dataset.roll ?? '';
     const bands = digitBands(el);
@@ -151,6 +152,7 @@ function tileRoll(): void {
     spoken.textContent = place;
     el.append(spoken);
     for (const { band, end } of bands) gsap.set(band, { yPercent: end });
+    if (!intro && el.getBoundingClientRect().top < innerHeight * 0.92) return;
     ScrollTrigger.create({
       trigger: el,
       start: 'top 92%',

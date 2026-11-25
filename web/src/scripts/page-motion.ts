@@ -30,5 +30,9 @@ export function initPageMotion(moment: PageMoment): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!document.querySelector(TARGETS[moment])) return;
   // Late code (a slow connection) skips the load-time intros: the page has painted its final state.
-  void import('./page-moments').then(m => m.runPageMoment(moment, { intro: introOnTime(startedAt, performance.now()) }));
+  // Measured from the first contentful paint when the browser reports it: that is when the final state shows.
+  void import('./page-moments').then(m => {
+    const fcp = performance.getEntriesByName('first-contentful-paint')[0]?.startTime;
+    m.runPageMoment(moment, { intro: introOnTime(fcp ?? startedAt, performance.now()) });
+  });
 }

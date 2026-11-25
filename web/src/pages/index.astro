@@ -37,5 +37,9 @@ const hasRoster = home.athletes.length > 0;
   // rendered. When the chunk arrives late, the hero intro is skipped (the page has painted already).
   const startedAt = performance.now();
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-    void import('../scripts/motion').then(m => m.initMotion({ intro: introOnTime(startedAt, performance.now()) }));
+    void import('../scripts/motion').then(m => {
+      // Measured from the first contentful paint when the browser reports it: that is when the final state shows.
+      const fcp = performance.getEntriesByName('first-contentful-paint')[0]?.startTime;
+      m.initMotion({ intro: introOnTime(fcp ?? startedAt, performance.now()) });
+    });
 </script>

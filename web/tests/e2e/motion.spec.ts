@@ -262,6 +262,65 @@ test.describe('motion code that arrives late', () => {
   });
 });
 
+test.describe('inner-page moment code that arrives late', () => {
+  /**
+   * Records, on every frame, whether the first wall tile's digit band was ever back near its start
+   * (within a tenth of its height of the cell's top; a frame after the roll starts it has moved a
+   * few percent) and whether the contact poster was ever clipped or its plate shrunk.
+   */
+  const watchMoments = (page: Page) => page.addInitScript(() => {
+    const w = window as unknown as { bandAtStart: boolean; posterHidden: boolean };
+    w.bandAtStart = false;
+    w.posterHidden = false;
+    const frame = () => {
+      const band = document.querySelector<HTMLElement>('.wall [data-roll] i span');
+      if (band) {
+        const r = band.getBoundingClientRect();
+        if (r.top - band.parentElement!.getBoundingClientRect().top > -0.1 * r.height) w.bandAtStart = true;
+      }
+      const shot = document.querySelector<HTMLElement>('.plated.reveal .shot');
+      const plate = document.querySelector<HTMLElement>('.plated.reveal .plate');
+      if (shot && /inset\((?!0px 0px 0px 0px|0%)/.test(shot.style.clipPath)) w.posterHidden = true;
+      if (plate && plate.style.transform && new DOMMatrix(getComputedStyle(plate).transform).d < 0.99) w.posterHidden = true;
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  });
+  const seen = (page: Page) =>
+    page.evaluate(() => { const w = window as unknown as { bandAtStart: boolean; posterHidden: boolean }; return { band: w.bandAtStart, poster: w.posterHidden }; });
+
+  /** Delays the inner pages' moment chunk by `ms`; resolves `arrived` once it is served. */
+  const delayMoments = async (page: Page, ms: number) => {
+    const state = { arrived: false };
+    await page.route(/\/_astro\/page-moments\.[^/]*\.js$/, async route => {
+      await new Promise(r => setTimeout(r, ms));
+      await route.continue();
+      state.arrived = true;
+    });
+    return state;
+  };
+
+  for (const [path, key] of [['/sportivi/', 'band'], ['/contact/', 'poster']] as const) {
+    test(`on time, ${path} plays its moment (the probe sees it start)`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await watchMoments(page);
+      await page.goto(path);
+      await expect.poll(async () => (await seen(page))[key]).toBe(true);
+    });
+
+    test(`1.5 s late, ${path} keeps what it painted`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await watchMoments(page);
+      const state = await delayMoments(page, 1500);
+      await page.goto(path);
+      await expect.poll(() => state.arrived, { timeout: 5000 }).toBe(true);
+      if (key === 'band') await expect(page.locator('.wall [data-roll] i').first()).toHaveCount(1); // the moment ran
+      await page.waitForTimeout(1200);
+      expect((await seen(page))[key]).toBe(false);
+    });
+  }
+});
+
 test('reduced motion shows final states', async ({ browser }) => {
   const ctx = await browser.newContext({ reducedMotion: 'reduce' }); const page = await ctx.newPage();
   await pinClock(page);
