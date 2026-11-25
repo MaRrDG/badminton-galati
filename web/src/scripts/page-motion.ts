@@ -24,11 +24,29 @@ export function initPageMotion(moment: PageMoment): void {
     case 'place-roll':
       placeRoll();
       break;
+    case 'season-fill':
+      seasonFill();
+      break;
     case 'poster-reveal':
       posterReveal();
       break;
     // The other moments arrive with their pages.
   }
+}
+
+/**
+ * The competition blocks of the calendar (`.months .evb`) fill in from the left, one after the
+ * other in date order, 0.2 s after load, so the season's shape draws itself. The clip is
+ * removed at the end, so the blocks and their focus rings end as rendered.
+ */
+function seasonFill(): void {
+  const blocks = gsap.utils.toArray<HTMLElement>('.months .evb');
+  if (blocks.length === 0) return;
+  gsap.fromTo(
+    blocks,
+    { clipPath: 'inset(0 100% 0 0)' },
+    { clipPath: 'inset(0 0% 0 0)', duration: 0.5, ease: 'power3.out', stagger: 0.07, delay: 0.2, clearProps: 'clipPath' },
+  );
 }
 
 /**

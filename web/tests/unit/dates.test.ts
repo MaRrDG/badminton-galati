@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { daysBetween, formatDateRo, formatRangeRo, isIsoDate, splitRangeRo, todayInBucharest } from '../../src/lib/dates';
+import {
+  daysBetween, daysInMonth, formatDateRo, formatRangeRo, formatShortRangeRo, isIsoDate, monthNameRo, splitRangeRo, todayInBucharest, weekdayOf,
+} from '../../src/lib/dates';
 
 describe('formatDateRo', () => {
   test('writes day, lowercase Romanian month and year', () => {
@@ -88,5 +90,47 @@ describe('isIsoDate', () => {
     expect(isIsoDate('2026-11-5')).toBe(false);
     expect(isIsoDate('2026-13-05')).toBe(false);
     expect(isIsoDate('25.11.2026')).toBe(false);
+  });
+});
+
+describe('formatShortRangeRo', () => {
+  test('abbreviates the month, with a dot only where letters are left out', () => {
+    expect(formatShortRangeRo('2026-03-13', '2026-03-15')).toBe('13–15 mar.');
+    expect(formatShortRangeRo('2026-09-04', '2026-09-06')).toBe('4–6 sept.');
+    expect(formatShortRangeRo('2026-05-08', '2026-05-10')).toBe('8–10 mai');
+    expect(formatShortRangeRo('2026-06-30', '2026-06-30')).toBe('30 iun.');
+  });
+
+  test('names both months when the range crosses one, and leaves out the year', () => {
+    expect(formatShortRangeRo('2026-10-30', '2026-11-01')).toBe('30 oct. – 1 nov.');
+    expect(formatShortRangeRo('2026-12-30', '2027-01-02')).toBe('30 dec. – 2 ian.');
+  });
+
+  test('has an abbreviation for every month', () => {
+    const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+    expect(months.map(m => formatShortRangeRo(`2026-${m}-01`, `2026-${m}-01`).slice(2))).toEqual(
+      ['ian.', 'feb.', 'mar.', 'apr.', 'mai', 'iun.', 'iul.', 'aug.', 'sept.', 'oct.', 'nov.', 'dec.'],
+    );
+  });
+});
+
+describe('weekdayOf', () => {
+  test('ISO weekday, Monday 1 to Sunday 7', () => {
+    expect(weekdayOf('2026-01-01')).toBe(4); // Thursday
+    expect(weekdayOf('2026-03-01')).toBe(7); // Sunday
+    expect(weekdayOf('2026-06-01')).toBe(1); // Monday
+    expect(weekdayOf('2026-11-25')).toBe(3); // Wednesday
+    expect(weekdayOf('2028-02-29')).toBe(2); // Tuesday, a leap day
+  });
+});
+
+describe('daysInMonth and monthNameRo', () => {
+  test('February has 29 days in leap years only', () => {
+    expect([daysInMonth(2026, 2), daysInMonth(2028, 2), daysInMonth(2000, 2), daysInMonth(2100, 2)]).toEqual([28, 29, 29, 28]);
+    expect([1, 4, 6, 9, 11, 12].map(m => daysInMonth(2026, m))).toEqual([31, 30, 30, 30, 30, 31]);
+  });
+
+  test('lowercase Romanian month names', () => {
+    expect([monthNameRo(1), monthNameRo(9), monthNameRo(12)]).toEqual(['ianuarie', 'septembrie', 'decembrie']);
   });
 });

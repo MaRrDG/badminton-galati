@@ -1,0 +1,170 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import { categoryFilter, cityLabel, eventStatus, statusWord } from '../../lib/calendar';
+import { formatShortRangeRo, splitRangeRo } from '../../lib/dates';
+import { splitCalendar } from '../../lib/home';
+import type { Competition } from '../../lib/types';
+
+interface Props {
+  spring: Competition[];
+  autumn: Competition[];
+  /** The build date, 'YYYY-MM-DD' in Bucharest. */
+  today: string;
+}
+
+const { spring, autumn, today } = Astro.props;
+// The same next event as the grid: the earliest of the year not yet over.
+const { next } = splitCalendar([...spring, ...autumn], today);
+const halves = [
+  { heading: 'Primăvara, Cupele României', comps: spring },
+  { heading: 'Toamna, Campionatele Naționale', comps: autumn },
+].filter(h => h.comps.length > 0);
+---
+
+<!--
+  The season as a plain list in date order: the target of every block in the grid, and the
+  calendar for screen readers and for pages without JavaScript. The panel reads its data-*.
+-->
+<section class="list" aria-labelledby="list-h">
+  <SectionHeading id="list-h">Toate competițiile, pe rând</SectionHeading>
+  {
+    halves.map(h => (
+      <div>
+        <h3>{h.heading}</h3>
+        <ol>
+          {h.comps.map(c => {
+            const status = eventStatus(c, today, next);
+            const when = splitRangeRo(c.start, c.end);
+            return (
+              <li
+                id={`ev-${c.id}`}
+                class:list={['li', status, { home: c.home }]}
+                data-f={categoryFilter([c])}
+                data-status={status}
+                data-home={c.home ? '' : undefined}
+                data-days={when.days}
+                data-rest={when.rest}
+                data-title={c.title}
+                data-city={cityLabel(c)}
+              >
+                <span class="ld">
+                  <time datetime={c.start}>{formatShortRangeRo(c.start, c.end)}</time>
+                </span>
+                <span class="lt">{c.title}</span>
+                <span class:list={['lc', { unknown: c.city === 'de confirmat' }]}>
+                  {cityLabel(c)}
+                  {c.home && <span class="home-tag">acasă</span>}
+                </span>
+                {(c.postSlug || c.resultsUrl) && (
+                  <span class="la">
+                    {c.postSlug && <a class="textlink" href={`/noutati/${c.postSlug}/`}>Articolul clubului</a>}
+                    {c.resultsUrl && <a class="textlink" href={c.resultsUrl}>Rezultatele pe badminton.ro</a>}
+                  </span>
+                )}
+                <span class="visually-hidden">{statusWord(status)}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .list {
+    margin-top: clamp(52px, 6vw, 84px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px clamp(32px, 5vw, 72px);
+  }
+  /* The approved calendar keeps this heading small beside the grids. */
+  .list > :global(.h2s) {
+    grid-column: 1 / -1;
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: 0;
+  }
+  h3 {
+    font-weight: 600;
+    font-size: 0.98rem;
+    margin-bottom: 6px;
+    color: var(--ink-muted);
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .li {
+    display: grid;
+    grid-template-columns: 6.4rem minmax(0, 1fr) auto;
+    gap: 2px 16px;
+    align-items: baseline;
+    padding: 9px 10px;
+    margin: 0 -10px;
+  }
+  .ld {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .lt {
+    font-weight: 500;
+  }
+  .lc {
+    text-align: right;
+    font-size: 0.95rem;
+  }
+  .lc.unknown {
+    font-style: italic;
+  }
+  .la {
+    grid-column: 2 / -1;
+    justify-self: start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 18px;
+    margin-top: 2px;
+    font-size: 0.95rem;
+  }
+  .li.played {
+    color: var(--ink-muted);
+  }
+  .li.played .la {
+    color: var(--ink);
+  }
+  .li.next :is(.lt, .ld) {
+    color: var(--blue);
+    font-weight: 700;
+  }
+  .li:target {
+    background: var(--mist);
+  }
+  .home-tag {
+    display: inline-block;
+    background: var(--red-field);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.82rem;
+    line-height: 1;
+    padding: 4px 7px 5px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  @media (max-width: 860px) {
+    .list {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 420px) {
+    .li {
+      grid-template-columns: 6.4rem minmax(0, 1fr);
+      column-gap: 10px;
+    }
+    .lc {
+      grid-column: 2;
+      text-align: left;
+    }
+  }
+</style>

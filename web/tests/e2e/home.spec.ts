@@ -189,6 +189,14 @@ test.describe('no athlete may be shown', on('sparse'), () => {
     expect(await sectionIds(page)).toEqual(['hero', 'de-ce', 'program', 'calendar', 'hall', 'noutati', 'proba']);
   });
 
+  test('an empty calendar is one quiet line', async ({ page }) => {
+    await page.goto('/');
+    const cal = page.locator('#calendar');
+    await expect(cal.getByText('Nicio competiție programată deocamdată.')).toBeVisible();
+    await expect(cal.locator('.nextev, .played, [data-countdown]')).toHaveCount(0);
+    await expect(cal.getByRole('link', { name: 'Tot calendarul 2026' })).toHaveAttribute('href', '/calendar/');
+  });
+
   test('a long hero line wraps inside a 380px screen', async ({ page }) => {
     await page.setViewportSize({ width: 380, height: 800 }); await page.goto('/');
     await expect(page.locator('.hero h1 span').first()).toHaveText('Ai pierdut? Încearcă');

@@ -63,17 +63,9 @@ const year = (next?.start ?? today).slice(0, 4);
 </section>
 
 <script>
-  // The page is built once a day, so the build-time label can go stale: recompute it from the
-  // visitor's clock with the same rules. Without JavaScript the build-time label stays.
-  import { todayInBucharest } from '../../lib/dates';
-  import { countdownLabel } from '../../lib/home';
+  import { initCountdowns } from '../../scripts/countdown';
 
-  for (const el of document.querySelectorAll<HTMLElement>('[data-countdown]')) {
-    const { start, end } = el.dataset;
-    const label = start && end ? countdownLabel({ start, end }, todayInBucharest()) : undefined;
-    el.textContent = label ?? '';
-    el.hidden = !label;
-  }
+  initCountdowns();
 </script>
 
 <style>

@@ -28,8 +28,29 @@ export function isIsoDate(value: string): boolean {
   }
 }
 
+/** The short forms of the months, for compact lists: a dot only where letters are left out ("mai"). */
+const MONTHS_SHORT_RO = ['ian.', 'feb.', 'mar.', 'apr.', 'mai', 'iun.', 'iul.', 'aug.', 'sept.', 'oct.', 'nov.', 'dec.'];
+
 function monthName(month: number): string {
   return MONTHS_RO[month - 1];
+}
+
+/** 1 → 'ianuarie', 12 → 'decembrie'. */
+export function monthNameRo(month: number): string {
+  const name = MONTHS_RO[month - 1];
+  if (!name) throw new Error(`Expected a month from 1 to 12, got ${month}`);
+  return name;
+}
+
+/** The number of days in `month` (1–12) of `year`, leap years included. */
+export function daysInMonth(year: number, month: number): number {
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+/** The ISO weekday of a date: 1 = luni … 7 = duminică. */
+export function weekdayOf(iso: string): number {
+  const { year, month, day } = parseIso(iso);
+  return ((new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7) + 1;
 }
 
 /** Whole calendar days from `from` to `to` (negative when `to` is earlier). */
@@ -61,6 +82,19 @@ export function formatRangeRo(start: string, end: string, { year = true }: { yea
   if (start === end) return `${s.day} ${monthName(s.month)}${tail}`;
   if (s.month !== e.month) return `${s.day} ${monthName(s.month)} – ${e.day} ${monthName(e.month)}${tail}`;
   return `${s.day}–${e.day} ${monthName(e.month)}${tail}`;
+}
+
+/**
+ * A compact range without the year, for lists:
+ * '2026-03-13', '2026-03-15' → '13–15 mar.'; '2026-10-30', '2026-11-01' → '30 oct. – 1 nov.'
+ */
+export function formatShortRangeRo(start: string, end: string): string {
+  const s = parseIso(start);
+  const e = parseIso(end);
+  const short = (month: number) => MONTHS_SHORT_RO[month - 1];
+  if (start === end) return `${s.day} ${short(s.month)}`;
+  if (s.year !== e.year || s.month !== e.month) return `${s.day} ${short(s.month)} – ${e.day} ${short(e.month)}`;
+  return `${s.day}–${e.day} ${short(e.month)}`;
 }
 
 /**

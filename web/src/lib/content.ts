@@ -1,4 +1,5 @@
 import { athleteProfile, athletesView, type AthleteProfile, type AthletesPage } from './athletes';
+import { calendarView, type CalendarPage } from './calendar';
 import { isIsoDate, todayInBucharest } from './dates';
 import { byStart, latestPosts, newestFirst, visibleAthletes } from './home';
 import { fetchHomeQuery, slugifyRo, toHomeData } from './sanity';
@@ -72,6 +73,11 @@ export async function getAthleteProfiles(): Promise<AthleteProfile[]> {
   const site = await getSiteData();
   const today = buildToday();
   return visibleAthletes(site.athletes).map(athlete => athleteProfile(site, athlete, today));
+}
+
+/** The competition calendar (/calendar/) of the build year, with the build date marked. */
+export async function getCalendarPage(): Promise<CalendarPage> {
+  return calendarView(await getSiteData(), buildToday());
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */

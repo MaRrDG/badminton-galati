@@ -1,0 +1,157 @@
+---
+import type { Month } from '../../lib/calendar';
+
+interface Props {
+  month: Month;
+  year: number;
+  /** The build date, 'YYYY-MM-DD' in Bucharest: marks today inside an event block. */
+  today: string;
+}
+
+const { month, year, today } = Astro.props;
+// Today's day number when today falls in this month.
+const todayDay = today.startsWith(`${year}-${String(month.month).padStart(2, '0')}-`) ? Number(today.slice(8, 10)) : undefined;
+const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Jo', 'Vi', 'Sâ', 'Du'];
+---
+
+<section class:list={['mo', { empty: month.empty }]} aria-label={`${month.name} ${year}`}>
+  <h3>{month.name}{month.empty && <span class="none"> fără competiții</span>}</h3>
+  <div class="grid">
+    {WEEKDAYS.map(w => <span class="wd" aria-hidden="true">{w}</span>)}
+    {
+      month.cells.map(cell =>
+        cell.kind === 'pad' ? (
+          <span class="pad" style={`grid-column:span ${cell.span}`} />
+        ) : cell.kind === 'day' ? (
+          <span class:list={['d', { today: cell.today }]} aria-current={cell.today ? 'date' : undefined}>{cell.day}</span>
+        ) : (
+          <a
+            class:list={['evb', cell.status, { home: cell.home }]}
+            href={`#ev-${cell.comps[0].id}`}
+            data-ev={`ev-${cell.comps[0].id}`}
+            data-f={cell.filter}
+            style={`grid-column:span ${cell.days.length};--n:${cell.days.length}`}
+            aria-label={cell.label}
+          >
+            {cell.days.map(d => (
+              <span class:list={{ today: d === todayDay }} aria-current={d === todayDay ? 'date' : undefined}>{d}</span>
+            ))}
+          </a>
+        ),
+      )
+    }
+  </div>
+</section>
+
+<style>
+  h3 {
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    margin: 0 0 8px;
+  }
+  .none {
+    font-weight: 400;
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 3px;
+    font-size: 0.84rem;
+    line-height: 1;
+  }
+  .wd {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding-bottom: 4px;
+    color: var(--ink-muted);
+  }
+  .d {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    background: var(--mist-soft);
+  }
+  .empty .d {
+    background: none;
+    color: var(--ink-muted);
+  }
+  .d.today {
+    background: var(--ink);
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  /* A competition: one block across its days. Played on a tint, coming in full colour,
+     home events in red; the words are in the label, the panel and the list. */
+  .evb {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 3px;
+    text-decoration: none;
+    font-weight: 700;
+    background: var(--blue-tint);
+    color: var(--blue-deep);
+  }
+  .evb span {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+  }
+  .evb.home {
+    background: var(--red-tint);
+    color: var(--red-deep);
+  }
+  .evb:is(.next, .upcoming) {
+    background: var(--blue);
+    color: var(--white);
+  }
+  .evb:is(.next, .upcoming).home {
+    background: var(--red-field);
+  }
+  .evb:hover,
+  .evb.on {
+    background: var(--blue);
+    color: var(--white);
+  }
+  .evb.home:hover,
+  .evb.home.on {
+    background: var(--red-field);
+    color: var(--white);
+  }
+  .evb:is(.next, .upcoming):hover,
+  .evb:is(.next, .upcoming).on {
+    background: var(--blue-deep);
+  }
+  .evb:is(.next, .upcoming).home:hover,
+  .evb:is(.next, .upcoming).home.on {
+    background: var(--red-ink);
+  }
+  .evb .today {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .evb:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 860px) {
+    .empty .grid {
+      display: none;
+    }
+    .empty h3 {
+      margin: 0;
+    }
+    .grid,
+    .evb {
+      gap: 4px;
+    }
+    .grid {
+      font-size: 0.95rem;
+    }
+  }
+</style>
