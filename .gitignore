@@ -5,3 +5,5 @@ dist/
 .astro/
 test-results/
 playwright-report/
+# Deploy settings (server address, user, path): local only, the repository is public.
+.deploy.env

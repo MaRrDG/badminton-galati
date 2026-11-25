@@ -1,0 +1,13 @@
+# Test deployment of the static site: one nginx container serving web/dist.
+# scripts/deploy.sh copies this file, nginx.conf and dist/ into DEPLOY_PATH on the server.
+# The port is bound to localhost only; the server's reverse proxy (with SSO) sits in front.
+services:
+  web:
+    image: nginx:alpine
+    container_name: badminton-galati
+    restart: always
+    ports:
+      - "127.0.0.1:3013:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro

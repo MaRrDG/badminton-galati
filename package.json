@@ -9,6 +9,7 @@
     "test": "pnpm -r test",
     "e2e": "pnpm -C web e2e",
     "test:changed": "pnpm -r test:changed",
-    "e2e:changed": "pnpm -C web e2e:changed"
+    "e2e:changed": "pnpm -C web e2e:changed",
+    "deploy:test": "bash scripts/deploy.sh"
   }
 }
