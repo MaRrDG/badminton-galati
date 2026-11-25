@@ -9,7 +9,8 @@ type AnyField = {
   title?: string;
   fields?: AnyField[];
   of?: AnyField[];
-  options?: { list?: (string | { value: string })[] };
+  options?: { list?: (string | { value: string })[]; filter?: unknown };
+  to?: { type: string }[];
   initialValue?: unknown;
   readOnly?: unknown;
   validation?: (rule: unknown) => unknown;
@@ -85,6 +86,9 @@ describe('content model', () => {
       const alt = img.fields?.find((f) => f.name === 'alt');
       expect(alt, `${path} has no alt`).toBeDefined();
       expect(ruleCalls(alt!), `${path}.alt is not required`).toContain('required');
+      // An error blocks publishing; a warning would let a photo go out without a description.
+      expect(ruleCalls(alt!), `${path}.alt is only a warning`).toContain('error');
+      expect(ruleCalls(alt!), `${path}.alt is only a warning`).not.toContain('warning');
     }
   });
 
@@ -95,6 +99,21 @@ describe('content model', () => {
     expect(item.fields!.map((f) => f.name)).toEqual(['category', 'discipline', 'place', 'points']);
     const discipline = item.fields!.find((f) => f.name === 'discipline')!;
     expect(listValues(discipline)).toEqual(['SB', 'SF', 'DB', 'DF', 'DX']);
+  });
+
+  it('lets a post tag only athletes with parental consent in its results', () => {
+    const row = field('post', 'results').of![0]!;
+    expect(row.name).toBe('resultRow');
+    expect(row.fields!.map((f) => f.name)).toEqual(['athlete', 'discipline', 'result']);
+    const athlete = row.fields!.find((f) => f.name === 'athlete')!;
+    expect(athlete.to).toEqual([{ type: 'athlete' }]);
+    expect(athlete.options?.filter).toBe('consent == true');
+  });
+
+  it('writes the diacritics range of the slug rule as escapes, not literal combining marks', () => {
+    const source = readFileSync(new URL('../schemaTypes/shared.ts', import.meta.url), 'utf8');
+    expect(source).not.toMatch(/[\u0300-\u036f]/);
+    expect(slugifyRo('Nistor Cristian-Ionuț, Ștefănescu Îrina')).toBe('nistor-cristian-ionut-stefanescu-irina');
   });
 
   it('limits group tracks to performanta and amatori', () => {
@@ -130,6 +149,10 @@ describe('seed', () => {
     expect(ofType('competition')).toHaveLength(12);
     expect(ofType('post')).toHaveLength(3);
     expect(ofType('siteSettings').map((d) => d._id)).toEqual(['siteSettings']);
+  });
+
+  it('publishes no athlete: parental consent has not been given yet', () => {
+    for (const a of ofType('athlete')) expect(a.consent, a._id).toBe(false);
   });
 
   it('derives slugs the way the Studio button does', () => {

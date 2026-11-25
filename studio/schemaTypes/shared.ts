@@ -25,7 +25,7 @@ export const disciplines = [
 export const slugifyRo = (input: string): string =>
   input
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '') // combining accents left by NFD
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')

@@ -128,7 +128,7 @@ export const post = defineType({
       fieldset: 'legaturi',
       of: [
         defineArrayMember({
-          name: 'result',
+          name: 'resultRow',
           title: 'Rezultat',
           type: 'object',
           fields: [
@@ -137,6 +137,9 @@ export const post = defineType({
               title: 'Sportivul',
               type: 'reference',
               to: [{ type: 'athlete' }],
+              description: 'Apar doar sportivii cu acordul părintelui bifat.',
+              // Only athletes whose families agreed may be named anywhere on the site.
+              options: { filter: 'consent == true' },
               validation: (rule) => rule.required().error('Alege sportivul.'),
             }),
             defineField({ name: 'discipline', title: 'Proba', type: 'string', options: { list: disciplines } }),

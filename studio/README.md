@@ -34,10 +34,11 @@ pnpm --filter studio exec sanity dataset import seed/seed.ndjson --dataset produ
 `--missing` sare peste documentele care există deja, deci nu suprascrie ce au
 schimbat antrenorii.
 
-> **Date de test:** cei trei sportivi din seed au `consent: true` doar ca să
-> apară pe site în timpul dezvoltării. Acordul real al părinților nu a fost
-> încă primit. Înainte de lansare, debifează „Acord părinte” la fiecare sportiv
-> până la primirea acordului scris.
+> **Acordul părinților:** cei trei sportivi din seed sunt minori și intră cu
+> „Acord părinte” nebifat (`consent: false`), pentru că acordul scris al
+> părinților nu a fost încă primit. Până la bifă nu apar nicăieri pe site și nu
+> pot fi aleși la rezultatele unui articol. Bifează „Acord părinte” la fiecare
+> sportiv abia după ce clubul are acordul scris al părintelui lui.
 
 Seed-ul nu conține poze: pozele se încarcă din Studio (câmpurile de poză sunt
 goale după import). Tot din Studio se leagă sportivii de grupe și articolele de
