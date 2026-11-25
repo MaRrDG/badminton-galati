@@ -33,7 +33,7 @@ No request to Sanity is made from the browser, and the read token never reaches 
 | `web/src/lib/dates.ts` | ISO date strings in the Europe/Bucharest calendar, Romanian formatting, `todayInBucharest()` |
 | `web/src/pages/404.astro` | The not-found page: copy, ways out, and `components/notfound/RallyScene.astro` (the 404 net and two players as static SVG, once per framing) |
 | `web/src/lib/rally/` | The 404 rally without DOM: `court.ts` (framings, the net's digits and cords), `flight.ts` (shuttle drag, launch solvers), `figure.ts` (jointed silhouette to transforms), `rally.ts` (shots, footwork, net faults; `frame()` also yields the still frame at build time) |
-| `web/src/scripts/rally.ts` | `initRally()`: steps the rally per animation frame and writes transforms; taps ask a player to smash |
+| `web/src/scripts/rally.ts` | `initRally()`: steps the rally per animation frame and writes transforms; no visitor input, the scene is decoration |
 | `web/src/pages/index.astro` | The homepage. Omits the roster section and the hero's "Vezi toți sportivii" link when no athlete is visible |
 | `web/src/layouts/Base.astro` | `<html lang="ro">`, head, skip link, header, footer |
 | `web/src/components/Site{Header,Footer}.astro` | Shell. Nav links to `/sportivi/`, `/program/`, `/calendar/`, `/noutati/`, `/contact/` point to pages that do not exist yet (plan 2) |

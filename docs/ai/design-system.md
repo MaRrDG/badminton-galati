@@ -58,6 +58,8 @@ A sixth, asked for by Mario and confined to the 404 page: the rally over the net
 `transform` only, no GSAP; it stops when the tab is hidden or the scene is off screen. Reduced
 motion and no-JS show the still frame that `RallyScene.astro` renders from the same code (the
 shuttle caught in the 0). Two framings of one scene: `wide`, and `tall` at 860px and below.
+The scene takes no input: no hint, no pointer or key handling, nothing focusable (Mario had the
+tap-to-smash removed).
 
 Hero lines may wrap below 860px (coach-editable motto must never clip). `initMotion()` returns at once
 under `prefers-reduced-motion: reduce` (`base.css` also turns off smooth scrolling). GSAP is bundled

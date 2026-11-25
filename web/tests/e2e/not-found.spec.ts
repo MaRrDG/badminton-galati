@@ -47,7 +47,6 @@ test('the rally runs: the shuttle crosses the net, with no page errors', async (
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('/404.html');
-  await expect(page.getByText('Atinge un jucător ca să atace.')).toBeVisible();
   // It starts caught in the 0, drops, is served, and must then be seen on both sides of the net.
   await page.waitForFunction(() => {
     const svg = [...document.querySelectorAll<SVGSVGElement>('svg[data-rally]')].find(s => s.getClientRects().length)!;
@@ -70,7 +69,6 @@ test('reduced motion shows the still frame: the shuttle stays in the 0', async (
   await expectShuttleInZero(page);
   await page.waitForTimeout(700);
   expect(await snapshot(page)).toBe(first);
-  await expect(page.getByText('Atinge un jucător ca să atace.')).toBeHidden();
   await ctx.close();
 });
 
@@ -86,6 +84,22 @@ test('without JavaScript the headline, the links and the still scene are there',
     await expect(scene(page).locator('[data-player]')).toHaveCount(2);
     await expectShuttleInZero(page);
     await ctx.close();
+  }
+});
+
+test('the scene takes no input: no hint, nothing to focus or press', async ({ page }) => {
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/404.html');
+    await expect(page.getByText(/Atinge|Apasă/)).toHaveCount(0);
+    await expect(page.locator('[data-rally-hint]')).toHaveCount(0);
+    const stage = page.locator('[data-rally-stage]');
+    await expect(stage.locator('a, button, input, select, textarea, [tabindex], [role], [contenteditable]')).toHaveCount(0);
+    expect(await stage.evaluate(el => getComputedStyle(el).cursor)).toBe('auto');
+    // Tab from the last way out leaves the section without stopping in the scene.
+    await page.getByRole('navigation', { name: 'Alte pagini' }).getByRole('link', { name: 'Contact' }).focus();
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => Boolean(document.activeElement?.closest('[data-rally-stage]')))).toBe(false);
   }
 });
 

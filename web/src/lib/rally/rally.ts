@@ -135,7 +135,6 @@ export class Rally {
   private flight: Flight | null = null;
   private hitsLeft: number;
   private server: Side = 0;
-  private want: [number, number] = [0, 0];
   // Shuttle in play: position, angle (degrees, cork first along +x), visibility.
   private sx = 0;
   private sy = 0;
@@ -174,17 +173,6 @@ export class Rally {
     const [cx, cy] = catchPoint(layout);
     this.sx = cx + this.dir[0] * HANG; this.sy = cy + this.dir[1] * HANG;
     this.pose();
-  }
-
-  /** A tap near a player: that player smashes at the next chance; a stalled rally restarts. */
-  poke(side: Side): void {
-    this.want[side] = 2;
-    if (this.mode === 'rest') { this.server = side; this.restUntil = this.t; }
-    else if (this.mode === 'caught') this.slipAt = Math.min(this.slipAt, this.t + 0.06);
-    else if (this.mode === 'fly' && this.flight && this.flight.hitter !== side && this.flight.catchT == null) {
-      const s = this.players[side].stroke;
-      if (s && s.over && s.shot !== 'smash' && s.shot !== 'fault' && s.tc - this.t > 0.34) this.planReceive(this.flight, true);
-    }
   }
 
   advance(step: number): void {
@@ -316,7 +304,6 @@ export class Rally {
     this.struck = p;
     this.hits++;
     this.hitsLeft--;
-    this.want[p.side] = Math.max(0, this.want[p.side] - 1);
     const dir = p.f;
     const shot = s.next ?? this.shotPath(s.shot, s.cx, s.cy, dir);
     if (!s.next && shot.stray) this.strays++;
@@ -327,7 +314,7 @@ export class Rally {
     this.mode = 'fly';
     const home = this.L.base[p.side], back = s.tc + 0.12;
     p.move = { x0: p.x, t0: back, x1: home, t1: back + 0.38 + Math.abs(home - p.x) / 420 };
-    if (shot.catchT == null) this.planReceive(this.flight, false);
+    if (shot.catchT == null) this.planReceive(this.flight);
   }
 
   /** Arm angles that meet (cx, cy) from where the body will be at contact. */
@@ -340,7 +327,7 @@ export class Rally {
   }
 
   /** Decides where and how the receiver meets a flight, and sends the receiver there. */
-  private planReceive(fl: Flight, forceSmash: boolean): void {
+  private planReceive(fl: Flight): void {
     const L = this.L, path = fl.path, floor = L.floor, rnd = this.rnd;
     const r = this.players[(1 - fl.hitter) as Side], f = r.f;
     const edge = f > 0 ? L.netX : L.netX + NET.width;
@@ -354,7 +341,6 @@ export class Rally {
     };
     const ok = (i: number, margin: number) => i > 0 && depth(path.x[i]) >= margin && depth(path.x[i]) <= half - 56;
 
-    const feed = this.want[fl.hitter] > 0; // the other player asked for a smash: give them height
     const due = this.hitsLeft <= 0;
     const hi = cross(298), top = cross(338);
     // Ways to meet it, best first: overhead from mid-court back; low, where there is room to
@@ -378,11 +364,11 @@ export class Rally {
       ({ i, over } = way);
       jump = 0;
       const u = rnd();
-      if (over) shot = feed || u > 0.56 ? 'clear' : 'drop';
-      else shot = !feed && u < (depth(path.x[i]) < half * 0.42 ? 0.45 : 0.22) ? 'net' : 'lift';
+      if (over) shot = u > 0.56 ? 'clear' : 'drop';
+      else shot = u < (depth(path.x[i]) < half * 0.42 ? 0.45 : 0.22) ? 'net' : 'lift';
       if (due) shot = 'fault';
       next = null;
-      if (way === ways[0] && over && ok(top, 80) && !feed && (forceSmash || this.want[r.side] > 0 || u < 0.24)) {
+      if (way === ways[0] && over && ok(top, 80) && u < 0.24) {
         // A smash only if a flat, fast line over the tape exists from up there.
         const smash = this.shotPath('smash', path.x[top], path.y[top], f);
         if (smash.shot === 'smash') { next = smash; i = top; jump = 38; }

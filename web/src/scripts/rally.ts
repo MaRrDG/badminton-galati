@@ -3,7 +3,7 @@
 // figures stay sharp at any size, and a frame only rewrites `transform` on some forty nodes (no
 // layout). No GSAP: the motion is a simulation stepped per frame, not a set of tweens.
 import { digitCords, makeLayout, type LayoutName } from '../lib/rally/court';
-import { Rally, type Frame, type Side } from '../lib/rally/rally';
+import { Rally, type Frame } from '../lib/rally/rally';
 
 interface Stage {
   svg: SVGSVGElement;
@@ -52,7 +52,6 @@ export function initRally(): void {
   const host = document.querySelector<HTMLElement>('[data-rally-stage]');
   if (!host) return;
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const hint = document.querySelector<HTMLElement>('[data-rally-hint]');
   const stages = new Map<SVGSVGElement, Stage>();
   let onScreen = true;
   let raf = 0;
@@ -79,7 +78,6 @@ export function initRally(): void {
   /** Runs only while it can be seen: motion allowed, tab visible, scene on screen. */
   function sync(): void {
     const run = !still.matches && !document.hidden && onScreen;
-    if (hint) hint.hidden = still.matches;
     if (run && !raf) raf = requestAnimationFrame(tick);
     else if (!run) {
       if (raf) cancelAnimationFrame(raf);
@@ -95,12 +93,6 @@ export function initRally(): void {
   document.addEventListener('visibilitychange', sync);
   still.addEventListener('change', sync);
   window.matchMedia('(max-width: 860px)').addEventListener('change', pick);
-
-  host.addEventListener('pointerdown', event => {
-    if (!stage || still.matches) return;
-    const box = stage.svg.getBoundingClientRect();
-    stage.rally.poke((event.clientX < box.left + box.width / 2 ? 0 : 1) as Side);
-  });
 
   pick();
   sync();
