@@ -29,7 +29,7 @@ test('a reading page: the questions listed, every unknown answer marked for the 
   await expect(page.getByRole('link', { name: 'Amatori copii', exact: true })).toHaveAttribute('href', '/program/#amatori-copii');
   await expect(page.getByRole('link', { name: 'formularul de probă' })).toHaveAttribute('href', '/contact/#formular');
   await expect(page.locator('#sala img')).toHaveAttribute('src', '/img/sala-turneu-2.jpg');
-  await expect(page.locator('#sala').getByRole('link', { name: 'Cum ajungeți' })).toHaveAttribute('href', '/contact/#drum');
+  await expect(page.locator('#sala').getByRole('link', { name: 'Cum ajungi' })).toHaveAttribute('href', '/contact/#drum');
   await expect(page.locator('#proba').getByRole('link', { name: 'Cere un antrenament de probă' })).toHaveAttribute('href', '/contact/#formular');
 });
 
@@ -104,7 +104,7 @@ test.describe('with the club\'s answers', on('quiet-season'), () => {
     await expect(page.locator('#varsta')).toContainText('Răspuns de test pentru vârstă.');
     await expect(page.locator('#varsta .tbc')).toHaveCount(0);
     await expect(page.locator('#echipament .tbc')).toHaveCount(1);
-    await expect(page.locator('#antrenori')).toContainText('Clubul e condus de antrenorul său. Îi puteți scrie la adresa clubului');
+    await expect(page.locator('#antrenori')).toContainText('Clubul e condus de antrenorul său. Îi poți scrie la adresa clubului');
     const coach = page.locator('.coaches li');
     await expect(coach).toHaveCount(1);
     await expect(coach.locator('b')).toHaveText('Antrenor Exemplu');

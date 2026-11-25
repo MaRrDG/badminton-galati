@@ -7,7 +7,7 @@ interface Props {
   display: boolean;
   label: string;
   href: string;
-  /** Adds "sau scrieți la …" under the button. */
+  /** Adds "sau scrie la …" under the button. */
   email?: boolean;
 }
 
@@ -22,7 +22,7 @@ const { text, display, label, href, email = false } = Astro.props;
     </div>
     <div>
       <a class="btn" href={href}>{label}</a>
-      {email && <p class="alt">sau scrieți la <a href={`mailto:${address}`}>{address}</a></p>}
+      {email && <p class="alt">sau scrie la <a href={`mailto:${address}`}>{address}</a></p>}
     </div>
   </div>
 </section>

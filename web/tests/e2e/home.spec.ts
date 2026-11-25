@@ -131,7 +131,7 @@ test('the homepage leads to the inner pages', async ({ page }) => {
     await expect(groups.getByRole('link', { name, exact: true })).toHaveAttribute('href', `/program/#${slug}`);
   const cta = page.locator('#proba');
   await expect(cta.getByRole('link', { name: 'Cere un antrenament de probă' })).toHaveAttribute('href', '/contact/#formular');
-  await expect(cta).toContainText('sau scrieți la siderurgistul@badmintongalati.ro');
+  await expect(cta).toContainText('sau scrie la siderurgistul@badmintongalati.ro');
   await expect(cta.getByRole('link', { name: 'siderurgistul@badmintongalati.ro' })).toHaveAttribute('href', 'mailto:siderurgistul@badmintongalati.ro');
   await expect(page.getByRole('link', { name: 'Toate articolele' })).toHaveAttribute('href', '/noutati/');
   await expect(page.getByRole('link', { name: 'Toți sportivii clubului' })).toHaveAttribute('href', '/sportivi/');

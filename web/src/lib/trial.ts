@@ -34,25 +34,25 @@ export const MAILTO_MAX = 1900;
 /** The message in the e-mail is cut to at most this many characters (the form keeps all of it). */
 export const MAILTO_MESSAGE_MAX = 600;
 
-const PHONE_EXAMPLE = 'Scrieți-l cu 10 cifre, de exemplu 0745 123 456.';
-const AGE_HINT = `Scrieți vârsta copilului în ani, între ${AGE_MIN} și ${AGE_MAX}.`;
+const PHONE_EXAMPLE = 'Scrie-l cu 10 cifre, de exemplu 0745 123 456.';
+const AGE_HINT = `Scrie vârsta copilului în ani, între ${AGE_MIN} și ${AGE_MAX}.`;
 
 type Copy = readonly [summary: string, message: string];
 const MESSAGES = {
-  who: ['Lipsește cine vine la antrenament', 'Alegeți „Copilul meu” sau „Eu”.'],
+  who: ['Lipsește cine vine la antrenament', 'Alege „Copilul meu” sau „Eu”.'],
   nameEmpty: {
-    copil: ['Lipsește numele părintelui', 'Scrieți numele dumneavoastră.'],
-    eu: ['Lipsește numele', 'Scrieți numele dumneavoastră.'],
+    copil: ['Lipsește numele părintelui', 'Scrie numele tău.'],
+    eu: ['Lipsește numele', 'Scrie numele tău.'],
   },
-  nameShort: ['Numele pare incomplet', 'Scrieți numele și prenumele.'],
-  nameLong: ['Numele e prea lung', `Scrieți cel mult ${NAME_MAX} de caractere.`],
-  phoneEmpty: ['Lipsește telefonul', 'Scrieți un număr la care vă poate suna clubul.'],
+  nameShort: ['Numele pare incomplet', 'Scrie numele și prenumele.'],
+  nameLong: ['Numele e prea lung', `Scrie cel mult ${NAME_MAX} de caractere.`],
+  phoneEmpty: ['Lipsește telefonul', 'Scrie un număr la care te poate suna clubul.'],
   phoneShort: ['Telefonul are prea puține cifre', `Numărul are prea puține cifre. ${PHONE_EXAMPLE}`],
   phoneWrong: ['Telefonul nu pare corect', PHONE_EXAMPLE],
   ageEmpty: ['Lipsește vârsta copilului', AGE_HINT],
   ageWrong: ['Vârsta nu pare corectă', AGE_HINT],
-  messageLong: ['Mesajul e prea lung', `Scrieți cel mult ${MESSAGE_MAX} de caractere.`],
-  consent: ['Lipsește acordul pentru date', 'Bifați căsuța ca să putem folosi datele pentru a vă contacta.'],
+  messageLong: ['Mesajul e prea lung', `Scrie cel mult ${MESSAGE_MAX} de caractere.`],
+  consent: ['Lipsește acordul pentru date', 'Bifează căsuța ca să putem folosi datele pentru a te contacta.'],
 } as const;
 
 const error = (field: TrialField, [summary, message]: Copy): TrialError => ({ field, summary, message });
@@ -132,9 +132,9 @@ export function trialDelivered(status: number, body: unknown): boolean {
 
 const COUNT_WORDS = ['', 'un lucru', 'două lucruri', 'trei lucruri', 'patru lucruri', 'cinci lucruri', 'șase lucruri'];
 
-/** The line above the list of errors: "Verificați două lucruri:". */
+/** The line above the list of errors: "Verifică două lucruri:". */
 export function errorIntro(n: number): string {
-  return `Verificați ${COUNT_WORDS[n] ?? `${n} lucruri`}:`;
+  return `Verifică ${COUNT_WORDS[n] ?? `${n} lucruri`}:`;
 }
 
 /**

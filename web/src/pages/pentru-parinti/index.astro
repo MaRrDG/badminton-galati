@@ -12,7 +12,7 @@ import { answerParagraphs } from '../../lib/parents';
 
 const page = await getParentsPage();
 const { parents, groupSlugs } = page;
-const lede = 'Ce e bine să știți înainte de primul antrenament, în ordinea în care vă vin întrebările.';
+const lede = 'Ce e bine să știi înainte de primul antrenament, în ordinea în care îți vin întrebările.';
 const program = (slug?: string) => (slug ? `/program/#${slug}` : undefined);
 const firstWeeks = answerParagraphs(parents.firstWeeks);
 
@@ -37,7 +37,7 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
         <div>
           <p class="said">„Asigurăm un climat prietenos pentru toate categoriile de vârstă.”</p>
           <p class="said-by">
-            Așa își descrie clubul antrenamentele, din 7 martie 2002 încoace. Mai jos găsiți răspunsurile la întrebările pe care și le
+            Așa își descrie clubul antrenamentele, din 7 martie 2002 încoace. Mai jos găsești răspunsurile la întrebările pe care și le
             pune orice părinte înainte să-și aducă copilul în sală.
           </p>
         </div>
@@ -75,10 +75,10 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
           <Question id="inceput" question={q.inceput}>
             <ol class="steps">
               <li>
-                <b>Ne scrieți.</b> Completați <a href="/contact/#formular">formularul de probă</a> sau trimiteți-ne un e-mail, iar clubul vă
+                <b>Ne scrii.</b> Completează <a href="/contact/#formular">formularul de probă</a> sau trimite-ne un e-mail, iar clubul te
                 contactează ca să stabiliți ziua.
               </li>
-              <li><b>Antrenamentul de probă.</b> Copilul încearcă un antrenament în sală, iar dumneavoastră cunoașteți antrenorul.</li>
+              <li><b>Antrenamentul de probă.</b> Copilul încearcă un antrenament în sală, iar tu cunoști antrenorul.</li>
               <li>
                 <b>Primele săptămâni la Inițiere.</b>
                 {
@@ -94,7 +94,7 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
                 }
               </li>
               <li>
-                <b>Alegeți drumul.</b> Împreună cu antrenorul vedeți dacă merge spre Performanță și competiții sau joacă de plăcere la Amatori
+                <b>Alegi drumul.</b> Împreună cu antrenorul vezi dacă merge spre Performanță și competiții sau joacă de plăcere la Amatori
                 copii.
               </li>
             </ol>
@@ -106,7 +106,7 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
             </p>
             <p>
               <b>Competițiile.</b> Federația organizează campionate naționale pe categorii de vârstă, de la U9 la U19, iar unele se joacă la
-              Galați. Le găsiți în <a href="/calendar/">calendarul competițiilor</a>, iar pe cei care merg deja la ele, pe pagina <a
+              Galați. Le găsești în <a href="/calendar/">calendarul competițiilor</a>, iar pe cei care merg deja la ele, pe pagina <a
                 href="/sportivi/">sportivilor clubului</a
               >.
             </p>
@@ -124,13 +124,13 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
           <b>Sala Siderurgistul, Bd. Cloșca, Galați.</b> Are patru terenuri de badminton și aici se antrenează toate grupele. În aceeași sală
           s-a jucat Balcaniada din 2002 și cea din 2023.
         </p>
-        <p class="links"><a class="textlink" href={HALL_MAP_URL}>Sala pe hartă</a><a class="textlink" href="/contact/#drum">Cum ajungeți</a></p>
+        <p class="links"><a class="textlink" href={HALL_MAP_URL}>Sala pe hartă</a><a class="textlink" href="/contact/#drum">Cum ajungi</a></p>
       </Question>
     </div>
   </section>
 
   <ClosingCta
-    text="Cel mai simplu răspuns la toate întrebările de mai sus e o oră în sală. Lăsați-ne vârsta copilului și un număr de telefon."
+    text="Cel mai simplu răspuns la toate întrebările de mai sus e o oră în sală. Lasă-ne vârsta copilului și un număr de telefon."
     display
     label="Cere un antrenament de probă"
     href="/contact/#formular"

@@ -37,6 +37,8 @@ Repo artefacts (code, comments, docs, commits) are English; site copy and Studio
 - **No invented facts or copy.** Unknown data is omitted or shown as `de confirmat`. Why: the old
   site lost trust with stale and fake numbers; the spec lists invented content as failure.
 - **Romanian copy, comma-below diacritics** (ș ț, never ş ţ); no English labels on the site.
+- **Voice: «tu» everywhere.** Site copy addresses the visitor as "tu" ("Scrie-ne", "Numele tău"), never
+  "dumneavoastră"/"vă" (owner, 2026-11-26); `Tbc` lines speak to the club. See `design-system.md`.
 - **Tone invites, never boasts.** Rankings are proof lower on the page, never in the hero.
   Why: Mario rejected a hero with ranking places; the club says "why play", not "how good we are".
 - **Forbidden visual patterns** (Mario rejected drafts as "AI slop"): flip-card scoreboard widget,

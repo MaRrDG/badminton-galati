@@ -34,7 +34,7 @@ describe('validateTrial', () => {
     expect(r.ok === false && r.errors[0]).toEqual({
       field: 'telefon',
       summary: 'Telefonul are prea puține cifre',
-      message: 'Numărul are prea puține cifre. Scrieți-l cu 10 cifre, de exemplu 0745 123 456.',
+      message: 'Numărul are prea puține cifre. Scrie-l cu 10 cifre, de exemplu 0745 123 456.',
     });
   });
 
@@ -101,11 +101,11 @@ test('phones are normalised and written the Romanian way', () => {
 });
 
 test('errorIntro counts the things to check in words', () => {
-  expect(errorIntro(1)).toBe('Verificați un lucru:');
-  expect(errorIntro(2)).toBe('Verificați două lucruri:');
-  expect(errorIntro(3)).toBe('Verificați trei lucruri:');
-  expect(errorIntro(4)).toBe('Verificați patru lucruri:');
-  expect(errorIntro(5)).toBe('Verificați cinci lucruri:');
+  expect(errorIntro(1)).toBe('Verifică un lucru:');
+  expect(errorIntro(2)).toBe('Verifică două lucruri:');
+  expect(errorIntro(3)).toBe('Verifică trei lucruri:');
+  expect(errorIntro(4)).toBe('Verifică patru lucruri:');
+  expect(errorIntro(5)).toBe('Verifică cinci lucruri:');
 });
 
 test('trialDelivered: only a 2xx answer with { ok: true } means the club has the request', () => {

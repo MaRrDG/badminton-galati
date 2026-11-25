@@ -7,13 +7,13 @@ import { getContactPage } from '../../lib/content';
 import { CLUB_EMAIL } from '../../lib/club';
 
 const page = await getContactPage();
-const description = 'Cereți un antrenament de probă, pentru copil sau pentru dumneavoastră, ori scrieți-ne. Sala Siderurgistul, Bd. Cloșca, Galați.';
+const description = 'Cere un antrenament de probă, pentru copil sau pentru tine, ori scrie-ne. Sala Siderurgistul, Bd. Cloșca, Galați.';
 ---
 
 <Base title="Contact | CS Siderurgistul Galați" description={description}>
   <PageHead title="Contact" tone="blue">
     <p class="lead">
-      Pentru un antrenament de probă, completați formularul. Pentru orice altă întrebare, scrieți-ne la <a href={`mailto:${CLUB_EMAIL}`}
+      Pentru un antrenament de probă, completează formularul. Pentru orice altă întrebare, scrie-ne la <a href={`mailto:${CLUB_EMAIL}`}
         >{CLUB_EMAIL}</a
       >.
     </p>

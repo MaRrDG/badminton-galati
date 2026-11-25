@@ -114,7 +114,7 @@ export function initTrialForm(form: HTMLFormElement, opts: Options): void {
     }
     if (mailto) {
       const p = el('p');
-      p.append(el('a', 'Trimiteți-o pe e-mail', { href: mailto }), ` la ${opts.email}.`);
+      p.append(el('a', 'Trimite-o pe e-mail', { href: mailto }), ` la ${opts.email}.`);
       summary!.append(p);
     }
     summary!.hidden = false;
@@ -153,8 +153,8 @@ export function initTrialForm(form: HTMLFormElement, opts: Options): void {
       if (intro) intro.hidden = false;
       focusable('cine')?.focus();
     });
-    const next = el('p', 'Până atunci, aflați ');
-    next.append(el('a', 'ce e bine să știți înainte de primul antrenament', { href: '/pentru-parinti/' }), '.');
+    const next = el('p', 'Până atunci, află ');
+    next.append(el('a', 'ce e bine să știi înainte de primul antrenament', { href: '/pentru-parinti/' }), '.');
     sent!.replaceChildren(h, ...lines, next, again);
     form.hidden = true;
     if (intro) intro.hidden = true;
@@ -163,12 +163,12 @@ export function initTrialForm(form: HTMLFormElement, opts: Options): void {
   }
 
   function delivered(r: TrialRequest): void {
-    const thanks = el('p', `Mulțumim, ${r.name}. Clubul vă contactează la `);
+    const thanks = el('p', `Mulțumim, ${r.name}. Clubul te contactează la `);
     thanks.append(el('b', formatPhoneRo(r.phone)), ' ca să stabiliți ziua probei.');
     let when: HTMLElement;
-    if (replyDays) when = el('p', `Vă sunăm în cel mult ${replyDays} zile.`);
+    if (replyDays) when = el('p', `Te sunăm în cel mult ${replyDays} zile.`);
     else {
-      when = el('p', ' în câte zile răspundeți, ca să putem scrie aici „vă sunăm în cel mult … zile”.', { class: 'tbc' });
+      when = el('p', ' în câte zile răspundeți, ca să putem scrie aici „te sunăm în cel mult … zile”.', { class: 'tbc' });
       when.prepend(el('b', 'De confirmat de club:'));
     }
     showSent('Cererea a ajuns la club', [thanks, when]);
@@ -177,10 +177,10 @@ export function initTrialForm(form: HTMLFormElement, opts: Options): void {
   /** Opens the e-mail now (still inside the visitor's click) and says what that means. */
   function openEmail(r: TrialRequest): void {
     const mailto = trialMailto(r, opts.email);
-    const what = el('p', 'Cererea e scrisă în el. Ajunge la club după ce apăsați „Trimite” în aplicația de e-mail; până atunci, clubul nu o are.');
+    const what = el('p', 'Cererea e scrisă în el. Ajunge la club după ce apeși „Trimite” în aplicația de e-mail; până atunci, clubul nu o are.');
     const retry = el('p', 'Nu s-a deschis nimic? ');
-    const link = el('a', 'Trimiteți-o pe e-mail', { href: mailto });
-    retry.append(link, ` sau scrieți-ne la ${opts.email}.`);
+    const link = el('a', 'Trimite-o pe e-mail', { href: mailto });
+    retry.append(link, ` sau scrie-ne la ${opts.email}.`);
     showSent('Am deschis un e-mail către club', [what, retry]);
     link.click();
   }
@@ -200,7 +200,7 @@ export function initTrialForm(form: HTMLFormElement, opts: Options): void {
     }
     const body: unknown = await res.json().catch(() => undefined);
     if (trialDelivered(res.status, body)) return delivered(r);
-    if (res.status === 429) return showSummary('Ați trimis deja câteva cereri. Încercați din nou peste câteva minute.', []);
+    if (res.status === 429) return showSummary('Ai trimis deja câteva cereri. Încearcă din nou peste câteva minute.', []);
     const errors = res.status === 400 ? (body as { errors?: unknown } | undefined)?.errors : undefined;
     if (isTrialErrors(errors)) return showErrors(errors);
     failed();

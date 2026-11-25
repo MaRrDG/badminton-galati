@@ -15,7 +15,7 @@ const { replyDays } = Astro.props;
 // to the endpoint first.
 const endpoint = process.env.TRIAL_ENDPOINT?.trim() || undefined;
 const action = `mailto:${CLUB_EMAIL}?subject=${encodeURIComponent('Cerere antrenament de probă')}`;
-const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numele și telefonul meu doar ca să mă contacteze despre această cerere.';
+const consent = 'Ești de acord ca CS Siderurgistul Galați să-ți folosească numele și telefonul doar ca să te contacteze despre această cerere.';
 ---
 
 <div class="form-col" id="formular">
@@ -24,7 +24,7 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
   <noscript>
     <p class="noscript">
       Fără JavaScript, „Trimite cererea” deschide un e-mail către <a href={`mailto:${CLUB_EMAIL}`}>{CLUB_EMAIL}</a> cu datele completate; cererea
-      ajunge la club după ce trimiteți e-mailul.
+      ajunge la club după ce trimiți e-mailul.
     </p>
   </noscript>
 
@@ -54,13 +54,13 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
     </fieldset>
 
     <div class="field" data-field="nume">
-      <label for="f-nume"><span class="for-copil">Numele părintelui</span><span class="for-eu">Numele dumneavoastră</span></label>
+      <label for="f-nume"><span class="for-copil">Numele părintelui</span><span class="for-eu">Numele tău</span></label>
       <p class="err" id="f-nume-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
       <input id="f-nume" name="nume" type="text" autocomplete="name" autocapitalize="words" required />
     </div>
     <div class="field" data-field="telefon">
       <label for="f-tel">Telefon</label>
-      <p class="hint" id="f-tel-h">Clubul vă contactează la acest număr.</p>
+      <p class="hint" id="f-tel-h">Clubul te contactează la acest număr.</p>
       <p class="err" id="f-tel-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
       <input id="f-tel" name="telefon" type="tel" autocomplete="tel" required aria-describedby="f-tel-h" />
     </div>
@@ -76,7 +76,7 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
     </div>
     <div class="field" data-field="mesaj">
       <label for="f-mesaj">Mesaj <span class="opt">(opțional)</span></label>
-      <p class="hint" id="f-mesaj-h">De exemplu, ce zile vă convin sau dacă a mai jucat badminton.</p>
+      <p class="hint" id="f-mesaj-h">De exemplu, ce zile îți convin sau dacă a mai jucat badminton.</p>
       <p class="err" id="f-mesaj-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
       <textarea id="f-mesaj" name="mesaj" rows="4" aria-describedby="f-mesaj-h"></textarea>
     </div>
@@ -88,7 +88,7 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
 
     {/* Honeypot for plan 2b's endpoint: hidden from people, the keyboard and assistive tech. */}
     <div class="visually-hidden" aria-hidden="true">
-      <label for="f-site">Nu completați acest câmp</label>
+      <label for="f-site">Nu completa acest câmp</label>
       <input id="f-site" name="site_web" type="text" tabindex="-1" autocomplete="off" />
     </div>
 

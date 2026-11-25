@@ -5,6 +5,16 @@ Reference: `mockups/varianta-d.html` (mockup D, "Afiș + Tabela", approved by Ma
 intended differences: no photo captions, a source line under the roster ("Clasamentul FRB,
 săptămâna N, ..."), the footer from the shell.
 
+## Voice: «tu» everywhere
+
+Every visitor-facing line (pages, shared pieces, form labels, hints and messages, meta
+descriptions, the 404 page) addresses the visitor as "tu", warm and direct like the club's motto
+"Ai reușit? Continuă!": "Scrie-ne la …", "Lasă-ne vârsta copilului", "Numele tău", "Clubul te
+contactează". Never "dumneavoastră" or the polite plural ("Scrieți", "vă"). Owner's decision,
+2026-11-26. Exception: the "De confirmat de club" lines speak to the club, so they keep the plural
+("primiți", "răspundeți"). A verb whose subject is the visitor and the club together stays plural
+("ca să stabiliți ziua").
+
 ## Tokens (`web/src/styles/tokens.css`, the only place values live)
 
 | Token | Value | Use |

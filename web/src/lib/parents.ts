@@ -36,7 +36,7 @@ export function coachesLead(count: number): string | undefined {
 
 /** The start of "… scrie la adresa clubului": "îi" for the one coach, "le" for several (or the coaches in general). */
 export function writeToCoaches(count: number): string {
-  return count === 1 ? 'Îi puteți scrie' : 'Le puteți scrie';
+  return count === 1 ? 'Îi poți scrie' : 'Le poți scrie';
 }
 
 /** A club answer as paragraphs: split on blank lines, empty ones dropped. */

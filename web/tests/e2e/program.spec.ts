@@ -31,7 +31,7 @@ test('without sessions: one quiet line, no grid, no filter', async ({ page }) =>
   await expect(page.getByText('De confirmat de club: antrenorul fiecărei grupe.')).toBeVisible();
   await expect(page.locator('#initiere')).toContainText('Inițiere');
   await expect(page.locator('#proba').getByRole('link', { name: 'Cere un antrenament de probă' })).toHaveAttribute('href', '/contact/#formular');
-  await expect(page.getByRole('link', { name: 'cum ajungeți' })).toHaveAttribute('href', '/contact/#drum');
+  await expect(page.getByRole('link', { name: 'cum ajungi' })).toHaveAttribute('href', '/contact/#drum');
   await expect(page.getByRole('link', { name: 'Întrebări de părinte: vârstă, echipament, cost' })).toHaveAttribute('href', '/pentru-parinti/');
   // Nothing is an example here, so nothing is hatched and no note explains hatching.
   await expect(page.locator('.sample')).toHaveCount(0);

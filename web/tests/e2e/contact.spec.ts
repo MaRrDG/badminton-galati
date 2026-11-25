@@ -13,7 +13,7 @@ async function fillGood(page: Page) {
   await page.getByLabel('Numele părintelui').fill('Ana Ionescu');
   await page.getByLabel('Telefon', { exact: true }).fill('+40 745-123-456');
   await page.getByLabel('Vârsta copilului').fill('8');
-  await page.getByLabel(/Sunt de acord/).check();
+  await page.getByLabel(/Ești de acord/).check();
 }
 
 /** Mailto navigations are caught before they leave the page; the last one is kept in `__mailto`. */
@@ -64,7 +64,7 @@ test.describe('the error state', () => {
     const sum = summary(page);
     await expect(sum).toBeFocused();
     await expect(sum).toContainText('Cererea nu a plecat');
-    await expect(sum).toContainText('Verificați patru lucruri:');
+    await expect(sum).toContainText('Verifică patru lucruri:');
     await expect(sum.getByRole('link')).toHaveText(['Lipsește numele părintelui', 'Lipsește telefonul', 'Lipsește vârsta copilului', 'Lipsește acordul pentru date']);
     // Focus announces it; no live role on top of that.
     await expect(page.locator('[role="alert"], [role="status"]')).toHaveCount(0);
@@ -73,7 +73,7 @@ test.describe('the error state', () => {
     await expect(tel).toBeFocused();
     await expect(tel).toHaveAttribute('aria-invalid', 'true');
     await expect(tel).toHaveAttribute('aria-describedby', 'f-tel-h f-tel-err');
-    await expect(page.locator('#f-tel-err')).toHaveText('Eroare: Scrieți un număr la care vă poate suna clubul.');
+    await expect(page.locator('#f-tel-err')).toHaveText('Eroare: Scrie un număr la care te poate suna clubul.');
     await expect(page.locator('#f-mesaj')).not.toHaveAttribute('aria-invalid');
     await expect(page.locator('[data-field="acord"]')).toHaveClass(/\bbad\b/);
   });
@@ -83,17 +83,17 @@ test.describe('the error state', () => {
     await page.goto('/contact/');
     await fillGood(page);
     await page.getByLabel('Telefon', { exact: true }).fill('0745 12');
-    await page.getByLabel(/Sunt de acord/).uncheck();
+    await page.getByLabel(/Ești de acord/).uncheck();
     await send(page);
     const sum = summary(page);
-    await expect(sum).toContainText('Verificați două lucruri:');
+    await expect(sum).toContainText('Verifică două lucruri:');
     await expect(sum.getByRole('link')).toHaveText(['Telefonul are prea puține cifre', 'Lipsește acordul pentru date']);
     await expect(page.locator('#f-acord')).toHaveAttribute('aria-describedby', 'f-acord-err');
     await expect(page.getByLabel('Numele părintelui')).not.toHaveAttribute('aria-invalid');
 
     // Fixing them clears the old marks before the request goes.
     await page.getByLabel('Telefon', { exact: true }).fill('+40 (0)745 123 456');
-    await page.getByLabel(/Sunt de acord/).check();
+    await page.getByLabel(/Ești de acord/).check();
     await send(page);
     await expect(sent(page)).toContainText('Am deschis un e-mail către club');
     await expect(page.locator('[aria-invalid]')).toHaveCount(0);
@@ -111,7 +111,7 @@ test.describe('without an endpoint (every build until plan 2b)', () => {
     await send(page);
     const box = sent(page);
     await expect(box.getByRole('heading', { name: 'Am deschis un e-mail către club' })).toBeFocused();
-    await expect(box).toContainText('Ajunge la club după ce apăsați „Trimite” în aplicația de e-mail');
+    await expect(box).toContainText('Ajunge la club după ce apeși „Trimite” în aplicația de e-mail');
     await expect(box).not.toContainText('a ajuns la club');
     await expect(page.locator('form.trial')).toBeHidden();
 
@@ -119,7 +119,7 @@ test.describe('without an endpoint (every build until plan 2b)', () => {
       `mailto:${EMAIL}?subject=${SUBJECT}&body=` +
       mailBody('Numele părintelui: Ana Ionescu', 'Telefon: 0745 123 456', 'Vârsta copilului: 8 ani', 'Mesaj: Joi după-amiaza.');
     expect(await lastMailto(page)).toBe(expected); // opened inside the submit, nothing awaited
-    await expect(box.getByRole('link', { name: 'Trimiteți-o pe e-mail' })).toHaveAttribute('href', expected);
+    await expect(box.getByRole('link', { name: 'Trimite-o pe e-mail' })).toHaveAttribute('href', expected);
     expect(calls).toEqual([]);
 
     await box.getByRole('button', { name: 'Trimite altă cerere' }).click();
@@ -135,10 +135,10 @@ test.describe('without an endpoint (every build until plan 2b)', () => {
     await expect(page.getByRole('group', { name: 'Cine vine la antrenament?' })).toBeVisible();
     await page.getByLabel('Eu', { exact: true }).check();
     await expect(page.getByLabel('Vârsta copilului')).toBeHidden();
-    await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele dumneavoastră');
-    await page.getByLabel('Numele dumneavoastră').fill('Dan Popa');
+    await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele tău');
+    await page.getByLabel('Numele tău').fill('Dan Popa');
     await page.getByLabel('Telefon', { exact: true }).fill('0745 123 456');
-    await page.getByLabel(/Sunt de acord/).check();
+    await page.getByLabel(/Ești de acord/).check();
     await send(page);
     await expect(sent(page)).toContainText('Am deschis un e-mail către club');
     expect(await lastMailto(page)).toBe(
@@ -166,7 +166,7 @@ test('the data-who rules alone switch to the self path (browsers without :has())
   // "Copilul meu" stays checked, so no :has() rule matches; only the script's data-who can act.
   await page.locator('form[data-trial]').evaluate(f => f.setAttribute('data-who', 'eu'));
   await expect(page.getByLabel('Copilul meu')).toBeChecked();
-  await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele dumneavoastră');
+  await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele tău');
   await expect(page.locator('[data-field="varsta"]')).toBeHidden();
 });
 
@@ -178,9 +178,9 @@ test.describe('with an endpoint (plan 2b)', () => {
     await send(page);
     const box = sent(page);
     await expect(box.getByRole('heading', { name: 'Cererea a ajuns la club' })).toBeFocused();
-    await expect(box).toContainText('Mulțumim, Ana Ionescu. Clubul vă contactează la 0745 123 456 ca să stabiliți ziua probei.');
+    await expect(box).toContainText('Mulțumim, Ana Ionescu. Clubul te contactează la 0745 123 456 ca să stabiliți ziua probei.');
     await expect(box.locator('.tbc')).toContainText('De confirmat de club: în câte zile răspundeți');
-    await expect(box.getByRole('link', { name: 'ce e bine să știți înainte de primul antrenament' })).toHaveAttribute('href', '/pentru-parinti/');
+    await expect(box.getByRole('link', { name: 'ce e bine să știi înainte de primul antrenament' })).toHaveAttribute('href', '/pentru-parinti/');
     await expect(page.locator('[role="alert"], [role="status"]')).toHaveCount(0);
   });
 
@@ -198,7 +198,7 @@ test.describe('with an endpoint (plan 2b)', () => {
       const sum = summary(page);
       await expect(sum).toBeFocused();
       await expect(sum).toContainText('Cererea nu a putut fi trimisă de pe site.');
-      await expect(sum.getByRole('link', { name: 'Trimiteți-o pe e-mail' })).toHaveAttribute('href', new RegExp(`^mailto:${EMAIL.replace(/\./g, '\\.')}\\?subject=`));
+      await expect(sum.getByRole('link', { name: 'Trimite-o pe e-mail' })).toHaveAttribute('href', new RegExp(`^mailto:${EMAIL.replace(/\./g, '\\.')}\\?subject=`));
       await expect(sent(page)).toBeHidden();
       await expect(page.locator('form.trial')).toBeVisible();
     });
@@ -209,7 +209,7 @@ test.describe('with an endpoint (plan 2b)', () => {
       r.fulfill({
         status: 400,
         contentType: 'application/json',
-        body: JSON.stringify({ ok: false, errors: [{ field: 'telefon', summary: 'Telefonul nu pare corect', message: 'Scrieți-l cu 10 cifre, de exemplu 0745 123 456.' }] }),
+        body: JSON.stringify({ ok: false, errors: [{ field: 'telefon', summary: 'Telefonul nu pare corect', message: 'Scrie-l cu 10 cifre, de exemplu 0745 123 456.' }] }),
       }),
     );
     await page.goto('/contact/');
@@ -225,7 +225,7 @@ test.describe('with an endpoint (plan 2b)', () => {
     await page.goto('/contact/');
     await fillGood(page);
     await send(page);
-    await expect(summary(page)).toContainText('Ați trimis deja câteva cereri. Încercați din nou peste câteva minute.');
+    await expect(summary(page)).toContainText('Ai trimis deja câteva cereri. Încearcă din nou peste câteva minute.');
   });
 });
 
@@ -309,7 +309,7 @@ test('without JavaScript the browser checks the fields and the form opens an e-m
   await expect(page.getByLabel('Vârsta copilului')).toBeVisible();
   await page.getByLabel('Eu', { exact: true }).check();
   await expect(page.getByLabel('Vârsta copilului')).toBeHidden();
-  await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele dumneavoastră');
+  await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele tău');
   await page.getByLabel('Copilul meu').check();
   await expect(page.getByLabel('Vârsta copilului')).toBeVisible();
   await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele părintelui');
@@ -344,7 +344,7 @@ test.describe('known contact details', on('quiet-season'), () => {
 
     await fillGood(page);
     await send(page);
-    await expect(sent(page)).toContainText('Vă sunăm în cel mult 3 zile.');
+    await expect(sent(page)).toContainText('Te sunăm în cel mult 3 zile.');
     await expect(sent(page).locator('.tbc')).toHaveCount(0);
   });
 });

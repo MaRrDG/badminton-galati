@@ -24,9 +24,9 @@ describe('coachesLead', () => {
 
 describe('writeToCoaches', () => {
   test('one coach is "îi", several or none (the coaches in general) "le"', () => {
-    expect(writeToCoaches(1)).toBe('Îi puteți scrie');
-    expect(writeToCoaches(0)).toBe('Le puteți scrie');
-    expect(writeToCoaches(3)).toBe('Le puteți scrie');
+    expect(writeToCoaches(1)).toBe('Îi poți scrie');
+    expect(writeToCoaches(0)).toBe('Le poți scrie');
+    expect(writeToCoaches(3)).toBe('Le poți scrie');
   });
 });
 
