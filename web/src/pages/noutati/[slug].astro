@@ -5,6 +5,7 @@ import ArticleHead from '../../components/news/ArticleHead.astro';
 import Gallery from '../../components/news/Gallery.astro';
 import PrevNext from '../../components/news/PrevNext.astro';
 import Share from '../../components/news/Share.astro';
+import PlatePhoto from '../../components/ui/PlatePhoto.astro';
 import { getPostPages } from '../../lib/content';
 import { postDescription, type PostPage } from '../../lib/article';
 
@@ -16,7 +17,7 @@ interface Props {
   page: PostPage;
 }
 
-const { post, bodyHtml, competition, tagged, mosaic, neighbours } = Astro.props.page;
+const { post, body, competition, inCalendar, tagged, mosaic, neighbours } = Astro.props.page;
 const aside = competition !== undefined || tagged.length > 0;
 ---
 
@@ -26,11 +27,25 @@ const aside = competition !== undefined || tagged.length > 0;
     <div class="wrap">
       <div class:list={['artbody', { solo: !aside }]}>
         <div class="col">
-          {/* The body is rendered by bodyToHtml (lib/body.ts), which escapes every content string. */}
-          {bodyHtml && <div class="prose" set:html={bodyHtml} />}
+          {/* Text runs come from bodySegments (lib/body.ts), which escapes every content string. */}
+          {
+            body.length > 0 && (
+              <div class="prose">
+                {body.map(segment =>
+                  segment.kind === 'html' ? (
+                    <Fragment set:html={segment.html} />
+                  ) : (
+                    <div class="pull">
+                      <PlatePhoto img={segment.photo} offset={14} sizes="(max-width: 520px) 300px, 42vw" />
+                    </div>
+                  ),
+                )}
+              </div>
+            )
+          }
           <Share title={post.title} />
         </div>
-        {aside && <ArticleAside competition={competition} tagged={tagged} />}
+        {aside && <ArticleAside competition={competition} inCalendar={inCalendar} tagged={tagged} />}
       </div>
     </div>
     {mosaic.length > 0 && <Gallery mosaic={mosaic} />}
@@ -116,16 +131,11 @@ const aside = competition !== undefined || tagged.length > 0;
     text-underline-offset: 4px;
     overflow-wrap: anywhere;
   }
-  /* A photo in the text leaves the line on wide screens, with the red plate behind it. */
-  .prose :global(.pull) {
+  /* A photo in the text leaves the line on wide screens; PlatePhoto draws its plate. */
+  .pull {
     float: right;
     width: 42%;
-    margin: 6px 14px 18px 32px;
-    box-shadow: 14px 14px 0 var(--red);
-  }
-  .prose :global(.pull img) {
-    width: 100%;
-    height: auto;
+    margin: 6px 0 18px 32px;
   }
   .prose::after {
     content: '';
@@ -137,17 +147,17 @@ const aside = competition !== undefined || tagged.length > 0;
     .artbody {
       grid-template-columns: minmax(0, 1fr);
     }
-    .prose :global(.pull) {
+    .pull {
       width: 46%;
       margin-left: 20px;
     }
   }
   @media (max-width: 520px) {
-    .prose :global(.pull) {
+    .pull {
       float: none;
       width: auto;
       max-width: 300px;
-      margin: 28px 14px 28px 0;
+      margin: 28px 0;
     }
   }
 </style>

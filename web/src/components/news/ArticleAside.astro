@@ -7,10 +7,12 @@ import type { Competition } from '../../lib/types';
 
 interface Props {
   competition?: Competition;
+  /** The competition has a block on the calendar page (it starts in the year shown there). */
+  inCalendar: boolean;
   tagged: TaggedRow[];
 }
 
-const { competition, tagged } = Astro.props;
+const { competition, inCalendar, tagged } = Astro.props;
 const when = competition ? splitRangeRo(competition.start, competition.end) : undefined;
 ---
 
@@ -26,10 +28,12 @@ const when = competition ? splitRangeRo(competition.start, competition.end) : un
         </p>
         <h3>{competition.title}</h3>
         <p class="city">{cityLabel(competition)}</p>
-        <p class="links">
-          <a class="textlink" href={`/calendar/#ev-${competition.id}`}>În calendar</a>
-          {competition.resultsUrl && <a class="textlink" href={competition.resultsUrl}>Rezultatele pe badminton.ro</a>}
-        </p>
+        {(inCalendar || competition.resultsUrl) && (
+          <p class="links">
+            {inCalendar && <a class="textlink" href={`/calendar/#ev-${competition.id}`}>În calendar</a>}
+            {competition.resultsUrl && <a class="textlink" href={competition.resultsUrl}>Rezultatele pe badminton.ro</a>}
+          </p>
+        )}
       </section>
     )
   }
@@ -42,7 +46,15 @@ const when = competition ? splitRangeRo(competition.start, competition.end) : un
             <li>
               <a href={`/sportivi/${row.athlete.slug}/`}>{row.athlete.name}</a>
               {row.line && <span class="line">{row.line}</span>}
-              <span class="res">{row.result}</span>
+              <span class="res">
+                {row.results.map((r, i) => (
+                  <span>
+                    {r.result}
+                    {r.discipline && `, ${r.discipline}`}
+                    {i < row.results.length - 1 && ';'}
+                  </span>
+                ))}
+              </span>
             </li>
           ))}
         </ul>
@@ -129,6 +141,8 @@ const when = competition ? splitRangeRo(competition.start, competition.end) : un
     grid-column: 2;
     grid-row: 1 / 3;
     align-self: center;
+    display: grid;
+    justify-items: end;
     font-weight: 600;
     font-style: italic;
     color: var(--red-ink);

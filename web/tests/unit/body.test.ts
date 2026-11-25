@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { bodyToHtml } from '../../src/lib/body';
+import { bodySegments, bodyToHtml } from '../../src/lib/body';
 import type { BodyBlock, Img } from '../../src/lib/types';
 
 let key = 0;
@@ -66,12 +66,15 @@ describe('the article body', () => {
     expect(bodyToHtml([block('unu', { listItem: 'bullet', level: 1 }), para('Text')])).toBe('<ul><li>unu</li></ul><p class="lead">Text</p>');
   });
 
-  test('a photo in the text keeps its size and loads lazily', () => {
-    const html = bodyToHtml([{ _type: 'photo', _key: 'p', photo: smash }]);
-    expect(html).toContain('width="800" height="1200"');
-    expect(html).toBe(
-      '<figure class="pull"><img src="/img/smash.jpg" width="800" height="1200" alt="Sportiv în săritură" loading="lazy" decoding="async"></figure>',
-    );
+  test('a photo in the text is its own segment, between the runs of text; the lead is given once', () => {
+    expect(bodySegments([para('Prima'), { _type: 'photo', _key: 'p', photo: smash }, para('A doua')])).toEqual([
+      { kind: 'html', html: '<p class="lead">Prima</p>' },
+      { kind: 'photo', photo: smash },
+      { kind: 'html', html: '<p>A doua</p>' },
+    ]);
+    expect(bodySegments([{ _type: 'photo', _key: 'p', photo: smash }])).toEqual([{ kind: 'photo', photo: smash }]);
+    expect(bodyToHtml([{ _type: 'photo', _key: 'p', photo: smash }, para('Text')])).toBe('<p class="lead">Text</p>');
+    expect(bodySegments([])).toEqual([]);
   });
 
   test('unknown blocks and marks are skipped, not rendered or crashed on', () => {

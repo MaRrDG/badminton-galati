@@ -47,7 +47,9 @@ test('"Copiază linkul" copies the address, or shows it selected without a clipb
   const copy = page.locator('.share button');
   await expect(copy).toHaveAccessibleName('Copiază linkul');
   await copy.click();
-  await expect(copy).toHaveText('Link copiat');
+  // One announcement: the status says it; the button keeps its name.
+  await expect(page.locator('.share [role="status"]')).toHaveText('Link copiat');
+  await expect(copy).toHaveText('Copiază linkul');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(page.url());
 
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { value: undefined }));
@@ -67,7 +69,10 @@ test.describe('the test article', on('quiet-season'), () => {
     await expect(prose.locator('h2')).toHaveCount(1);
     await expect(prose.locator('li').first()).toBeVisible();
     await expect(prose.locator('blockquote')).toHaveCount(1);
-    await expect(prose.locator('figure.pull img[width][height]')).toHaveCount(1);
+    // The photo in the text is a PlatePhoto: the one red-plate implementation.
+    await expect(prose.locator('.pull figure.plated img[width][height]')).toHaveCount(1);
+    await expect(prose.locator('.pull figure.plated .plate')).toHaveCount(1);
+    await expect(prose.locator('.pull img')).toHaveAttribute('loading', 'lazy');
     await expect(prose.locator('a[href^="https://"]')).toHaveAttribute('rel', 'noopener');
 
     const comp = page.locator('.comp');

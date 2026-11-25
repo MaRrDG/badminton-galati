@@ -249,6 +249,15 @@ describe('site data', () => {
     expect(c).not.toHaveProperty('postSlug');
   });
 
+  test('a body block of a type the site does not know is dropped, a known one is still checked', () => {
+    const para = { _type: 'block', _key: 'p', children: [{ _type: 'span', _key: 's', text: 'Text' }] };
+    const withBody = (body: unknown[]) => ({ ...fixture, posts: [{ ...fixture.posts[0], body }] });
+    const s = parseSiteData(withBody([{ _type: 'video', _key: 'v', url: 7 }, para]), 't');
+    expect(s.posts.find(p => p.slug === fixture.posts[0].slug)!.body).toEqual([para]);
+    expect(() => parseSiteData(withBody([{ _type: 'photo', _key: 'f' }]), 't')).toThrow('posts[0].body[0].photo');
+    expect(() => parseSiteData(withBody([{ _key: 'x' }]), 't')).toThrow('posts[0].body[0]._type');
+  });
+
   const session = (s: object) => ({ ...fixture, groups: [{ ...fixture.groups[0], sessions: [{ day: 1, start: '17:00', end: '18:30', ...s }] }] });
   for (const [name, patch, path] of [
     ['duplicate athlete slug', { ...fixture, athletes: [{ ...shown, slug: 'a' }, { ...hidden, slug: 'a' }] }, 'athletes[1].slug'],

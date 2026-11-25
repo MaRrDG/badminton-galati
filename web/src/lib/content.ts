@@ -135,6 +135,8 @@ const PARENT_ANSWERS = ['age', 'equipment', 'cost', 'firstWeeks', 'registration'
 /** 24-hour time with two-digit hours: 09:00, 18:30. */
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+const BODY_TYPES = ['block', 'photo'] as const satisfies readonly BodyBlock['_type'][];
+const isBodyType = (t: unknown): t is BodyBlock['_type'] => BODY_TYPES.includes(t as BodyBlock['_type']);
 /** Fields the source may leave out; `parseSiteData` fills them in. */
 type Loose<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type CheckedSite = Omit<SiteData, 'groups' | 'competitions' | 'posts' | 'coaches' | 'info'> & {
@@ -218,10 +220,12 @@ export function parseSiteData(value: unknown, source: string): SiteData {
   };
   const bodyBlock = (v: unknown, path: string) => {
     const o = record(v, path);
-    fields(o, path, { _type: oneOf(['block', 'photo']), _key: text });
+    fields(o, path, { _type: text, _key: text });
+    if (!isBodyType(o._type)) return;
     if (o._type === 'photo') {
       fields(o, path, { photo: img });
       return;
+  // Block types the site does not know yet (a new Studio field) are dropped below, not rejected.
     }
     fields(o, path, { children: (c, cp) => list(c, cp, span) });
     optional(o, 'style', path, oneOf(BLOCK_STYLES));
@@ -334,7 +338,7 @@ export function parseSiteData(value: unknown, source: string): SiteData {
   const visible = new Set(athletes.map(a => a.id));
   const posts = newestFirst(site.posts.map((p): Post => ({
     ...p,
-    body: p.body ?? [],
+    body: (p.body ?? []).filter(b => isBodyType(b._type)),
     gallery: p.gallery ?? [],
     results: (p.results ?? []).filter(r => visible.has(r.athleteId)),
   })));

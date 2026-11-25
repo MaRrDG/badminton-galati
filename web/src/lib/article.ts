@@ -1,7 +1,7 @@
 // The article page (/noutati/[slug]/): its neighbours in the news list, the gallery mosaic,
 // the tagged athletes and the page view. Pure functions; the site data is never reordered.
 import { athleteCategory } from './athletes';
-import { bodyToHtml } from './body';
+import { bodySegments, type BodySegment } from './body';
 import { formatDateRo } from './dates';
 import { bestRanking, disciplineLabel, newestFirst, postKindLabel } from './home';
 import { countRo } from './ro';
@@ -44,25 +44,42 @@ export function photoCountLabel(n: number): string {
   return n === 1 ? 'o fotografie' : countRo(n, 'fotografie', 'fotografii');
 }
 
-/** One row of "Sportivi în articol": the athlete, "U17, simplu băieți" (as on the wall), the result. */
-export type TaggedRow = { athlete: Athlete; line?: string; result: string };
+/** One result of an athlete in the article; the discipline in words ("simplu fete") when known. */
+export type TaggedResult = { discipline?: string; result: string };
+/**
+ * One row of "Sportivi în articol": the athlete, the line under the name, the results. With
+ * one result the line is "U13, simplu fete" (as on the wall) and the result has no discipline
+ * of its own; with several the line is the category and each result names its discipline.
+ */
+export type TaggedRow = { athlete: Athlete; line?: string; results: TaggedResult[] };
 
 /**
- * One row per result of the article, in the article's order, for athletes in `athletes` only
- * (the consented ones; a result naming anyone else is left out). The line is the athlete's
- * category in `seasonYear` and the discipline: the result's own, else that of the best place.
+ * One row per athlete, in the order they first appear in the article's results, for athletes
+ * in `athletes` with consent only (a result naming anyone else is left out). The category is
+ * counted in `seasonYear`; a single result's discipline is its own, else the best place's.
  */
 export function taggedRows(post: Post, athletes: Athlete[], seasonYear: number): TaggedRow[] {
-  const rows: TaggedRow[] = [];
+  const byAthlete = new Map<string, { athlete: Athlete; results: Post['results'] }>();
   for (const r of post.results) {
     const athlete = athletes.find(a => a.id === r.athleteId && a.consent === true);
     if (!athlete) continue;
-    const category = athleteCategory(athlete, seasonYear);
-    const discipline = r.discipline ?? bestRanking(athlete)?.discipline;
-    const parts = [category, discipline && disciplineLabel(discipline)].filter(Boolean);
-    rows.push({ athlete, ...(parts.length > 0 ? { line: parts.join(', ') } : {}), result: r.result });
+    const entry = byAthlete.get(athlete.id) ?? { athlete, results: [] };
+    entry.results.push(r);
+    byAthlete.set(athlete.id, entry);
   }
-  return rows;
+  return [...byAthlete.values()].map(({ athlete, results }): TaggedRow => {
+    const category = athleteCategory(athlete, seasonYear);
+    if (results.length === 1) {
+      const discipline = results[0].discipline ?? bestRanking(athlete)?.discipline;
+      const parts = [category, discipline && disciplineLabel(discipline)].filter(Boolean);
+      return { athlete, ...(parts.length > 0 ? { line: parts.join(', ') } : {}), results: [{ result: results[0].result }] };
+    }
+    return {
+      athlete,
+      ...(category !== undefined ? { line: category } : {}),
+      results: results.map(r => ({ ...(r.discipline ? { discipline: disciplineLabel(r.discipline) } : {}), result: r.result })),
+    };
+  });
 }
 
 /** A meta description is cut at a word near this length. */
@@ -83,9 +100,12 @@ export function postDescription(post: Post): string {
 
 export type PostPage = {
   post: Post;
-  bodyHtml: string;
+  /** The body in reading order: text as HTML, photos as their own segments (see `bodySegments`). */
+  body: BodySegment[];
   /** Only for a competition article linked to a competition of the calendar. */
   competition?: Competition;
+  /** The competition starts in the year the calendar page shows (the build year), so it has a block there. */
+  inCalendar: boolean;
   tagged: TaggedRow[];
   mosaic: { img: Img; shape: MosaicShape }[];
   neighbours: { older?: Post; newer?: Post };
@@ -100,8 +120,9 @@ export function postView(site: SiteData, post: Post, today: string): PostPage {
   const shapes = mosaicLayout(post.gallery);
   return {
     post,
-    bodyHtml: bodyToHtml(post.body),
+    body: bodySegments(post.body),
     ...(competition ? { competition } : {}),
+    inCalendar: competition !== undefined && competition.start.startsWith(`${today.slice(0, 4)}-`),
     tagged: taggedRows(post, site.athletes, Number(today.slice(0, 4))),
     mosaic: post.gallery.map((img, i) => ({ img, shape: shapes[i] })),
     neighbours: postNeighbours(site.posts, post.slug),

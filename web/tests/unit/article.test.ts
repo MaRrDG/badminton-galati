@@ -47,9 +47,30 @@ describe('the article page', () => {
     const post = site.posts.find(p => p.slug === 'articol-de-test-cu-galerie')!;
     expect(taggedRows(post, [], 2026)).toEqual([]);
     const rows = taggedRows(post, site.athletes, 2026);
-    expect(rows.map(r => [r.athlete.name, r.line, r.result])).toEqual([['Zet Exemplu-Ana', 'U13, simplu fete', 'aur']]);
+    expect(rows.map(r => [r.athlete.name, r.line, r.results])).toEqual([['Zet Exemplu-Ana', 'U13, simplu fete', [{ result: 'aur' }]]]);
     const unknown = { ...post, results: [{ athleteId: 'athlete-nobody', result: 'aur' }] };
     expect(taggedRows(unknown, site.athletes, 2026)).toEqual([]);
+  });
+
+  test('one row per athlete, in first-appearance order; several results name their disciplines', () => {
+    const site = parseSiteData(quiet, 'quiet-season.json');
+    const post = site.posts.find(p => p.slug === 'articol-de-test-cu-galerie')!;
+    const zet = 'athlete-zet-exemplu-ana';
+    const nistor = 'athlete-nistor-cristian-ionut';
+    const results = [
+      { athleteId: nistor, result: 'locul 5' },
+      { athleteId: zet, discipline: 'SF' as const, result: 'aur' },
+      { athleteId: nistor, discipline: 'DX' as const, result: 'bronz' },
+      { athleteId: zet, discipline: 'DX' as const, result: 'argint' },
+      { athleteId: 'athlete-nobody', result: 'aur' },
+    ];
+    const rows = taggedRows({ ...post, results }, site.athletes, 2026);
+    expect(rows.map(r => r.athlete.id)).toEqual([nistor, zet]);
+    expect(rows[1]).toMatchObject({
+      line: 'U13',
+      results: [{ discipline: 'simplu fete', result: 'aur' }, { discipline: 'dublu mixt', result: 'argint' }],
+    });
+    expect(rows[0].results).toEqual([{ result: 'locul 5' }, { discipline: 'dublu mixt', result: 'bronz' }]);
   });
 
   test('a result names a non-consented athlete: dropped before the page sees it', () => {
@@ -65,8 +86,10 @@ describe('the article page', () => {
     const copy = structuredClone(site);
     const post = site.posts.find(p => p.slug === 'articol-de-test-cu-galerie')!;
     const page = postView(site, post, '2026-11-25');
-    expect(page.bodyHtml).toMatch(/^<p class="lead">/);
+    expect(page.body.map(b => b.kind)).toEqual(['html', 'photo', 'html']);
+    expect(page.body[0]).toMatchObject({ html: expect.stringMatching(/^<p class="lead">/) });
     expect(page.competition?.title).toBe('CR U15 și CR U23');
+    expect(page.inCalendar).toBe(true);
     expect(page.tagged).toHaveLength(1);
     expect(page.mosaic.map(m => [m.img.url, m.shape])).toEqual(seven.map((p, i) => [p.url, mosaicLayout(seven)[i]]));
     expect(page.neighbours.older?.slug).toBe('galati-olimpiada-nationala-a-sportului-scolar-2026');
@@ -79,8 +102,17 @@ describe('the article page', () => {
     const post = site.posts.find(p => p.slug === 'articol-de-test-cu-galerie')!;
     expect(postView(site, { ...post, kind: 'viata-clubului' }, '2026-11-25').competition).toBeUndefined();
     const plain = postView(site, site.posts.find(p => p.slug === 'novi-sad-2026')!, '2026-11-25');
-    expect(plain).toMatchObject({ bodyHtml: '', tagged: [], mosaic: [] });
+    expect(plain).toMatchObject({ body: [], tagged: [], mosaic: [], inCalendar: false });
     expect(plain.competition).toBeUndefined();
+  });
+
+  test('"În calendar" only for a competition in the year the calendar shows', () => {
+    const site = parseSiteData(quiet, 'quiet-season.json');
+    const post = site.posts.find(p => p.slug === 'articol-de-test-cu-galerie')!;
+    expect(postView(site, post, '2026-11-25').inCalendar).toBe(true);
+    const later = postView(site, post, '2027-01-05');
+    expect(later.competition?.id).toBe(post.competitionId);
+    expect(later.inCalendar).toBe(false);
   });
 
   test('the meta description: the first paragraph, or the kind, date and title', () => {

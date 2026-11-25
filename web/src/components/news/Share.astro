@@ -16,7 +16,7 @@ const { title } = Astro.props;
   <a href="https://wa.me/" data-share="wa">WhatsApp</a>
   <button type="button" data-share="copy">Copiază linkul</button>
   <input class="url" type="text" readonly aria-label="Adresa articolului" data-share="url" hidden />
-  <span class="visually-hidden" aria-live="polite" data-share="status"></span>
+  <span class="status" role="status" data-share="status"></span>
 </div>
 
 <style>
@@ -28,6 +28,10 @@ const { title } = Astro.props;
   }
   .lbl {
     font-weight: 600;
+  }
+  .status {
+    font-weight: 600;
+    color: var(--red-ink);
   }
   a,
   button {

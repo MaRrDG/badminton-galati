@@ -1,9 +1,10 @@
 // The article's share row (Share.astro), built from the page's own address: the public address
 // of the site is not known before launch, so the row is hidden until this runs. Plain links, no
-// third-party script. "Copiază linkul" copies the address; where the clipboard is not available
-// it shows the address in a field, selected, to copy by hand.
+// third-party script. "Copiază linkul" copies the address and "Link copiat" shows for 2.4 s in a
+// status beside it (the button's name never changes, so it is announced once); where the
+// clipboard is not available it shows the address in a field, selected, to copy by hand.
 
-/** How long "Link copiat" stays on the button, in ms. */
+/** How long "Link copiat" stays beside the button, in ms. */
 const COPIED_FOR = 2400;
 
 export function initShare(): void {
@@ -21,7 +22,6 @@ export function initShare(): void {
   const copy = part<HTMLButtonElement>('copy');
   const field = part<HTMLInputElement>('url');
   const status = part<HTMLElement>('status');
-  const label = copy?.textContent ?? '';
   let timer: number | undefined;
 
   const showField = () => {
@@ -40,12 +40,12 @@ export function initShare(): void {
       showField();
       return;
     }
-    copy.textContent = 'Link copiat';
-    if (status) status.textContent = 'Link copiat';
+    // The button keeps its name; the status next to it shows and announces the copy, once.
+    if (!status) return;
+    status.textContent = 'Link copiat';
     window.clearTimeout(timer);
     timer = window.setTimeout(() => {
-      copy.textContent = label;
-      if (status) status.textContent = '';
+      status.textContent = '';
     }, COPIED_FOR);
   });
 
