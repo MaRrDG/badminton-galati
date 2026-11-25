@@ -126,7 +126,8 @@ When you add a spec or a new source folder, update this table in the script's he
   screen with the footer on the bottom edge at 1920/2560/3440 (`not-found.spec`); a short
   profile at 2560×1600 fills to the footer (`athletes.spec`).
 - Shell: Romanian nav and footer, no overflow at several widths, self-hosted fonts, narrow menu
-  with and without JS, focus ring colour equals text colour; the menu marks a page's section
+  with and without JS, the seven menu entries on one line with nothing wrapped at 900/1024/1440/2560
+  and "Meniu" at 861/899, focus ring colour equals text colour; the menu marks a page's section
   (`aria-current="page"` on the page itself, `"true"` under it); the footer links the parents'
   page and Facebook.
 - Inner pages (`inner-pages.spec`): see "The inner-pages sweep" below. Per-page specs

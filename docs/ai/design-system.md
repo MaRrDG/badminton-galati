@@ -48,7 +48,10 @@ Fonts are self-hosted through `@fontsource` packages (bundled into `/_astro/`); 
 request at runtime (e2e test "fonts are self-hosted"). Section headings: `h2.display`,
 `clamp(2.2rem, 4.6vw, 4.2rem)`; hero headline `clamp(3rem, 6.2vw, 5.9rem)` (display type capped
 near 6rem up to 1440px). One layout breakpoint: `max-width: 860px` (CSS) / `min-width: 861px`
-(motion); past 1440px only the large-screen growth below.
+(motion); past 1440px only the large-screen growth below. One exception: the header's menu
+switches at 900px (`max-width: 899px` shows "Meniu"), because its seven entries (Acasă, Sportivi,
+Program, Calendar, Noutăți, Pentru părinți, Contact) and the club's name need about 830px on one
+line; from 861 to 899px the pages are wide but the menu is still the "Meniu" drop-down.
 
 Straight edges everywhere. Photos are treated as posters with an offset red plate behind.
 

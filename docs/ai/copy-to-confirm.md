@@ -18,7 +18,8 @@ the line. Placeholders in braces are filled from data.
 | "**De confirmat de club:** …" | Every unknown value (`ui/Tbc`); the lines after it speak to the club and are approved as the visible state | Mockup |
 | ", oră dată ca exemplu", ", antrenor dat ca exemplu" (screen readers only) | After hatched example hours and coaches (`ui/Sample`) | Mockup |
 | Map link to the coordinates 45.4194907, 28.0277769 | "Sala pe hartă", "Deschide harta" (programme, parents, contact) | 2a: confirm the hall's position |
-| "Pentru părinți", "Facebook" | Footer | 2a |
+| "Pentru părinți" | Main menu (owner, 2026-11-26) and footer | 2a |
+| "Facebook" | Footer | 2a |
 
 ## Sportivi (`/sportivi/`)
 

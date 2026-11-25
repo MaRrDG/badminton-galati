@@ -7,6 +7,7 @@ const items = [
   { label: 'Program', href: '/program/' },
   { label: 'Calendar', href: '/calendar/' },
   { label: 'Noutăți', href: '/noutati/' },
+  { label: 'Pentru părinți', href: '/pentru-parinti/' },
   { label: 'Contact', href: '/contact/' },
 ];
 const path = Astro.url.pathname;
@@ -102,8 +103,10 @@ const currentOf = (href: string) => (href === path ? 'page' : isCurrent(href, pa
     border-bottom-color: var(--red);
   }
 
-  /* Narrow: the list drops down under the header when "Meniu" is open. Works without JavaScript. */
-  @media (max-width: 860px) {
+  /* Narrow: the list drops down under the header when "Meniu" is open. Works without JavaScript.
+     The menu switches at 900px, not at the site's 860px: its seven entries and the club's name
+     need about 830px on one line, so from 861 to 899px the header keeps "Meniu". */
+  @media (max-width: 899px) {
     .menu ul {
       position: absolute;
       top: 100%;
@@ -121,7 +124,7 @@ const currentOf = (href: string) => (href === path ? 'page' : isCurrent(href, pa
 
   /* Wide: the list is always shown and the toggle is hidden. Browsers without
      ::details-content keep the toggle, so the links stay reachable. */
-  @media (min-width: 861px) {
+  @media (min-width: 900px) {
     @supports selector(::details-content) {
       .menu summary {
         display: none;
@@ -137,6 +140,7 @@ const currentOf = (href: string) => (href === path ? 'page' : isCurrent(href, pa
       .menu a {
         display: inline-block;
         padding: 6px 0;
+        white-space: nowrap;
       }
     }
   }

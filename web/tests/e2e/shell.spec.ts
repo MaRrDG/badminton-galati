@@ -1,10 +1,11 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 
+const MENU = ['Acasă', 'Sportivi', 'Program', 'Calendar', 'Noutăți', 'Pentru părinți', 'Contact'];
+
 test('shell renders in Romanian with nav and footer', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ro');
-  for (const n of ['Acasă', 'Sportivi', 'Program', 'Calendar', 'Noutăți', 'Contact'])
-    await expect(page.getByRole('navigation').getByRole('link', { name: n })).toBeVisible();
+  for (const n of MENU) await expect(page.getByRole('navigation', { name: 'Meniu principal' }).getByRole('link', { name: n })).toBeVisible();
   await expect(page.getByRole('contentinfo')).toContainText('siderurgistul@badmintongalati.ro');
 });
 
@@ -24,7 +25,7 @@ test('fonts are self-hosted', async ({ page }) => {
 
 test.describe('narrow menu', () => {
   test.use({ viewport: { width: 390, height: 844 } });
-  const links = ['Acasă', 'Sportivi', 'Program', 'Calendar', 'Noutăți', 'Contact'];
+  const links = MENU;
 
   const opensAndCloses = async (page: Page) => {
     await page.goto('/');
@@ -45,6 +46,50 @@ test.describe('narrow menu', () => {
     await opensAndCloses(await ctx.newPage());
     await ctx.close();
   });
+});
+
+test.describe('the header holds the seven menu entries', () => {
+  /** Rows the visible entries sit on, the tallest entry (a wrapped label is two lines), the space between the name and the list. */
+  const measure = (page: Page) => page.evaluate(() => {
+    const links = [...document.querySelectorAll<HTMLElement>('.menu a')];
+    const rects = links.map(a => a.getBoundingClientRect());
+    const brand = document.querySelector('.brand span')!.getBoundingClientRect();
+    return {
+      order: links.map(a => a.textContent!.trim()),
+      rows: new Set(rects.map(r => Math.round(r.top))).size,
+      lineH: Math.max(...rects.map(r => r.height)),
+      brandH: brand.height,
+      space: rects[0].left - brand.right,
+      header: document.querySelector('.site-header')!.getBoundingClientRect().height,
+    };
+  });
+
+  for (const width of [900, 1024, 1440, 2560])
+    test(`one line, nothing wrapped, at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/pentru-parinti/');
+      await expect(page.locator('.menu summary')).toBeHidden();
+      const m = await measure(page);
+      expect(m.order).toEqual(MENU);
+      expect(m.rows).toBe(1);
+      expect(m.lineH).toBeLessThan(45);
+      expect(m.brandH).toBeLessThan(30);
+      expect(m.space).toBeGreaterThanOrEqual(32);
+      expect(m.header).toBe(69);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+    });
+
+  // Seven entries do not fit beside the club's name below 900px, so the header keeps "Meniu" there.
+  for (const width of [861, 899])
+    test(`"Meniu" at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/');
+      const nav = page.getByRole('navigation', { name: 'Meniu principal' });
+      await expect(nav.getByRole('link', { name: 'Pentru părinți' })).toBeHidden();
+      await nav.getByText('Meniu', { exact: true }).click();
+      for (const n of MENU) await expect(nav.getByRole('link', { name: n })).toBeVisible();
+      expect((await page.locator('.site-header').boundingBox())!.height).toBe(69);
+    });
 });
 
 test.describe('focus ring', () => {
@@ -87,6 +132,14 @@ test.describe('the menu marks the current section', () => {
   const RED = 'rgb(226, 58, 69)';
   const NONE = 'rgba(0, 0, 0, 0)';
 
+  test('the parents\' page is the current page', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/pentru-parinti/');
+    await expect(menuLink(page, 'Pentru părinți')).toHaveAttribute('aria-current', 'page');
+    expect(await underline(menuLink(page, 'Pentru părinți'))).toBe(RED);
+    for (const other of MENU.filter(n => n !== 'Pentru părinți')) await expect(menuLink(page, other)).not.toHaveAttribute('aria-current');
+  });
+
   test('a section page is the current page', async ({ page }) => {
     await page.goto('/noutati/');
     await expect(menuLink(page, 'Noutăți')).toHaveAttribute('aria-current', 'page');
@@ -101,7 +154,7 @@ test.describe('the menu marks the current section', () => {
       // The section is current, but the link is not the page itself.
       await expect(link).toHaveAttribute('aria-current', 'true');
       expect(await underline(link)).toBe(RED);
-      for (const other of ['Acasă', 'Program', 'Calendar', 'Contact']) {
+      for (const other of ['Acasă', 'Program', 'Calendar', 'Pentru părinți', 'Contact']) {
         await expect(menuLink(page, other)).not.toHaveAttribute('aria-current');
         expect(await underline(menuLink(page, other))).toBe(NONE);
       }
