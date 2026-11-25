@@ -5,7 +5,7 @@ import { todayInBucharest } from '../../src/lib/dates';
 import { HOME_QUERY, toHomeData } from '../../src/lib/sanity';
 import fixture from '../../src/fixtures/home.json';
 
-const ENV_KEYS = ['CONTENT_SOURCE', 'SANITY_PROJECT_ID', 'SANITY_DATASET', 'HOME_FIXTURE', 'BUILD_TODAY'] as const;
+const ENV_KEYS = ['CONTENT_SOURCE', 'SANITY_PROJECT_ID', 'SANITY_DATASET', 'SANITY_READ_TOKEN', 'HOME_FIXTURE', 'BUILD_TODAY'] as const;
 let savedEnv: Record<string, string | undefined>;
 beforeEach(() => {
   savedEnv = Object.fromEntries(ENV_KEYS.map(k => [k, process.env[k]]));
@@ -145,6 +145,12 @@ describe('Sanity source', () => {
   test('CONTENT_SOURCE=sanity without a project id names the missing variable', async () => {
     process.env.CONTENT_SOURCE = 'sanity';
     await expect(getHomeData()).rejects.toThrow(/SANITY_PROJECT_ID/);
+  });
+
+  test('CONTENT_SOURCE=sanity without a read token names the missing variable', async () => {
+    process.env.CONTENT_SOURCE = 'sanity';
+    process.env.SANITY_PROJECT_ID = 'p';
+    await expect(getHomeData()).rejects.toThrow(/SANITY_READ_TOKEN/);
   });
 
   test('an unknown CONTENT_SOURCE is refused', async () => {

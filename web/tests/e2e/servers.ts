@@ -1,6 +1,8 @@
 // The site is static, so one build serves one fixture. Each entry is built and previewed on
 // its own port; tests pick a server with `serverURL`. Every build is pinned to BUILD_TODAY.
 export const BUILD_TODAY = '2026-11-25';
+/** Set as SANITY_READ_TOKEN for every e2e build; it must never show up in the built site. */
+export const DUMMY_READ_TOKEN = 'dummy-token-should-not-leak';
 
 export const SERVERS = {
   // Not 4321, so a running `astro dev` is never mistaken for the built site.

@@ -30,13 +30,17 @@ export const HOME_QUERY = `{
   "posts": *[_type == "post"] | order(date desc)[0...${HOME_POSTS}]{ title, "slug": slug.current, kind, date, "cover": cover${IMAGE} }
 }`;
 
-/** Runs `HOME_QUERY` against the public, read-only dataset: published documents only, no token. */
-export function fetchHomeQuery(config: { projectId: string; dataset: string }): Promise<unknown> {
+/**
+ * Runs `HOME_QUERY` against the private dataset with a read token: published documents only.
+ * Build-time code only; the token never goes into the page or a client bundle.
+ */
+export function fetchHomeQuery(config: { projectId: string; dataset: string; token: string }): Promise<unknown> {
   const client = createClient({
     projectId: config.projectId,
     dataset: config.dataset,
+    token: config.token,
     apiVersion: API_VERSION,
-    useCdn: false, // builds want the version just published, not a cached one
+    useCdn: false, // builds want the version just published, and the CDN does not serve token requests
     perspective: 'published',
   });
   return client.fetch(HOME_QUERY);

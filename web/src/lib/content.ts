@@ -36,8 +36,12 @@ export async function getHomeData(): Promise<HomeData> {
     if (!projectId) {
       throw new Error('CONTENT_SOURCE=sanity needs SANITY_PROJECT_ID, the id of the Sanity project (see web/.env.example).');
     }
+    const token = process.env.SANITY_READ_TOKEN;
+    if (!token) {
+      throw new Error('CONTENT_SOURCE=sanity needs SANITY_READ_TOKEN, a read-only token for the private dataset (see web/.env.example).');
+    }
     const dataset = process.env.SANITY_DATASET || 'production';
-    const raw = await fetchHomeQuery({ projectId, dataset });
+    const raw = await fetchHomeQuery({ projectId, dataset, token });
     return parseHomeData(toHomeData(raw), `Sanity ${projectId}/${dataset}`);
   }
   const name = process.env.HOME_FIXTURE || DEFAULT_FIXTURE;
