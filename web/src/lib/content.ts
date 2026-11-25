@@ -9,7 +9,7 @@ import { programView, type ProgramPage } from './program';
 import { fetchHomeQuery, slugifyRo, toHomeData } from './sanity';
 import {
   COMPETITION_CATEGORIES, DISCIPLINES, POST_KINDS, TRACKS, WEEKDAYS,
-  type BodyBlock, type ClubInfo, type Coach, type Competition, type Group, type HomeData, type Post, type SiteData,
+  type BodyBlock, type ClubInfo, type Coach, type Competition, type Group, type HomeData, type Img, type Post, type SiteData,
 } from './types';
 
 const DEFAULT_FIXTURE = 'home.json';
@@ -104,6 +104,23 @@ export async function getProgramPage(): Promise<ProgramPage> {
 /** The parents' page (/pentru-parinti/): the club's answers, the coaches, the opening and hall photos. */
 export async function getParentsPage(): Promise<ParentsPage> {
   return parentsView(await getSiteData());
+}
+
+/** The contact page (/contact/): the club's contact details and the hall's photo. */
+export type ContactPage = {
+  contact: ClubInfo['contact'];
+  /** The club's `venuePhoto`, else the first hall photo. */
+  hallPhoto?: Img;
+};
+
+export function contactView(site: SiteData): ContactPage {
+  const hallPhoto = site.info.venuePhoto ?? site.hallPhotos[0];
+  return { contact: site.info.contact, ...(hallPhoto ? { hallPhoto } : {}) };
+}
+
+/** The contact page (/contact/): the trial form beside the hall's address and the club's details. */
+export async function getContactPage(): Promise<ContactPage> {
+  return contactView(await getSiteData());
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */

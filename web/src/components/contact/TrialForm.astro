@@ -1,0 +1,328 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import { CLUB_EMAIL } from '../../lib/club';
+import { AGE_MAX, AGE_MIN } from '../../lib/trial';
+
+interface Props {
+  /** In how many days the club calls back, when it has said so (the sent state names it). */
+  replyDays?: number;
+}
+
+const { replyDays } = Astro.props;
+// Without JavaScript the browser checks the required fields and hands the request to the
+// e-mail app (plan 2b points the form at /api/proba). With JavaScript, scripts/trial-form.ts
+// checks it, sends it to the endpoint and falls back to the same e-mail.
+const action = `mailto:${CLUB_EMAIL}?subject=${encodeURIComponent('Cerere antrenament de probă')}`;
+const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numele și telefonul meu doar ca să mă contacteze despre această cerere.';
+---
+
+<div class="form-col" id="formular">
+  <SectionHeading id="f-h">Cere un antrenament de probă</SectionHeading>
+  <p class="intro">Toate câmpurile sunt obligatorii, în afară de mesaj.</p>
+  <noscript>
+    <p class="noscript">
+      Fără JavaScript, „Trimite cererea” deschide un e-mail către <a href={`mailto:${CLUB_EMAIL}`}>{CLUB_EMAIL}</a> cu datele completate; cererea
+      ajunge la club după ce trimiteți e-mailul.
+    </p>
+  </noscript>
+
+  <form
+    class="trial"
+    action={action}
+    method="post"
+    enctype="text/plain"
+    aria-labelledby="f-h"
+    data-reply-days={replyDays}
+  >
+    <div class="errsum" role="alert" tabindex="-1" hidden></div>
+
+    <div class="field" data-field="nume">
+      <label for="f-nume">Numele părintelui</label>
+      <p class="err" id="f-nume-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
+      <input id="f-nume" name="nume" type="text" autocomplete="name" autocapitalize="words" required />
+    </div>
+    <div class="field" data-field="telefon">
+      <label for="f-tel">Telefon</label>
+      <p class="hint" id="f-tel-h">Clubul vă contactează la acest număr.</p>
+      <p class="err" id="f-tel-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
+      <input id="f-tel" name="telefon" type="tel" autocomplete="tel" required aria-describedby="f-tel-h" />
+    </div>
+    <div class="field" data-field="varsta">
+      <label for="f-varsta">Vârsta copilului</label>
+      <p class="hint" id="f-varsta-h">În ani, între {AGE_MIN} și {AGE_MAX}. Ne ajută să alegem grupa potrivită.</p>
+      <p class="err" id="f-varsta-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
+      <div class="unit">
+        <input id="f-varsta" name="varsta" type="text" inputmode="numeric" maxlength="2" autocomplete="off" required aria-describedby="f-varsta-h" /><span
+          aria-hidden="true">ani</span
+        >
+      </div>
+    </div>
+    <div class="field" data-field="mesaj">
+      <label for="f-mesaj">Mesaj <span class="opt">(opțional)</span></label>
+      <p class="hint" id="f-mesaj-h">De exemplu, ce zile vă convin sau dacă a mai jucat badminton.</p>
+      <p class="err" id="f-mesaj-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
+      <textarea id="f-mesaj" name="mesaj" rows="4" aria-describedby="f-mesaj-h"></textarea>
+    </div>
+    <div class="consent" data-field="acord">
+      <p class="err" id="f-acord-err" hidden><span class="visually-hidden">Eroare: </span><span class="msg"></span></p>
+      <input type="checkbox" id="f-acord" name="acord" required />
+      <label for="f-acord">{consent}</label>
+    </div>
+
+    <!-- Honeypot for plan 2b's endpoint: hidden from people, the keyboard and assistive tech. -->
+    <div class="visually-hidden" aria-hidden="true">
+      <label for="f-site">Nu completați acest câmp</label>
+      <input id="f-site" name="site_web" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <button class="send" type="submit">Trimite cererea</button>
+  </form>
+
+  <div class="sent" role="status" hidden></div>
+</div>
+
+<script>
+  import { initTrialForm } from '../../scripts/trial-form';
+  import { CLUB_EMAIL } from '../../lib/club';
+
+  const form = document.querySelector<HTMLFormElement>('form.trial');
+  if (form) initTrialForm(form, { endpoint: '/api/proba', email: CLUB_EMAIL });
+</script>
+
+<style>
+  /* The form is the page: large fields, labels above, hints and errors tied to each field.
+     The error summary and the sent box are filled by scripts/trial-form.ts, hence :global. */
+  .form-col {
+    scroll-margin-top: 16px;
+  }
+  .intro {
+    margin-top: 6px;
+    font-size: 0.98rem;
+  }
+  .noscript {
+    margin-top: 12px;
+    font-size: 0.98rem;
+    max-width: 36rem;
+  }
+  .noscript a {
+    font-weight: 600;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .trial {
+    margin-top: clamp(20px, 2.6vw, 28px);
+    max-width: 36rem;
+  }
+  .field + .field,
+  .field + .consent {
+    margin-top: 22px;
+  }
+  .field label {
+    display: block;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+  .opt {
+    font-weight: 400;
+  }
+  .hint {
+    font-size: 0.95rem;
+    margin: -2px 0 8px;
+    color: var(--ink-soft);
+  }
+  .trial input[type='text'],
+  .trial input[type='tel'],
+  .trial textarea {
+    display: block;
+    width: 100%;
+    min-height: 54px;
+    padding: 12px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.06rem;
+  }
+  .trial textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  .trial input:focus-visible,
+  .trial textarea:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+    border-color: var(--blue);
+  }
+  .unit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .unit input {
+    max-width: 6.5rem;
+  }
+  .unit span {
+    font-weight: 600;
+  }
+
+  .consent {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 4px 14px;
+    align-items: start;
+    margin-top: 26px;
+    font-size: 0.98rem;
+  }
+  .consent input {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    accent-color: var(--ink);
+    cursor: pointer;
+  }
+  .consent input:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
+  .consent label {
+    cursor: pointer;
+    padding-top: 2px;
+  }
+  .consent .err {
+    grid-column: 1 / -1;
+  }
+
+  .send {
+    display: inline-block;
+    margin-top: 26px;
+    min-height: 56px;
+    padding: 14px 30px;
+    border: 0;
+    background: var(--red-field);
+    color: var(--white);
+    font: 600 1.08rem var(--body);
+    cursor: pointer;
+  }
+  .send:hover {
+    background: var(--ink);
+  }
+  .send:focus-visible {
+    outline-color: var(--ink);
+  }
+  .send[aria-disabled='true'] {
+    cursor: progress;
+  }
+
+  /* The error state (contact.html, "stare: eroare"). */
+  .errsum {
+    border-left: 6px solid var(--red-ink);
+    padding: 2px 0 4px 16px;
+    margin-bottom: 24px;
+  }
+  .errsum:focus {
+    outline: none;
+  }
+  .errsum:focus-visible {
+    outline: 3px solid var(--red-ink);
+    outline-offset: 3px;
+  }
+  .errsum :global(h3) {
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    color: var(--red-ink);
+  }
+  .errsum :global(p) {
+    margin-top: 4px;
+  }
+  .errsum :global(ul) {
+    margin: 6px 0 0;
+    padding-left: 1.2em;
+  }
+  .errsum :global(li) {
+    padding: 3px 0;
+  }
+  .errsum :global(a) {
+    color: var(--red-ink);
+    font-weight: 600;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .err {
+    color: var(--red-ink);
+    font-weight: 600;
+    font-size: 0.96rem;
+    margin: 0 0 8px;
+  }
+  .bad input[type='tel'],
+  .bad input[type='text'],
+  .bad textarea {
+    border-color: var(--red-ink);
+    border-width: 3px;
+  }
+  .consent.bad input {
+    outline: 3px solid var(--red-ink);
+    outline-offset: 1px;
+  }
+
+  /* The sent state (contact.html, "stare: trimis"): a blue box in place of the form. */
+  .sent {
+    margin-top: clamp(20px, 2.6vw, 28px);
+    max-width: 36rem;
+    background: var(--blue);
+    color: var(--white);
+    padding: clamp(22px, 3vw, 32px);
+  }
+  .sent :global(h3) {
+    font-weight: 700;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .sent :global(h3:focus) {
+    outline: none;
+  }
+  .sent :global(p + p) {
+    margin-top: 12px;
+  }
+  .sent :global(.tbc),
+  .sent :global(.tbc b) {
+    color: var(--white);
+  }
+  .sent :global(a) {
+    font-weight: 600;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .sent :global(.again) {
+    display: inline-block;
+    margin-top: 20px;
+    min-height: 52px;
+    padding: 14px 22px;
+    border: 0;
+    background: var(--white);
+    color: var(--ink);
+    font: 600 1rem var(--body);
+    cursor: pointer;
+  }
+  .sent :global(.again:hover) {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .sent :global(.again:focus-visible) {
+    outline-color: var(--white);
+  }
+
+  @media (max-width: 860px) {
+    .trial,
+    .sent {
+      max-width: none;
+    }
+    .send {
+      width: 100%;
+    }
+  }
+</style>

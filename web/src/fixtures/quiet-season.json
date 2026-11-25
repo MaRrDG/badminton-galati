@@ -416,6 +416,7 @@
   ],
   "info": {
     "programNote": "Notă de test pentru program.",
+    "contact": { "phone": "0700 000 000", "directions": "Text de test pentru drum.", "replyDays": 3 },
     "venuePhoto": { "url": "/img/sala-turneu-2.jpg", "width": 1280, "height": 720, "alt": "Meciuri pe cele patru terenuri ale sălii Siderurgistul" },
     "parentsPhoto": { "url": "/img/cantonament.jpg", "width": 1280, "height": 960, "alt": "Copii și antrenori ai clubului în tricouri verzi, în cantonament" },
     "parents": {
