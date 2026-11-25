@@ -40,7 +40,6 @@ const ways = [
         <RallyScene layout="tall" />
       </div>
     </div>
-    <p class="nf-hint" data-rally-hint hidden>Atinge un jucător ca să atace.</p>
   </section>
 </Base>
 
@@ -114,10 +113,6 @@ const ways = [
     --unit: calc(var(--frame) / var(--w));
     position: relative;
     margin-top: clamp(4px, 1.5vh, 20px);
-    cursor: pointer;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
   }
   .nf-court::before {
     content: '';
@@ -134,12 +129,6 @@ const ways = [
   }
   .nf-frame :global(.tall) {
     display: none;
-  }
-  .nf-hint {
-    background: var(--blue-deep);
-    text-align: center;
-    font-size: 0.92rem;
-    padding: 0 var(--gut) 18px;
   }
 
   @media (max-width: 860px) {

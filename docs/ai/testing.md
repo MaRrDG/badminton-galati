@@ -102,7 +102,8 @@ When you add a spec or a new source folder, update this table in the script's he
   scrolling (home, sparse, mixed-strip); motion bundled, not from a CDN.
 - 404 page (`not-found.spec`, on `home`): an unknown address answers 404 with the page; the
   shuttle is seen on both sides of the net (the rally runs) with no page errors; reduced motion
-  and no-JS show the still frame with the shuttle in the 0; no overflow at 380 and 1440.
+  and no-JS show the still frame with the shuttle in the 0; no hint text and nothing focusable in
+  the scene; no overflow at 380 and 1440.
   `rally.test.ts` plays two minutes per layout: the racket head meets the shuttle at every hit,
   net faults happen but stay rare.
 - Shell: Romanian nav and footer, no overflow at several widths, self-hosted fonts, narrow menu
