@@ -119,6 +119,11 @@ describe('countdownLabel', () => {
     expect(countdownLabel(cnU17, '2026-08-01')).toBeUndefined(); // more than 60 days away
   });
 
+  test('the countdown shows at exactly 60 days and not at 61', () => {
+    expect(countdownLabel(cnU17, '2026-09-28')).toBe('peste 60 de zile');
+    expect(countdownLabel(cnU17, '2026-09-27')).toBeUndefined();
+  });
+
   test('Romanian numerals from 20 up take "de"', () => {
     expect(countdownLabel(cnU17, '2026-11-08')).toBe('peste 19 zile');
     expect(countdownLabel(cnU17, '2026-11-07')).toBe('peste 20 de zile');

@@ -1,6 +1,21 @@
 {
   "athletes": [
     {
+      "id": "athlete-fara-acord-zamfira",
+      "name": "Fără-Acord Zamfira",
+      "slug": "fara-acord-zamfira",
+      "consent": false,
+      "frbUrl": "https://badminton.ro/jucator/999/u15-sf-simplu-fete/",
+      "rankings": [
+        {
+          "category": "U15",
+          "discipline": "SF",
+          "place": 1,
+          "points": 250
+        }
+      ]
+    },
+    {
       "id": "athlete-nistor-cristian-ionut",
       "name": "Nistor Cristian-Ionuț",
       "slug": "nistor-cristian-ionut",
@@ -136,14 +151,6 @@
       "city": "Blejoi/Bacău",
       "start": "2026-11-20",
       "end": "2026-11-22",
-      "home": false
-    },
-    {
-      "id": "competition-2026-11-27-cn-u9-cn-u17",
-      "title": "CN U9 și CN U17",
-      "city": "București",
-      "start": "2026-11-27",
-      "end": "2026-11-29",
       "home": false
     }
   ],

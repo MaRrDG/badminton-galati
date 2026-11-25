@@ -1,5 +1,24 @@
-import { test, expect } from '@playwright/test';
-import { serverURL } from './servers';
+import { test, expect, type Page } from '@playwright/test';
+import { BUILD_TODAY, serverURL } from './servers';
+
+/** 09:00 in Bucharest on `day`. */
+const at = (day: string) => new Date(`${day}T09:00:00+02:00`);
+
+// The countdown script reads the browser clock, so every page runs on the pinned build date
+// unless a test sets another day; otherwise assertions would change with the real date.
+test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(at(BUILD_TODAY));
+});
+
+/** Left and right edges of the text inside each element (not of its block box). */
+function textEdges(page: Page, selector: string) {
+  return page.locator(selector).evaluateAll(els => els.map(e => {
+    const range = document.createRange();
+    range.selectNodeContents(e);
+    const r = range.getBoundingClientRect();
+    return { text: e.textContent!.trim(), left: r.left, right: r.right };
+  }));
+}
 
 test('hero carries the club motto', async ({ page }) => {
   await page.goto('/');
@@ -49,6 +68,13 @@ for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${wi
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   const name = page.getByText('Bordeianu Nectarie-Ioan').first();
   const box = await name.boundingBox(); expect(box!.x).toBeGreaterThanOrEqual(0); expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+  // Sections clip sideways overflow, so scrollWidth alone would not catch cut-off text.
+  const edges = [...await textEdges(page, '.hero h1 span'), ...await textEdges(page, '#sportivi h3')];
+  expect(edges).toHaveLength(4 + 3);
+  for (const e of edges) {
+    expect(e.left, e.text).toBeGreaterThanOrEqual(0);
+    expect(e.right, e.text).toBeLessThanOrEqual(width);
+  }
 });
 
 test('calendar: next event with countdown, then three played events', async ({ page }) => {
@@ -62,7 +88,6 @@ test('calendar: next event with countdown, then three played events', async ({ p
 });
 
 test.describe('countdown follows the visitor’s clock, not the build date', () => {
-  const at = (iso: string) => new Date(`${iso}T09:00:00+02:00`);
   for (const [day, label] of [['2026-11-26', 'începe mâine'], ['2026-11-27', 'începe azi'], ['2026-11-28', 'în desfășurare']])
     test(`on ${day} it reads "${label}"`, async ({ page }) => {
       await page.clock.setFixedTime(at(day));
@@ -88,6 +113,14 @@ test.describe('a season with no competition left', () => {
     await expect(cal.locator('[data-countdown]')).toHaveCount(0);
     await expect(cal).not.toContainText(/peste -?\d+ (de )?zile/);
   });
+
+  test('an athlete without consent appears nowhere, even with the top place', async ({ page }) => {
+    const html = await (await page.goto('/'))!.text();
+    expect(html).not.toContain('Fără-Acord');
+    expect(html).not.toContain('fara-acord');
+    expect(html).not.toContain('jucator/999/');
+    await expect(page.locator('#sportivi [data-roll]').first()).toHaveAttribute('data-roll', '2');
+  });
 });
 
 test.describe('athletes without rankings', () => {
@@ -101,5 +134,12 @@ test.describe('athletes without rankings', () => {
       await expect(roster.getByRole('heading', { name })).toBeVisible();
     await expect(roster.getByRole('link', { name: 'Profilul FRB' })).toHaveCount(3);
     await expect(page.locator('[data-roll]')).toHaveCount(0);
+  });
+
+  test('without places no athlete gets a larger row', async ({ page }) => {
+    await page.goto('/');
+    const sizes = await page.locator('#sportivi h3').evaluateAll(hs => hs.map(h => getComputedStyle(h).fontSize));
+    expect(sizes).toHaveLength(3);
+    expect(new Set(sizes).size).toBe(1);
   });
 });
