@@ -13,6 +13,9 @@ test('an article without body, gallery or tags: the head, the cover and the neig
   await expect(cover).toHaveAttribute('loading', 'eager');
   await expect(cover).toHaveAttribute('fetchpriority', 'high');
   await expect(page.locator('.prose p')).toHaveCount(0);
+  // Nothing to read, so nothing to share: no share row and no empty text column.
+  await expect(page.locator('.share')).toHaveCount(0);
+  await expect(page.locator('.artbody')).toHaveCount(0);
   await expect(page.locator('.gallery')).toHaveCount(0);
   await expect(page.locator('.comp')).toHaveCount(0);
   await expect(page.getByText('Sportivi în articol')).toHaveCount(0);
@@ -24,26 +27,27 @@ test('an article without body, gallery or tags: the head, the cover and the neig
   await expect(page.locator('main .display')).toHaveCount(1);
 });
 
-test('share links are built in the browser; without JavaScript the row is hidden', async ({ page, browser, baseURL }) => {
+// The share row needs a text to share: the test article has one.
+test('share links are built in the browser; without JavaScript the row is hidden', on('quiet-season'), async ({ page, browser, baseURL }) => {
   const ctx = await browser.newContext({ baseURL, javaScriptEnabled: false });
   const bare = await ctx.newPage();
-  await bare.goto(NOVI_SAD);
+  await bare.goto(TEST_POST);
   await expect(bare.locator('.share')).toBeHidden();
   await ctx.close();
 
-  await page.goto(NOVI_SAD);
+  await page.goto(TEST_POST);
   const share = page.locator('.share');
   await expect(share).toBeVisible();
   const url = encodeURIComponent(page.url());
   expect(await share.getByRole('link', { name: 'Facebook' }).getAttribute('href')).toContain(url);
   expect(await share.getByRole('link', { name: 'WhatsApp' }).getAttribute('href')).toBe(
-    `https://wa.me/?text=${encodeURIComponent(`Novi Sad – 2026 ${page.url()}`)}`,
+    `https://wa.me/?text=${encodeURIComponent(`Articol de test cu galerie ${page.url()}`)}`,
   );
 });
 
-test('"Copiază linkul" copies the address, or shows it selected without a clipboard', async ({ page, context, baseURL }) => {
+test('"Copiază linkul" copies the address, or shows it selected without a clipboard', on('quiet-season'), async ({ page, context, baseURL }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: baseURL });
-  await page.goto(NOVI_SAD);
+  await page.goto(TEST_POST);
   const copy = page.locator('.share button');
   await expect(copy).toHaveAccessibleName('Copiază linkul');
   await copy.click();

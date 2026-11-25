@@ -19,35 +19,39 @@ interface Props {
 
 const { post, body, competition, inCalendar, tagged, mosaic, neighbours } = Astro.props.page;
 const aside = competition !== undefined || tagged.length > 0;
+// Without a text there is nothing to share: no share row and no empty text column.
+const text = body.length > 0;
 ---
 
 <Base title={`${post.title} | CS Siderurgistul Galați`} description={postDescription(post)}>
   <article class="art">
     <ArticleHead post={post} />
-    <div class="wrap">
-      <div class:list={['artbody', { solo: !aside }]}>
-        <div class="col">
-          {/* Text runs come from bodySegments (lib/body.ts), which escapes every content string. */}
-          {
-            body.length > 0 && (
-              <div class="prose">
-                {body.map(segment =>
-                  segment.kind === 'html' ? (
-                    <Fragment set:html={segment.html} />
-                  ) : (
-                    <div class="pull">
-                      <PlatePhoto img={segment.photo} offset={14} sizes="(max-width: 520px) 300px, 42vw" />
-                    </div>
-                  ),
-                )}
+    {
+      (text || aside) && (
+        <div class="wrap">
+          <div class:list={['artbody', { solo: !aside || !text }]}>
+            {text && (
+              <div class="col">
+                {/* Text runs come from bodySegments (lib/body.ts), which escapes every content string. */}
+                <div class="prose">
+                  {body.map(segment =>
+                    segment.kind === 'html' ? (
+                      <Fragment set:html={segment.html} />
+                    ) : (
+                      <div class="pull">
+                        <PlatePhoto img={segment.photo} offset={14} sizes="(max-width: 520px) 300px, 42vw" />
+                      </div>
+                    ),
+                  )}
+                </div>
+                <Share title={post.title} />
               </div>
-            )
-          }
-          <Share title={post.title} />
+            )}
+            {aside && <ArticleAside competition={competition} inCalendar={inCalendar} tagged={tagged} />}
+          </div>
         </div>
-        {aside && <ArticleAside competition={competition} inCalendar={inCalendar} tagged={tagged} />}
-      </div>
-    </div>
+      )
+    }
     {mosaic.length > 0 && <Gallery mosaic={mosaic} />}
     <PrevNext {...neighbours} />
   </article>
@@ -79,7 +83,7 @@ const aside = competition !== undefined || tagged.length > 0;
   .artbody.solo {
     grid-template-columns: minmax(0, 68ch);
   }
-  /* The share row follows the text at a distance; without a text it sits right under the cover. */
+  /* The share row follows the text at a distance. */
   .prose {
     margin-bottom: clamp(32px, 4vw, 48px);
   }
