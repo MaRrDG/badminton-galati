@@ -34,6 +34,11 @@ export function coachesLead(count: number): string | undefined {
   return count === 1 ? 'Clubul e condus de antrenorul său.' : 'Clubul e condus de antrenorii săi.';
 }
 
+/** The start of "… scrie la adresa clubului": "îi" for the one coach, "le" for several (or the coaches in general). */
+export function writeToCoaches(count: number): string {
+  return count === 1 ? 'Îi puteți scrie' : 'Le puteți scrie';
+}
+
 /** A club answer as paragraphs: split on blank lines, empty ones dropped. */
 export function answerParagraphs(answer: string | undefined): string[] {
   if (!answer) return [];

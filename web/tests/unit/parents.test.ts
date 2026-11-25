@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { answerParagraphs, coachesLead, parentsView } from '../../src/lib/parents';
+import { answerParagraphs, coachesLead, parentsView, writeToCoaches } from '../../src/lib/parents';
 import type { Group, Img, SiteData } from '../../src/lib/types';
 
 const img = (name: string): Img => ({ url: `/img/${name}.jpg`, width: 1280, height: 720, alt: name });
@@ -19,6 +19,14 @@ describe('coachesLead', () => {
     expect(coachesLead(1)).toBe('Clubul e condus de antrenorul său.');
     expect(coachesLead(2)).toBe('Clubul e condus de antrenorii săi.');
     expect(coachesLead(3)).toBe('Clubul e condus de antrenorii săi.');
+  });
+});
+
+describe('writeToCoaches', () => {
+  test('one coach is "îi", several or none (the coaches in general) "le"', () => {
+    expect(writeToCoaches(1)).toBe('Îi puteți scrie');
+    expect(writeToCoaches(0)).toBe('Le puteți scrie');
+    expect(writeToCoaches(3)).toBe('Le puteți scrie');
   });
 });
 

@@ -3,7 +3,7 @@ import InitialTile from '../ui/InitialTile.astro';
 import Photo from '../ui/Photo.astro';
 import Tbc from '../ui/Tbc.astro';
 import { CLUB_EMAIL as address } from '../../lib/club';
-import { coachesLead } from '../../lib/parents';
+import { coachesLead, writeToCoaches } from '../../lib/parents';
 import type { ParentsPage } from '../../lib/parents';
 
 interface Props {
@@ -16,7 +16,7 @@ const missingPhoto = coaches.some(({ coach }) => !coach.photo);
 ---
 
 <p class="intro">
-  {lead && <>{lead} </>}Le puteți scrie la adresa clubului, <a href={`mailto:${address}`}>{address}</a>.
+  {lead && <>{lead} </>}{writeToCoaches(coaches.length)} la adresa clubului, <a href={`mailto:${address}`}>{address}</a>.
 </p>
 {
   coaches.length > 0 && (

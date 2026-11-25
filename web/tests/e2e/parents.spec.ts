@@ -104,7 +104,7 @@ test.describe('with the club\'s answers', on('quiet-season'), () => {
     await expect(page.locator('#varsta')).toContainText('Răspuns de test pentru vârstă.');
     await expect(page.locator('#varsta .tbc')).toHaveCount(0);
     await expect(page.locator('#echipament .tbc')).toHaveCount(1);
-    await expect(page.locator('#antrenori')).toContainText('Clubul e condus de antrenorul său.');
+    await expect(page.locator('#antrenori')).toContainText('Clubul e condus de antrenorul său. Îi puteți scrie la adresa clubului');
     const coach = page.locator('.coaches li');
     await expect(coach).toHaveCount(1);
     await expect(coach.locator('b')).toHaveText('Antrenor Exemplu');
