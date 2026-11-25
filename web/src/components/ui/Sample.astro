@@ -1,0 +1,22 @@
+---
+interface Props {
+  /** What screen readers hear after the value, e.g. "oră dată ca exemplu". */
+  note: string;
+}
+
+const { note } = Astro.props;
+---
+
+<!-- A value the club has given only as an example: hatched in court orange, and said so. -->
+<span class="sample"><slot /></span><span class="visually-hidden">, {note}</span>
+
+<style>
+  .sample {
+    background-color: var(--white);
+    background-image: repeating-linear-gradient(-45deg, var(--court-hatch) 0 2px, transparent 2px 6px);
+    color: var(--ink);
+    padding: 0 0.3em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+</style>

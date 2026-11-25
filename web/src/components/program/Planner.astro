@@ -1,5 +1,6 @@
 ---
 import FilterBar from '../ui/FilterBar.astro';
+import Sample from '../ui/Sample.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import Tbc from '../ui/Tbc.astro';
 import type { FilterOption } from '../../lib/filter';
@@ -9,9 +10,11 @@ interface Props {
   planner?: Planner;
   filters: FilterOption[];
   note?: string;
+  /** Something on the page is an example the club has not confirmed: say what the hatching means. */
+  provisional: boolean;
 }
 
-const { planner, filters, note } = Astro.props;
+const { planner, filters, note, provisional } = Astro.props;
 const MAP = 'https://www.google.com/maps/search/?api=1&query=45.4194907,28.0277769';
 // The picker's swatches take their fill from the option; the light ones also need an edge.
 // Values are slugs (filterBarCss rejects anything else), so they are safe in a selector.
@@ -25,7 +28,18 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
 
 <section class="week" id="saptamana" aria-labelledby="wk-h">
   <div class="wrap">
-    <SectionHeading id="wk-h">Săptămâna în sală</SectionHeading>
+    <div class="week-top">
+      <SectionHeading id="wk-h">Săptămâna în sală</SectionHeading>
+      {
+        provisional && (
+          <p class="sample-note" role="note">
+            <span class="hatch" aria-hidden="true" />
+            <b>Orele sunt exemple, clubul le confirmă.</b> Zilele, orele și antrenorii de pe această pagină arată doar cum va
+            arăta programul; tot ce e hașurat portocaliu nu e încă real.
+          </p>
+        )
+      }
+    </div>
     {
       planner ? (
         <>
@@ -39,6 +53,7 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
                 options={filters}
                 effect="hide"
                 container=".daycol"
+                containerMedia="(max-width: 860px)"
                 variant="swatches"
                 status
               />
@@ -66,14 +81,16 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
                         style={`--c:${b.col};--r1:${b.r1};--r2:${b.r2};--lane:${b.lane};--lanes:${b.lanes}`}
                       >
                         <b>{b.group.name}</b>
-                        <span class="time">{b.label}</span>
+                        <span class="time">
+                          {b.provisional ? <Sample note="oră dată ca exemplu">{b.label}</Sample> : b.label}
+                        </span>
                       </li>
                     ))}
                 </ul>
               </div>
             ))}
           </div>
-          {note && <p class="note">{note}</p>}
+          {note && <p class="club-note">{note}</p>}
         </>
       ) : (
         <Tbc what="zilele și orele fiecărei grupe." />
@@ -93,8 +110,28 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
   .week {
     padding: clamp(32px, 4.4vw, 60px) 0 clamp(44px, 6vw, 80px);
   }
-  .week :global(.h2s) {
+  .week-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: 10px clamp(24px, 5vw, 72px);
+    align-items: start;
     margin-bottom: clamp(18px, 2.4vw, 28px);
+  }
+  .sample-note {
+    font-size: 0.98rem;
+    max-width: 62ch;
+  }
+  .sample-note b {
+    font-weight: 700;
+  }
+  .hatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: -1px;
+    margin-right: 8px;
+    border: 1px solid var(--court);
+    background-image: repeating-linear-gradient(-45deg, var(--court-hatch-strong) 0 2px, transparent 2px 5px);
   }
   .pick {
     margin-bottom: clamp(18px, 2.4vw, 28px);
@@ -159,7 +196,7 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
-  .note {
+  .club-note {
     margin-top: clamp(14px, 1.8vw, 20px);
     max-width: 62ch;
     font-size: 0.98rem;
@@ -184,10 +221,10 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
       grid-template-columns: 3.4rem repeat(var(--days), minmax(0, 1fr));
       column-gap: 6px;
     }
-    /* The picker hides only blocks here; every day keeps its column and its name. */
+    /* The picker hides only blocks here (its empty-day rule is for phones); every day keeps its name. */
     .daycol,
     .daycol ul {
-      display: contents !important;
+      display: contents;
     }
     .dname {
       grid-column: var(--c);
@@ -232,11 +269,28 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
       z-index: 1;
       overflow: hidden;
     }
+    /* An hour or less: name and time on one line that fits a single half-hour row; the name
+       gives way (ellipsis), the time always shows. */
     .blk.short {
-      flex-flow: row wrap;
-      align-items: baseline;
-      gap: 0 6px;
-      padding: 2px 7px;
+      flex-flow: row nowrap;
+      align-items: center;
+      gap: 6px;
+      padding: 1px 6px;
+      line-height: 1.1;
+    }
+    .blk.short b {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.8rem;
+      line-height: 1.1;
+    }
+    .blk.short .time {
+      flex: none;
+      font-size: 0.78rem;
+      line-height: 1.1;
+      white-space: nowrap;
     }
   }
 
@@ -249,6 +303,9 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
 
   /* Narrow: the days stacked, each with its sessions as full-width bars. */
   @media (max-width: 860px) {
+    .week-top {
+      grid-template-columns: minmax(0, 1fr);
+    }
     .hr,
     .gapband {
       display: none;

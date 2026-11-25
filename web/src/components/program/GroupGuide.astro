@@ -1,4 +1,5 @@
 ---
+import Sample from '../ui/Sample.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import Tbc from '../ui/Tbc.astro';
 import type { ProgramPage } from '../../lib/program';
@@ -7,6 +8,7 @@ type Props = Pick<ProgramPage, 'tracks' | 'missingCoach'>;
 
 const { tracks, missingCoach } = Astro.props;
 const anyCoach = tracks.some(t => t.groups.some(g => g.coach));
+const exampleCoach = tracks.some(t => t.groups.some(g => g.coachProvisional));
 ---
 
 <section class="groups" id="grupe" aria-labelledby="gr-h">
@@ -17,7 +19,15 @@ const anyCoach = tracks.some(t => t.groups.some(g => g.coach));
         Copiii încep la Inițiere. Cine vrea competiții merge mai departe spre Performanță și Elite; cine vrea doar să joace are
         grupele de amatori.
       </p>
-      {anyCoach && <p class="small">Sub fiecare grupă e numele antrenorului ei.</p>}
+      {
+        anyCoach && (
+          <p class="small">
+            {exampleCoach
+              ? 'Sub fiecare grupă e numele antrenorului ei, tot ca exemplu până confirmă clubul.'
+              : 'Sub fiecare grupă e numele antrenorului ei.'}
+          </p>
+        )
+      }
       {missingCoach && <Tbc what="antrenorul fiecărei grupe." />}
       <p class="small"><a class="textlink" href="/pentru-parinti/">Întrebări de părinte: vârstă, echipament, cost</a></p>
     </div>
@@ -26,7 +36,7 @@ const anyCoach = tracks.some(t => t.groups.some(g => g.coach));
         <div class="track">
           <h3>{track.title}</h3>
           <ul>
-            {track.groups.map(({ group, tone, coach }) => (
+            {track.groups.map(({ group, tone, coach, coachProvisional }) => (
               <li id={group.slug}>
                 <i class:list={['sw', `t-${tone}`]} aria-hidden="true" />
                 <div>
@@ -34,7 +44,13 @@ const anyCoach = tracks.some(t => t.groups.some(g => g.coach));
                   <p>{group.audience}</p>
                   {coach && (
                     <p class="coach">
-                      {coach.name}<span class="visually-hidden">, antrenorul grupei</span>
+                      {coachProvisional ? (
+                        <Sample note="antrenor dat ca exemplu">{coach.name}</Sample>
+                      ) : (
+                        <>
+                          {coach.name}<span class="visually-hidden">, antrenorul grupei</span>
+                        </>
+                      )}
                     </p>
                   )}
                 </div>

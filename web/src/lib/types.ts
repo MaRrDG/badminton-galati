@@ -26,9 +26,12 @@ export type Competition = {
   categories: CompetitionCategory[]; resultsUrl?: string;
   postSlug?: string; // derived from the newest linked post, never read from the source
 };
-export type Session = { day: (typeof WEEKDAYS)[number]; start: string; end: string }; // 'HH:MM', 24 h
+/** 'HH:MM', 24 h. `provisional`: an example time the club has not confirmed; the site hatches it. */
+export type Session = { day: (typeof WEEKDAYS)[number]; start: string; end: string; provisional?: boolean };
 export type Group = {
   id: string; slug: string; name: string; audience: string; track: Track; sessions: Session[]; coachId?: string;
+  /** The coach assignment is an example the club has not confirmed; the site hatches the name. */
+  coachProvisional?: boolean;
 };
 export type Coach = { id: string; name: string; role?: string; photo?: Img };
 export type Result = { athleteId: string; discipline?: Discipline; result: string };

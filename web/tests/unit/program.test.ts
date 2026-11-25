@@ -24,8 +24,29 @@ describe('weekPlanner', () => {
     const at = (name: string, day: number) => p.blocks.find(b => b.group.name === name && b.day === day)!;
     expect([at('Performanță', 6).r1, at('Performanță', 6).r2, at('Elite', 6).r1, at('Elite', 6).r2]).toEqual([2, 6, 6, 10]);
     expect([at('Inițiere', 1).r1, at('Inițiere', 1).r2, at('Amatori adulți', 2).r1, at('Amatori adulți', 2).r2]).toEqual([11, 14, 18, 21]);
-    expect(at('Elite', 6)).toMatchObject({ col: 7, tone: 'deep', label: '12:00–14:00', lane: 0, lanes: 1 });
-    expect(p.blocks).toHaveLength(14);
+    expect(at('Elite', 6)).toMatchObject({ col: 7, tone: 'deep', label: '12:00–14:00', lane: 0, lanes: 1, provisional: true });
+    // The fixture's half-hour session: one row.
+    expect([at('Amatori adulți', 1).r1, at('Amatori adulți', 1).r2]).toEqual([18, 19]);
+    expect(p.blocks).toHaveLength(15);
+  });
+
+  test('a group keeps its tone when a group before it has no sessions', () => {
+    const p = weekPlanner([
+      group('a', [{ day: 1, start: '17:00', end: '18:00' }]),
+      group('b', []),
+      group('c', []),
+      group('d', [{ day: 1, start: '18:00', end: '19:00' }]),
+    ])!;
+    expect(p.blocks.map(b => [b.group.slug, b.tone])).toEqual([['a', 'red'], ['d', 'outline']]);
+  });
+
+  test('hours are an example only where the data says so', () => {
+    const p = weekPlanner([group('a', [{ day: 1, start: '17:00', end: '18:00', provisional: true }, { day: 2, start: '17:00', end: '18:00' }])])!;
+    expect(p.blocks.map(b => b.provisional)).toEqual([true, false]);
+  });
+
+  test('a session that does not end after it starts is refused, not drawn', () => {
+    expect(() => weekPlanner([group('a', [{ day: 1, start: '18:00', end: '18:00' }])])).toThrow(/does not end after it starts/);
   });
 
   test('no sessions, no planner', () => {
@@ -109,20 +130,40 @@ describe('groupTone', () => {
 });
 
 describe('programView', () => {
+  test('confirmed data is shown as fact: no example flag on the page', () => {
+    const confirmed = {
+      ...site,
+      groups: site.groups.map(g => ({ ...g, coachProvisional: false, sessions: g.sessions.map(({ provisional: _p, ...x }) => x) })),
+    };
+    const page = programView(confirmed);
+    expect(page.provisional).toBe(false);
+    expect(page.planner!.blocks.some(b => b.provisional)).toBe(false);
+    expect(page.tracks.flatMap(t => t.groups.map(g => g.coachProvisional))).toEqual([false, false, false, false, false]);
+  });
+
+  test('an example coach alone makes the page provisional; a flag without a known coach does not', () => {
+    const coachOnly = { ...homeSite, groups: homeSite.groups.map((g, i) => (i === 0 ? { ...g, coachId: 'coach-dorel-badiu', coachProvisional: true } : g)) };
+    expect(programView(coachOnly).provisional).toBe(true);
+    const nobody = { ...homeSite, groups: homeSite.groups.map(g => ({ ...g, coachProvisional: true })) };
+    expect(programView(nobody).provisional).toBe(false);
+  });
+
   test('with sessions: the planner, a filter by group, the guide with coaches and the note', () => {
     const page = programView(site);
-    expect(page.planner?.blocks).toHaveLength(14);
+    expect(page.planner?.blocks).toHaveLength(15);
     expect(page.filters.map(f => f.label)).toEqual(['Toate grupele', 'Inițiere', 'Performanță', 'Elite', 'Amatori copii', 'Amatori adulți']);
     expect(page.filters.map(f => f.value)).toEqual(['toate', 'initiere', 'performanta', 'elite', 'amatori-copii', 'amatori-adulti']);
     expect(page.filters.map(f => f.countLabel)).toEqual([
-      '14 antrenamente pe săptămână', '3 antrenamente pe săptămână la Inițiere', '4 antrenamente pe săptămână la Performanță',
-      '3 antrenamente pe săptămână la Elite', '2 antrenamente pe săptămână la Amatori copii', '2 antrenamente pe săptămână la Amatori adulți',
+      '15 antrenamente pe săptămână', '3 antrenamente pe săptămână la Inițiere', '4 antrenamente pe săptămână la Performanță',
+      '3 antrenamente pe săptămână la Elite', '2 antrenamente pe săptămână la Amatori copii', '3 antrenamente pe săptămână la Amatori adulți',
     ]);
     expect(page.tracks.map(t => [t.title, t.groups.map(g => [g.group.name, g.tone, g.coach?.name])])).toEqual([
       ['Pentru cine vrea performanță', [['Inițiere', 'red', 'Antrenor Exemplu'], ['Performanță', 'blue', 'Antrenor Exemplu'], ['Elite', 'deep', 'Antrenor Exemplu']]],
       ['Pentru cine vrea doar să joace', [['Amatori copii', 'outline', 'Antrenor Exemplu'], ['Amatori adulți', 'mist', 'Antrenor Exemplu']]],
     ]);
     expect(page.missingCoach).toBe(false);
+    expect(page.provisional).toBe(true);
+    expect(page.tracks.flatMap(t => t.groups.map(g => g.coachProvisional))).toEqual([true, true, true, true, true]);
     expect(page.note).toBe('Notă de test pentru program.');
   });
 
@@ -131,6 +172,7 @@ describe('programView', () => {
     expect(page.planner).toBeUndefined();
     expect(page.filters).toEqual([]);
     expect(page.missingCoach).toBe(true);
+    expect(page.provisional).toBe(false);
     expect(page.tracks.flatMap(t => t.groups.map(g => g.coach))).toEqual([undefined, undefined, undefined, undefined, undefined]);
     expect(page.note).toBeUndefined();
   });

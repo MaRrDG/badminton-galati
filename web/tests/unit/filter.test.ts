@@ -26,6 +26,13 @@ describe('filterCss', () => {
     expect(css).toContain('.week:has(input[name="grupa"][value="initiere"]:checked) .daycol:not(:has([data-f~="initiere"]))');
   });
 
+  test('hides an empty container only inside its media query', () => {
+    const css = filterCss('.week', 'grupa', ['elite'], { effect: 'hide', container: '.daycol', containerMedia: '(max-width: 860px)' });
+    expect(css).toContain('@media (max-width: 860px){.week:has(input[name="grupa"][value="elite"]:checked) .daycol:not(:has([data-f~="elite"])){display:none}}');
+    // The items themselves hide at every width.
+    expect(css).toMatch(/^\.week:has\(input\[name="grupa"\]\[value="elite"\]:checked\) \[data-f\]:not/m);
+  });
+
   test('refuses values that could break out of the selector', () => {
     expect(() => filterCss('.x', 'cat', ['u"17'], { effect: 'hide' })).toThrow();
     expect(() => filterCss('.x', 'cat', ['U17'], { effect: 'hide' })).toThrow();

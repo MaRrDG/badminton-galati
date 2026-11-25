@@ -145,54 +145,60 @@
       "audience": "Copii care țin prima dată racheta în mână",
       "track": "performanta",
       "sessions": [
-        {"day": 1, "start": "17:00", "end": "18:30"},
-        {"day": 3, "start": "17:00", "end": "18:30"},
-        {"day": 5, "start": "17:00", "end": "18:30"}
+        {"day": 1, "start": "17:00", "end": "18:30", "provisional": true},
+        {"day": 3, "start": "17:00", "end": "18:30", "provisional": true},
+        {"day": 5, "start": "17:00", "end": "18:30", "provisional": true}
       ],
-      "coachId": "coach-exemplu"
+      "coachId": "coach-exemplu",
+      "coachProvisional": true
     },
     {
       "name": "Performanță",
       "audience": "Sportivi legitimați care merg la competiții",
       "track": "performanta",
       "sessions": [
-        {"day": 1, "start": "18:30", "end": "20:30"},
-        {"day": 3, "start": "18:30", "end": "20:30"},
-        {"day": 5, "start": "18:30", "end": "20:30"},
-        {"day": 6, "start": "10:00", "end": "12:00"}
+        {"day": 1, "start": "18:30", "end": "20:30", "provisional": true},
+        {"day": 3, "start": "18:30", "end": "20:30", "provisional": true},
+        {"day": 5, "start": "18:30", "end": "20:30", "provisional": true},
+        {"day": 6, "start": "10:00", "end": "12:00", "provisional": true}
       ],
-      "coachId": "coach-exemplu"
+      "coachId": "coach-exemplu",
+      "coachProvisional": true
     },
     {
       "name": "Elite",
       "audience": "Sportivii din lotul de vârf al clubului",
       "track": "performanta",
       "sessions": [
-        {"day": 2, "start": "18:30", "end": "20:30"},
-        {"day": 4, "start": "18:30", "end": "20:30"},
-        {"day": 6, "start": "12:00", "end": "14:00"}
+        {"day": 2, "start": "18:30", "end": "20:30", "provisional": true},
+        {"day": 4, "start": "18:30", "end": "20:30", "provisional": true},
+        {"day": 6, "start": "12:00", "end": "14:00", "provisional": true}
       ],
-      "coachId": "coach-exemplu"
+      "coachId": "coach-exemplu",
+      "coachProvisional": true
     },
     {
       "name": "Amatori copii",
       "audience": "Copii care joacă de plăcere",
       "track": "amatori",
       "sessions": [
-        {"day": 2, "start": "17:00", "end": "18:30"},
-        {"day": 4, "start": "17:00", "end": "18:30"}
+        {"day": 2, "start": "17:00", "end": "18:30", "provisional": true},
+        {"day": 4, "start": "17:00", "end": "18:30", "provisional": true}
       ],
-      "coachId": "coach-exemplu"
+      "coachId": "coach-exemplu",
+      "coachProvisional": true
     },
     {
       "name": "Amatori adulți",
       "audience": "Adulți, indiferent de nivel",
       "track": "amatori",
       "sessions": [
-        {"day": 2, "start": "20:30", "end": "22:00"},
-        {"day": 4, "start": "20:30", "end": "22:00"}
+        {"day": 1, "start": "20:30", "end": "21:00", "provisional": true},
+        {"day": 2, "start": "20:30", "end": "22:00", "provisional": true},
+        {"day": 4, "start": "20:30", "end": "22:00", "provisional": true}
       ],
-      "coachId": "coach-exemplu"
+      "coachId": "coach-exemplu",
+      "coachProvisional": true
     }
   ],
   "posts": [

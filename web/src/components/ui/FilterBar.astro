@@ -13,14 +13,16 @@ interface Props {
   options: FilterOption[];
   effect: 'hide' | 'dim';
   container?: string;
+  /** A media query that limits hiding the empty `container` (e.g. phones only). */
+  containerMedia?: string;
   /** chips: filled buttons (athletes); links: underlined words (calendar, news); swatches: outlined, with a colour square (programme). */
   variant: 'chips' | 'links' | 'swatches';
   /** A count line under the bar, announced to screen readers when the choice changes (filter-status.ts). */
   status?: boolean;
 }
 
-const { legend, legendVisible = false, name, scope, options, effect, container, variant, status = false } = Astro.props;
-const css = filterBarCss(scope, name, options, { effect, container, status });
+const { legend, legendVisible = false, name, scope, options, effect, container, containerMedia, variant, status = false } = Astro.props;
+const css = filterBarCss(scope, name, options, { effect, container, containerMedia, status });
 // A count is a <sup> right after its word; the radio is named with a comma between them, so
 // screen readers say "Toate, 15", not "Toate15".
 const nameOf = (o: FilterOption) => (o.count !== undefined ? `${o.label}, ${o.count}` : undefined);

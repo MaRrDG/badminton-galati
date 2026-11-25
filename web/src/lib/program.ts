@@ -21,11 +21,11 @@ export function groupTone(index: number): GroupTone {
 /**
  * One session on the timetable. `col` is its day's grid column; it spans rows `r1` to `r2`
  * (the row after its last half hour). Sessions that overlap on a day share the column in
- * `lanes` side-by-side lanes; `lane` is its own, from 0.
+ * `lanes` side-by-side lanes; `lane` is its own, from 0. `provisional`: the hours are an example.
  */
 export type PlannerBlock = {
   group: Group; tone: GroupTone; day: number; col: number; r1: number; r2: number; label: string;
-  lane: number; lanes: number;
+  lane: number; lanes: number; provisional: boolean;
 };
 /**
  * The week as a grid: row 1 holds the day names, then a row per half hour from the first full
@@ -47,11 +47,17 @@ const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)
 const clock = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 const span = (s: Session) => `${s.start}–${s.end}`;
 
-/** The week of these groups, or undefined when none has a session. */
+/**
+ * The week of these groups, or undefined when none has a session. A group's tone comes from its
+ * position in `groups`, sessions or not. Every session must end after it starts (parseSiteData
+ * checks it); one that does not is a bug upstream, and this throws rather than draw it.
+ */
 export function weekPlanner(groups: Group[]): Planner | undefined {
   const sessions = groups
     .flatMap((group, index) => group.sessions.map(s => ({ group, index, s, from: minutes(s.start), to: minutes(s.end) })))
     .sort((a, b) => a.s.day - b.s.day || a.from - b.from || a.index - b.index);
+  const backwards = sessions.find(x => x.to <= x.from);
+  if (backwards) throw new Error(`weekPlanner: ${backwards.group.name} has a session that does not end after it starts (${span(backwards.s)})`);
   if (sessions.length === 0) return undefined;
 
   const dayList = [...new Set(sessions.map(x => x.s.day))];
@@ -113,6 +119,7 @@ export function weekPlanner(groups: Group[]): Planner | undefined {
       cluster.push({
         group: x.group, tone: groupTone(x.index), day, col: colOf.get(day)!,
         r1: rowOf[slotOf(x.from)], r2: rowOf[slotOf(x.to - 1)] + 1, label: span(x.s), lane, lanes: 1,
+        provisional: x.s.provisional === true,
       });
     }
     close();
@@ -153,8 +160,11 @@ export function scheduleLabel(sessions: Session[]): string | undefined {
 export type ProgramPage = {
   planner?: Planner;
   filters: FilterOption[];
-  tracks: { title: string; groups: { group: Group; tone: GroupTone; coach?: Coach }[] }[];
+  /** `coachProvisional`: the coach is named only as an example. */
+  tracks: { title: string; groups: { group: Group; tone: GroupTone; coach?: Coach; coachProvisional: boolean }[] }[];
   missingCoach: boolean;
+  /** Something on the page (an hour or a coach) is an example the club has not confirmed. */
+  provisional: boolean;
   note?: string;
 };
 
@@ -180,7 +190,7 @@ export function programView(site: SiteData): ProgramPage {
       title: TRACK_TITLES[track],
       groups: toned.filter(t => t.group.track === track).map(t => {
         const coach = coachOf(t.group);
-        return { ...t, ...(coach ? { coach } : {}) };
+        return { ...t, ...(coach ? { coach } : {}), coachProvisional: coach !== undefined && t.group.coachProvisional === true };
       }),
     }))
     .filter(t => t.groups.length > 0);
@@ -189,6 +199,7 @@ export function programView(site: SiteData): ProgramPage {
     filters,
     tracks,
     missingCoach: site.groups.some(g => !coachOf(g)),
+    provisional: site.groups.some(g => (coachOf(g) && g.coachProvisional) || g.sessions.some(s => s.provisional)),
     ...(site.info.programNote ? { note: site.info.programNote } : {}),
   };
 }

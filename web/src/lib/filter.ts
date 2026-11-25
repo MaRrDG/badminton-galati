@@ -25,7 +25,8 @@ function assertSlugs(values: string[]): void {
  * counts; `values` are the filtering values, without the "all" option. `hide` takes other
  * items out of the layout; `dim` fades them and takes their colour (`DIM_OPACITY`, grayscale) where
  * the layout must not reflow. `container`
- * names a wrapper that is hidden when none of its items match. Browsers without :has() get
+ * names a wrapper that is hidden when none of its items match; with `containerMedia` (a media
+ * query such as '(max-width: 860px)') only there. Browsers without :has() get
  * no filter at all, and every item stays visible.
  * `name` and every value must be lowercase slugs (`/^[a-z0-9-]+$/`): pages that take values from
  * content (e.g. "U17") slugify them first; a non-slug value fails the build on purpose.
@@ -34,9 +35,10 @@ export function filterCss(
   scope: string,
   name: string,
   values: string[],
-  opts: { effect: 'hide' | 'dim'; container?: string },
+  opts: { effect: 'hide' | 'dim'; container?: string; containerMedia?: string },
 ): string {
   assertSlugs([name, ...values]);
+  const inMedia = (rule: string) => (opts.containerMedia ? `@media ${opts.containerMedia}{${rule}}` : rule);
   const effect = opts.effect === 'hide' ? 'display:none' : `opacity:${DIM_OPACITY};filter:grayscale(1)`;
   const rules = values.flatMap(v => {
     const on = `${scope}:has(input[name="${name}"][value="${v}"]:checked)`;
@@ -44,7 +46,7 @@ export function filterCss(
       `${on} [data-f]:not([data-f~="${v}"]){${effect}}`,
       `${on} [data-count-for]:not([data-count-for="${v}"]){display:none}`,
       `${on} [data-count-for="${v}"]{display:inline}`,
-      ...(opts.container ? [`${on} ${opts.container}:not(:has([data-f~="${v}"])){display:none}`] : []),
+      ...(opts.container ? [inMedia(`${on} ${opts.container}:not(:has([data-f~="${v}"])){display:none}`)] : []),
     ];
   });
   return [...rules, `@supports not selector(:has(*)){${scope} .filter{display:none}}`].join('\n');
@@ -59,7 +61,7 @@ export function filterBarCss(
   scope: string,
   name: string,
   options: FilterOption[],
-  opts: { effect: 'hide' | 'dim'; container?: string; status?: boolean },
+  opts: { effect: 'hide' | 'dim'; container?: string; containerMedia?: string; status?: boolean },
 ): string {
   assertSlugs([name, ...options.map(o => o.value)]);
   const [all, ...rest] = options;

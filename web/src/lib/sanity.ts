@@ -38,7 +38,7 @@ export const HOME_QUERY = `{
     _id, name, "slug": slug.current, consent, frbUrl, "photo": photo${IMAGE},
     rankings[]{ category, discipline, place, points }
   },
-  "groups": *[_type == "group"] | order(order asc){ _id, name, audience, track },
+  "groups": *[_type == "group"] | order(order asc){ _id, name, audience, track, coachProvisional },
   "competitions": *[_type == "competition"] | order(start asc){ _id, title, city, start, end, home },
   "posts": *[_type == "post"] | order(date desc)[0...${HOME_POSTS}]{ title, "slug": slug.current, kind, date, "cover": cover${IMAGE} }
 }`;
@@ -66,7 +66,7 @@ type RawRanking = Raw<{ category: string; discipline: Discipline; place: number;
 type RawAthlete = Raw<{
   _id: string; name: string; slug: string; consent: boolean; frbUrl: string; photo: RawImg; rankings: RawRanking[];
 }>;
-type RawGroup = Raw<{ _id: string; name: string; audience: string; track: Group['track'] }>;
+type RawGroup = Raw<{ _id: string; name: string; audience: string; track: Group['track']; coachProvisional: boolean }>;
 type RawCompetition = Raw<{ _id: string; title: string; city: string; start: string; end: string; home: boolean }>;
 type RawPost = Raw<{ title: string; slug: string; kind: PostKind; date: string; cover: RawImg }>;
 type RawSettings = Raw<{
@@ -124,6 +124,7 @@ function toGroup(raw: RawGroup): Group {
     audience: raw.audience as string,
     track: raw.track as Group['track'],
     sessions: [],
+    ...optional('coachProvisional', raw.coachProvisional),
   };
 }
 

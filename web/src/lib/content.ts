@@ -248,6 +248,7 @@ export function parseSiteData(value: unknown, source: string): SiteData {
   const session = (v: unknown, path: string) => {
     const o = record(v, path);
     fields(o, path, { day: oneOf(WEEKDAYS), start: time, end: time });
+    optional(o, 'provisional', path, bool);
     if ((o.end as string) <= (o.start as string)) fail(path, `a session that ends after it starts (${o.start}–${o.end})`);
   };
 
@@ -289,6 +290,7 @@ export function parseSiteData(value: unknown, source: string): SiteData {
       optional(g, 'slug', q, text);
       optionalList(g, 'sessions', q, session);
       optional(g, 'coachId', q, text);
+      optional(g, 'coachProvisional', q, bool);
     }),
     posts: (v, p) => list(v, p, (x, q) => {
       const post = record(x, q);
