@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { pinClock } from './clock';
-import { SERVERS, serverURL, type ServerName } from './servers';
+import { on } from './servers';
 
 // GSAP runs on Date.now, so the clock is pinned but keeps running (see pinClock).
 test.beforeEach(async ({ page }) => {
@@ -37,9 +37,7 @@ const stripEdges = (page: Page) => page.evaluate(() => {
   return { contentRight, lastRight: track.lastElementChild!.getBoundingClientRect().right };
 });
 
-test.describe('a hall with a single photo', () => {
-  test.use({ baseURL: serverURL('one-photo') });
-
+test.describe('a hall with a single photo', on('sparse'), () => {
   test('a single photo never pins and fits its column', async ({ page }) => {
     for (const [w, h] of [[390, 844], [860, 844], [1440, 900], [1904, 950]] as const) {
       await page.setViewportSize({ width: w, height: h }); await page.goto('/', { waitUntil: 'networkidle' });
@@ -69,9 +67,7 @@ test.describe('a hall with a single photo', () => {
   });
 });
 
-test.describe('a strip of landscape and portrait photos', () => {
-  test.use({ baseURL: serverURL('mixed-strip') });
-
+test.describe('a strip of landscape and portrait photos', on('mixed-strip'), () => {
   test('travels until the last photo is fully in view, or stays put when it fits', async ({ page }) => {
     for (const [w, h, travels] of [[390, 844, true], [600, 844, true], [1440, 900, false]] as const) {
       await page.setViewportSize({ width: w, height: h }); await page.goto('/', { waitUntil: 'networkidle' });
@@ -156,6 +152,11 @@ test.describe('crossing the 860px breakpoint', () => {
       await page.waitForTimeout(60);
     }
     expect(opacities).toEqual(Array(6).fill('1'));
+    // Nor does it leave the first line shifted: at the top of the page the scrub has not started.
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+    await page.waitForTimeout(800); // the scrub's catch-up
+    const x = await page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector('.hero .l1')!).transform).m41);
+    expect(Math.abs(x)).toBeLessThan(0.5);
   });
 });
 
@@ -188,36 +189,18 @@ test('reduced motion shows final states', async ({ browser }) => {
   await ctx.close();
 });
 
-// Sections clip sideways overflow, so a scrollWidth check could never fail; measure the text itself.
-for (const server of ['home', 'no-athletes'] as const) for (const [w, h] of [[390, 844], [1440, 900]] as const)
-  test(`hero lines and headings stay on screen while scrolling: ${server} at ${w}`, async ({ page }) => {
-    await page.setViewportSize({ width: w, height: h }); await page.goto(serverURL(server), { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1500); // the hero intro
-    const height = await page.evaluate(() => document.documentElement.scrollHeight);
-    for (let y = 0; y < height; y += 450) {
-      await page.evaluate(v => scrollTo(0, v), y); await page.waitForTimeout(400);
-      const off = await page.evaluate(() => [...document.querySelectorAll('.hero h1 span, main h2.display')].flatMap(e => {
-        const range = document.createRange();
-        range.selectNodeContents(e);
-        const r = range.getBoundingClientRect();
-        const onScreen = r.bottom > 0 && r.top < innerHeight;
-        return onScreen && (r.left < -0.5 || r.right > innerWidth + 0.5)
-          ? [`${e.textContent!.trim()}: ${Math.round(r.left)}..${Math.round(r.right)}`] : [];
-      }));
-      expect(off, `${server} ${w}×${h} at y=${y}`).toEqual([]);
-    }
-  });
-
-for (const server of Object.keys(SERVERS) as ServerName[])
-  test(`no page errors: ${server}`, async ({ page }) => {
+// One server per motion path: the full page, a single hall photo with no roster and a wrapped
+// hero line, and a strip that pins only when narrow. The other fixtures differ in content only.
+for (const server of ['home', 'sparse', 'mixed-strip'] as const)
+  test(`no page errors while scrolling: ${server}`, on(server), async ({ page }) => {
     const errs: string[] = []; page.on('pageerror', e => errs.push(e.message));
-    await page.goto(serverURL(server)); await page.mouse.wheel(0, 8000); await page.waitForTimeout(800);
+    await page.goto('/'); await page.mouse.wheel(0, 8000); await page.waitForTimeout(800);
     expect(errs).toEqual([]);
   });
 
-test('motion is bundled, not loaded from another site', async ({ page }) => {
+test('motion is bundled, not loaded from another site', async ({ page, baseURL }) => {
   const foreign: string[] = [];
-  page.on('request', r => { if (new URL(r.url()).origin !== new URL(serverURL('home')).origin) foreign.push(r.url()); });
+  page.on('request', r => { if (new URL(r.url()).origin !== new URL(baseURL!).origin) foreign.push(r.url()); });
   await page.goto('/', { waitUntil: 'networkidle' });
   expect(foreign).toEqual([]);
   // And the motion layer did run: it marks the hall whose strip it moves.

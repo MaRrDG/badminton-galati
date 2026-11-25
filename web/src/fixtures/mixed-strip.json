@@ -1,6 +1,21 @@
 {
   "athletes": [
     {
+      "id": "athlete-fara-acord-zamfira",
+      "name": "Fără-Acord Zamfira",
+      "slug": "fara-acord-zamfira",
+      "consent": false,
+      "frbUrl": "https://badminton.ro/jucator/999/u15-sf-simplu-fete/",
+      "rankings": [
+        {
+          "category": "U15",
+          "discipline": "SF",
+          "place": 1,
+          "points": 250
+        }
+      ]
+    },
+    {
       "id": "athlete-nistor-cristian-ionut",
       "name": "Nistor Cristian-Ionuț",
       "slug": "nistor-cristian-ionut",
@@ -21,13 +36,7 @@
       "slug": "pazargic-ligia-beatrice",
       "consent": true,
       "frbUrl": "https://badminton.ro/jucator/434/u15-sf-simplu-fete/",
-      "rankings": [
-        {
-          "category": "U15",
-          "discipline": "SF",
-          "place": 3
-        }
-      ]
+      "rankings": []
     },
     {
       "id": "athlete-bordeianu-nectarie-ioan",
@@ -35,13 +44,7 @@
       "slug": "bordeianu-nectarie-ioan",
       "consent": true,
       "frbUrl": "https://badminton.ro/jucator/709/u13-xd-dublu-mixt/",
-      "rankings": [
-        {
-          "category": "U13",
-          "discipline": "DX",
-          "place": 58
-        }
-      ]
+      "rankings": []
     }
   ],
   "rankingWeek": {

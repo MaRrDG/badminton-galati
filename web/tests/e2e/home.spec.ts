@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { at, pinClock } from './clock';
-import { serverURL } from './servers';
+import { on } from './servers';
 
 // The countdown script reads the browser clock, so every page runs on the pinned build date
 // unless a test sets another day; otherwise assertions would change with the real date.
@@ -126,9 +126,7 @@ test.describe('countdown follows the visitor’s clock, not the build date', () 
   });
 });
 
-test.describe('a season with no competition left', () => {
-  test.use({ baseURL: serverURL('empty-season') });
-
+test.describe('a season with no competition left', on('quiet-season'), () => {
   test('shows three played events and no countdown', async ({ page }) => {
     await page.goto('/');
     const cal = page.locator('#calendar');
@@ -137,19 +135,9 @@ test.describe('a season with no competition left', () => {
     await expect(cal.locator('[data-countdown]')).toHaveCount(0);
     await expect(cal).not.toContainText(/peste -?\d+ (de )?zile/);
   });
-
-  test('an athlete without consent appears nowhere, even with the top place', async ({ page }) => {
-    const html = await (await page.goto('/'))!.text();
-    expect(html).not.toContain('Fără-Acord');
-    expect(html).not.toContain('fara-acord');
-    expect(html).not.toContain('jucator/999/');
-    await expect(page.locator('#sportivi [data-roll]').first()).toHaveAttribute('data-roll', '2');
-  });
 });
 
-test.describe('athletes without rankings', () => {
-  test.use({ baseURL: serverURL('no-rankings') });
-
+test.describe('athletes without rankings', on('quiet-season'), () => {
   test('roster shows names and FRB links, no places and no source line', async ({ page }) => {
     await page.goto('/');
     const roster = page.locator('#sportivi');
@@ -168,9 +156,7 @@ test.describe('athletes without rankings', () => {
   });
 });
 
-test.describe('no athlete may be shown', () => {
-  test.use({ baseURL: serverURL('no-athletes') });
-
+test.describe('no athlete may be shown', on('sparse'), () => {
   test('the roster and every link to it are left out', async ({ page }) => {
     const html = await (await page.goto('/'))!.text();
     await expect(page.locator('#sportivi')).toHaveCount(0);
@@ -206,8 +192,14 @@ test.describe('no athlete may be shown', () => {
   });
 });
 
-test.describe('a roster with a single ranked athlete', () => {
-  test.use({ baseURL: serverURL('one-ranked') });
+test.describe('a roster with a single ranked athlete', on('mixed-strip'), () => {
+  test('an athlete without consent appears nowhere, even with the top place', async ({ page }) => {
+    const html = await (await page.goto('/'))!.text();
+    expect(html).not.toContain('Fără-Acord');
+    expect(html).not.toContain('fara-acord');
+    expect(html).not.toContain('jucator/999/');
+    await expect(page.locator('#sportivi [data-roll]').first()).toHaveAttribute('data-roll', '2');
+  });
 
   test('the unranked athletes after it get small rows, not the medium pair', async ({ page }) => {
     await page.goto('/');

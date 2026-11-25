@@ -1,60 +1,17 @@
 {
   "athletes": [
     {
-      "id": "athlete-fara-acord-zamfira",
+      "id": "athlete-fara-acord",
       "name": "Fără-Acord Zamfira",
       "slug": "fara-acord-zamfira",
       "consent": false,
-      "frbUrl": "https://badminton.ro/jucator/999/u15-sf-simplu-fete/",
-      "rankings": [
-        {
-          "category": "U15",
-          "discipline": "SF",
-          "place": 1,
-          "points": 250
-        }
-      ]
-    },
-    {
-      "id": "athlete-nistor-cristian-ionut",
-      "name": "Nistor Cristian-Ionuț",
-      "slug": "nistor-cristian-ionut",
-      "consent": true,
-      "frbUrl": "https://badminton.ro/jucator/236/u17-sb-simplu-baieti/",
+      "frbUrl": "https://badminton.ro/jucator/999/u19-sb/",
       "rankings": [
         {
           "category": "U17",
           "discipline": "SB",
           "place": 2,
           "points": 168
-        }
-      ]
-    },
-    {
-      "id": "athlete-pazargic-ligia-beatrice",
-      "name": "Pazargic Ligia-Beatrice",
-      "slug": "pazargic-ligia-beatrice",
-      "consent": true,
-      "frbUrl": "https://badminton.ro/jucator/434/u15-sf-simplu-fete/",
-      "rankings": [
-        {
-          "category": "U15",
-          "discipline": "SF",
-          "place": 3
-        }
-      ]
-    },
-    {
-      "id": "athlete-bordeianu-nectarie-ioan",
-      "name": "Bordeianu Nectarie-Ioan",
-      "slug": "bordeianu-nectarie-ioan",
-      "consent": true,
-      "frbUrl": "https://badminton.ro/jucator/709/u13-xd-dublu-mixt/",
-      "rankings": [
-        {
-          "category": "U13",
-          "discipline": "DX",
-          "place": 58
         }
       ]
     }
@@ -152,6 +109,14 @@
       "start": "2026-11-20",
       "end": "2026-11-22",
       "home": false
+    },
+    {
+      "id": "competition-2026-11-27-cn-u9-cn-u17",
+      "title": "CN U9 și CN U17",
+      "city": "București",
+      "start": "2026-11-27",
+      "end": "2026-11-29",
+      "home": false
     }
   ],
   "groups": [
@@ -213,48 +178,10 @@
       "height": 720,
       "width": 1280,
       "alt": "Meci de dublu în sala Siderurgistul"
-    },
-    {
-      "url": "/img/sala-turneu-1.jpg",
-      "height": 720,
-      "width": 1280,
-      "alt": "Sala Siderurgistul în timpul unui turneu"
-    },
-    {
-      "url": "/img/echipa-rosu.jpg",
-      "height": 854,
-      "width": 1280,
-      "alt": "Sportivi și antrenori în echipamentul roșu al clubului"
-    },
-    {
-      "url": "/img/festivitate.jpg",
-      "height": 720,
-      "width": 1280,
-      "alt": "Sportivi aliniați la o festivitate în sală"
-    },
-    {
-      "url": "/img/cantonament.jpg",
-      "height": 960,
-      "width": 1280,
-      "alt": "Grupul din cantonament, în tricouri verzi"
-    },
-    {
-      "url": "/img/medalii.jpg",
-      "height": 579,
-      "width": 1280,
-      "alt": "Sportivi cu medalii după o competiție"
-    },
-    {
-      "url": "/img/sala-turneu-2.jpg",
-      "height": 720,
-      "width": 1280,
-      "alt": "Meciuri pe terenurile sălii"
     }
   ],
   "heroLines": [
-    "Ai reușit?",
-    "Continuă!",
-    "N-ai reușit?",
+    "Ai pierdut? Încearcă",
     "Continuă!"
   ],
   "heroText": "CS Siderurgistul Galați crește jucători de badminton din 7 martie 2002, în sala cu patru terenuri de pe Bulevardul Cloșca.",
