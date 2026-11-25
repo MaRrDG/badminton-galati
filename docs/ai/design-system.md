@@ -53,7 +53,13 @@ links to full lists).
 | 5 | Hall strip | `.hall .track` in its column | Travels sideways while the column is pinned, until the last photo's right edge meets the column. Pins only with 2+ photos and a distance over 1px; created or removed on refresh. Adds `.js-rally` and removes the track's `tabindex` while JS drives it |
 
 Hero line classes follow the mockup: line 1 `.l1`, even positions `.l2`, others `.l3`. Hero
-lines may wrap below 860px (coach-editable motto must never clip). `initMotion()` returns at once
+A sixth, asked for by Mario and confined to the 404 page: the rally over the net that spells
+404 (`web/src/scripts/rally.ts`, simulation in `web/src/lib/rally/`). SVG nodes moved by
+`transform` only, no GSAP; it stops when the tab is hidden or the scene is off screen. Reduced
+motion and no-JS show the still frame that `RallyScene.astro` renders from the same code (the
+shuttle caught in the 0). Two framings of one scene: `wide`, and `tall` at 860px and below.
+
+Hero lines may wrap below 860px (coach-editable motto must never clip). `initMotion()` returns at once
 under `prefers-reduced-motion: reduce` (`base.css` also turns off smooth scrolling). GSAP is bundled
 from npm, never a CDN. No other animation may be added without Mario's approval.
 

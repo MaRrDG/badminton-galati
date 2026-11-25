@@ -70,6 +70,7 @@ A test runs on `home` unless tagged: `test.describe('â€¦', on('sparse'), () => â
 
 | Changed path (under `web/`) | Specs |
 |---|---|
+| `src/pages/404.astro`, `src/components/notfound/**`, `src/lib/rally/**`, `src/scripts/rally.ts` | not-found, build-output |
 | `src/scripts/**` | motion, scroll-scan, home |
 | `src/components/home/{Hero,CalendarBand,News,TrialCta}.astro` | home, motion, scroll-scan, shell |
 | `src/components/home/**` | home, motion, scroll-scan |
@@ -99,6 +100,11 @@ When you add a spec or a new source folder, update this table in the script's he
   (`scroll-scan.spec`, 17 positions per case).
 - Reduced motion shows final states; all content visible without JS; no page errors while
   scrolling (home, sparse, mixed-strip); motion bundled, not from a CDN.
+- 404 page (`not-found.spec`, on `home`): an unknown address answers 404 with the page; the
+  shuttle is seen on both sides of the net (the rally runs) with no page errors; reduced motion
+  and no-JS show the still frame with the shuttle in the 0; no overflow at 380 and 1440.
+  `rally.test.ts` plays two minutes per layout: the racket head meets the shuttle at every hit,
+  net faults happen but stay rare.
 - Shell: Romanian nav and footer, no overflow at several widths, self-hosted fonts, narrow menu
   with and without JS, focus ring colour equals text colour.
 - Unit: date formatting and Bucharest "today", Romanian plurals, roster order/layout, calendar
