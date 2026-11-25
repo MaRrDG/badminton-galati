@@ -53,6 +53,9 @@ importers:
       astro:
         specifier: ^7.4.13
         version: 7.4.13(@types/node@26.6.10)(jiti@2.7.0)(yaml@2.9.1)
+      gsap:
+        specifier: ^3.15.1
+        version: 3.15.1
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.12
@@ -3644,6 +3647,9 @@ packages:
   groq@6.25.0:
     resolution: {integrity: sha512-omyg6t6oUcqfuitJiYBQ77N5ZyPACKIfweAnnpbHOLuTqgFIF6kSdI4UDLE41jMOms+3gkemFgSYrjkqZb1pYQ==}
     engines: {node: '>=22.12'}
+
+  gsap@3.15.1:
+    resolution: {integrity: sha512-63yjWRFWj3QRP1UOuD8kcidCcy3nxb1mMRpwHr/xJRvPfm9GtWOXFAYUiL0ro1fgPq2nY53LR+98pAgy9BumBg==}
 
   gunzip-maybe@1.4.2:
     resolution: {integrity: sha512-4haO1M4mLO91PW57BMsDFf75UmwoRX0GkdD+Faw+Lr+r/OZrOCS0pIBwOL1xCKQqnQzbNFGgK2V2CpBUPeFNTw==}
@@ -9790,6 +9796,8 @@ snapshots:
       obug: 2.2.1
 
   groq@6.25.0: {}
+
+  gsap@3.15.1: {}
 
   gunzip-maybe@1.4.2:
     dependencies:

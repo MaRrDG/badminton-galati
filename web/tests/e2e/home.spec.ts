@@ -1,13 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
-import { BUILD_TODAY, serverURL } from './servers';
-
-/** 09:00 in Bucharest on `day`. */
-const at = (day: string) => new Date(`${day}T09:00:00+02:00`);
+import { at, pinClock } from './clock';
+import { serverURL } from './servers';
 
 // The countdown script reads the browser clock, so every page runs on the pinned build date
 // unless a test sets another day; otherwise assertions would change with the real date.
 test.beforeEach(async ({ page }) => {
-  await page.clock.setFixedTime(at(BUILD_TODAY));
+  await pinClock(page);
 });
 
 /** Left and right edges of the text inside each element (not of its block box). */
@@ -69,6 +67,11 @@ for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${wi
   const name = page.getByText('Bordeianu Nectarie-Ioan').first();
   const box = await name.boundingBox(); expect(box!.x).toBeGreaterThanOrEqual(0); expect(box!.x + box!.width).toBeLessThanOrEqual(width);
   // Sections clip sideways overflow, so scrollWidth alone would not catch cut-off text.
+  // The hero lines slide in on load, so measure them once they have settled.
+  await expect.poll(() => page.locator('.hero h1 span').evaluateAll(spans => spans.every(s => {
+    const cs = getComputedStyle(s);
+    return new DOMMatrix(cs.transform).isIdentity && cs.opacity === '1';
+  }))).toBe(true);
   const edges = [...await textEdges(page, '.hero h1 span'), ...await textEdges(page, '#sportivi h3')];
   expect(edges).toHaveLength(4 + 3);
   for (const e of edges) {
@@ -90,13 +93,13 @@ test('calendar: next event with countdown, then three played events', async ({ p
 test.describe('countdown follows the visitor’s clock, not the build date', () => {
   for (const [day, label] of [['2026-11-26', 'începe mâine'], ['2026-11-27', 'începe azi'], ['2026-11-28', 'în desfășurare']])
     test(`on ${day} it reads "${label}"`, async ({ page }) => {
-      await page.clock.setFixedTime(at(day));
+      await page.clock.setSystemTime(at(day));
       await page.goto('/');
       await expect(page.locator('#calendar [data-countdown]')).toHaveText(label);
     });
 
   test('after the event it disappears', async ({ page }) => {
-    await page.clock.setFixedTime(at('2026-11-30'));
+    await page.clock.setSystemTime(at('2026-11-30'));
     await page.goto('/');
     await expect(page.locator('#calendar [data-countdown]')).toBeHidden();
   });

@@ -16,7 +16,8 @@
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource/big-shoulders-display": "^5.3.0",
     "@sanity/client": "^8.17.0",
-    "astro": "^7.4.13"
+    "astro": "^7.4.13",
+    "gsap": "^3.15.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
