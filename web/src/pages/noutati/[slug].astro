@@ -67,10 +67,11 @@ const aside = competition !== undefined || tagged.length > 0;
   .art {
     overflow-x: clip;
   }
-  /* A ~68ch text column, the competition and the athletes beside it. */
+  /* A ~68ch text column, the competition and the athletes beside it. The side column keeps a
+     floor, or just above the breakpoint the full 68ch would squeeze it off the screen. */
   .artbody {
     display: grid;
-    grid-template-columns: minmax(0, 68ch) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 68ch) minmax(220px, 1fr);
     gap: 40px clamp(36px, 6vw, 96px);
     padding: clamp(40px, 5vw, 72px) 0 clamp(48px, 6vw, 84px);
     align-items: start;
