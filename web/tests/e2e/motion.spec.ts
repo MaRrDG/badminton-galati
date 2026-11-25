@@ -219,6 +219,49 @@ test.describe('the hero on a large screen (2560×1300)', () => {
     });
 });
 
+test.describe('motion code that arrives late', () => {
+  /**
+   * Records the lowest opacity the hero headline lines reach once the page has painted: on every
+   * frame and on every style change of a line.
+   */
+  const watchHeadline = (page: Page) => page.addInitScript(() => {
+    const w = window as unknown as { minOpacity: number };
+    w.minOpacity = 1;
+    const lines = () => document.querySelectorAll<HTMLElement>('.hero .l1, .hero .l2, .hero .l3');
+    const sample = () => lines().forEach(l => { w.minOpacity = Math.min(w.minOpacity, parseFloat(getComputedStyle(l).opacity)); });
+    const frame = () => { sample(); requestAnimationFrame(frame); };
+    document.addEventListener('DOMContentLoaded', () => {
+      new MutationObserver(sample).observe(document.querySelector('.hero')!, { attributes: true, attributeFilter: ['style'], subtree: true });
+      requestAnimationFrame(frame);
+    });
+  });
+  const minOpacity = (page: Page) => page.evaluate(() => (window as unknown as { minOpacity: number }).minOpacity);
+
+  test('on time, the hero intro plays (the probe sees the lines come in)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await watchHeadline(page);
+    await page.goto('/');
+    await expect.poll(() => minOpacity(page)).toBeLessThan(0.5);
+  });
+
+  test('1.5 s late, the headline never fades out after the first paint; the scrub is still set up', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await watchHeadline(page);
+    let arrived = false;
+    await page.route(/\/_astro\/motion\.[^/]*\.js$/, async route => {
+      await new Promise(r => setTimeout(r, 1500));
+      await route.continue();
+      arrived = true;
+    });
+    await page.goto('/');
+    await expect.poll(() => arrived, { timeout: 5000 }).toBe(true);
+    // The scroll moments run: the hero column is pinned (a pin spacer wraps it).
+    await expect(page.locator('.hero .pin-spacer')).toHaveCount(1);
+    await page.waitForTimeout(1200);
+    expect(await minOpacity(page)).toBe(1);
+  });
+});
+
 test('reduced motion shows final states', async ({ browser }) => {
   const ctx = await browser.newContext({ reducedMotion: 'reduce' }); const page = await ctx.newPage();
   await pinClock(page);

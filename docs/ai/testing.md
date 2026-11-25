@@ -7,7 +7,7 @@ merge or push; keep e2e fast.
 
 | Layer | Where | Runs with |
 |---|---|---|
-| Web unit (Vitest) | `web/tests/unit/` (one file per `src/lib` module with logic: `article`, `athletes`, `body`, `calendar`, `content` (also covers `sanity.ts` mapping), `dates`, `filter`, `home`, `nav`, `news`, `parents`, `program`, `rally`, `ro`, `tiles`, `trial`; `tokens` for contrast and photo weight) | `pnpm -C web test` |
+| Web unit (Vitest) | `web/tests/unit/` (one file per `src/lib` module with logic: `article`, `athletes`, `body`, `calendar`, `content` (also covers `sanity.ts` mapping), `dates`, `filter`, `home`, `nav`, `motion-budget`, `news`, `parents`, `program`, `rally`, `ro`, `tiles`, `trial`; `tokens` for contrast and photo weight) | `pnpm -C web test` |
 | Studio unit (Vitest) | `studio/tests/schema.test.ts` (model + seed, no network) | `pnpm --filter studio test` |
 | E2E (Playwright, Chrome at `/usr/bin/google-chrome`) | `web/tests/e2e/*.spec.ts` against built previews | `pnpm e2e` |
 | Static checks | `pnpm -C web check` (astro check), `pnpm --filter studio typecheck`, `pnpm --filter studio validate` | |
@@ -101,6 +101,8 @@ When you add a spec or a new source folder, update this table in the script's he
   mixed-strip); empty roster omitted with its links (sparse); unit filters and the Studio filter.
 - Read token never in the built output of any server; no HTML comment in any built page; the
   trial form's `data-who` fallback never shares a CSS selector list with `:has()` (`build-output.spec`).
+- Motion code that arrives 1.5 s late (route delayed) never fades the hero headline after the
+  first paint, and the scrub is still set up; on time, the intro plays (`motion.spec`).
 - GSAP is not requested under reduced motion (homepage and `/noutati/`, `motion.spec`); a fault in
   the calendar's today logic leaves the panel and motion working (`calendar.spec`).
 - Countdown follows the visitor's clock, not the build date (clock overridden), and disappears

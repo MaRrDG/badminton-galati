@@ -3,6 +3,8 @@
 // show the final state, which is the page as rendered. GSAP and the moments (page-moments.ts)
 // are fetched only when the moment will run: motion allowed and its targets on the page.
 
+import { introOnTime } from '../lib/motion-budget';
+
 export type PageMoment =
   | 'tile-roll' // /sportivi/: place digits roll when a tile enters (once)
   | 'place-roll' // /sportivi/[slug]/: the place numeral rolls on load
@@ -24,7 +26,9 @@ const TARGETS: Record<PageMoment, string> = {
 };
 
 export function initPageMotion(moment: PageMoment): void {
+  const startedAt = performance.now();
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!document.querySelector(TARGETS[moment])) return;
-  void import('./page-moments').then(m => m.runPageMoment(moment));
+  // Late code (a slow connection) skips the load-time intros: the page has painted its final state.
+  void import('./page-moments').then(m => m.runPageMoment(moment, { intro: introOnTime(startedAt, performance.now()) }));
 }

@@ -125,7 +125,12 @@ tap-to-smash removed).
 Hero lines may wrap below 860px (coach-editable motto must never clip). Under
 `prefers-reduced-motion: reduce` the homepage does not even fetch `motion.ts` (a dynamic import in
 `pages/index.astro`), and `initMotion()` also returns at once (`base.css` also turns off smooth
-scrolling). GSAP is bundled from npm, never a CDN, in a chunk fetched only when motion runs. No other animation may be added without Mario's approval.
+scrolling). GSAP is bundled from npm, never a CDN, in a chunk fetched only when motion runs.
+**Late code:** when that chunk resolves more than 1000 ms after the page script started
+(`lib/motion-budget.ts`, `introOnTime`), the load-time intros are skipped and the page stays as
+rendered (it has painted its final state by then; an intro would snap back to the start): the
+hero load here; on the inner pages place-roll, season-fill, feature-reveal, and poster-reveal or
+sessions-settle when their target is already in view. Scroll-driven moments are set up anyway. No other animation may be added without Mario's approval.
 
 ## Inner pages
 

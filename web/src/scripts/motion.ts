@@ -9,12 +9,16 @@ import { digitBands } from './roll';
 const WIDE = '(min-width: 861px)';
 const NARROW = '(max-width: 860px)';
 
-export function initMotion(): void {
+/**
+ * `intro: false` (the motion code arrived late, `lib/motion-budget.ts`) leaves the hero as
+ * rendered; the scroll-driven moments are set up either way.
+ */
+export function initMotion({ intro = true }: { intro?: boolean } = {}): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.registerPlugin(ScrollTrigger);
 
   // The intro plays once per visit, outside matchMedia, so crossing 860px does not replay it.
-  heroLoad();
+  if (intro) heroLoad();
   const mm = gsap.matchMedia();
   mm.add({ wide: WIDE, narrow: NARROW }, (ctx) => {
     const wide = Boolean(ctx.conditions?.wide);

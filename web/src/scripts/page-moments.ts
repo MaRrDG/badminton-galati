@@ -5,31 +5,43 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { PageMoment } from './page-motion';
 import { digitBands } from './roll';
 
-export function runPageMoment(moment: PageMoment): void {
+/**
+ * `intro: false` means the code arrived late (`lib/motion-budget.ts`): the moments that play on
+ * load (place-roll, season-fill, feature-reveal) are skipped, and so are the once-on-scroll
+ * reveals whose target is already in view (it would snap back and replay). Scroll-driven
+ * moments run as usual.
+ */
+export function runPageMoment(moment: PageMoment, { intro = true }: { intro?: boolean } = {}): void {
   gsap.registerPlugin(ScrollTrigger);
   switch (moment) {
     case 'tile-roll':
       tileRoll();
       break;
     case 'place-roll':
-      placeRoll();
+      if (intro) placeRoll();
       break;
     case 'season-fill':
-      seasonFill();
+      if (intro) seasonFill();
       break;
     case 'poster-reveal':
-      posterReveal();
+      if (intro || !inView('.plated.reveal', 0.85)) posterReveal();
       break;
     case 'feature-reveal':
-      featureReveal();
+      if (intro) featureReveal();
       break;
     case 'cover-recrop':
       coverRecrop();
       break;
     case 'sessions-settle':
-      sessionsSettle();
+      if (intro || !inView('.planner', 0.8)) sessionsSettle();
       break;
   }
+}
+
+/** Whether the top of `selector` is above `start` of the window (the trigger's `top N%`), so its scroll reveal would fire at once. */
+function inView(selector: string, start: number): boolean {
+  const el = document.querySelector(selector);
+  return !!el && el.getBoundingClientRect().top < innerHeight * start;
 }
 
 /**
