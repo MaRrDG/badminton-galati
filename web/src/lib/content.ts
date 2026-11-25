@@ -1,12 +1,9 @@
 import { isIsoDate, todayInBucharest } from './dates';
-import { visibleAthletes } from './home';
+import { byStart, latestPosts, visibleAthletes } from './home';
 import { fetchHomeQuery, toHomeData } from './sanity';
-import type { HomeData } from './types';
+import { DISCIPLINES, POST_KINDS, TRACKS, type HomeData } from './types';
 
 const DEFAULT_FIXTURE = 'home.json';
-const DISCIPLINES = ['SB', 'SF', 'DB', 'DF', 'DX'] as const;
-const TRACKS = ['performanta', 'amatori'] as const;
-const POST_KINDS = ['competitie', 'viata-clubului', 'proiecte'] as const;
 
 /** Every fixture in src/fixtures, loaded on demand; works the same under Astro and Vitest. */
 const fixtures = import.meta.glob<unknown>('../fixtures/*.json', { import: 'default' });
@@ -55,7 +52,8 @@ export async function getHomeData(): Promise<HomeData> {
 /**
  * Checks that `value` has the shape of `HomeData`, so a malformed fixture or an incomplete
  * Sanity document fails the build with the path of the bad field. Optional fields must be
- * left out, not null. Returns the data with only consented athletes, whatever the source.
+ * left out, not null. Whatever the source, returns only consented athletes, competitions by
+ * start date and the newest posts, so the order of a fixture file does not matter.
  */
 export function parseHomeData(value: unknown, source: string): HomeData {
   const fail = (path: string, expected: string): never => {
@@ -136,5 +134,10 @@ export function parseHomeData(value: unknown, source: string): HomeData {
   optional(d, 'rankingWeek', '', (v, p) => fields(record(v, p), p, { week: count, from: isoDate, to: isoDate }));
 
   const home = d as HomeData;
-  return { ...home, athletes: visibleAthletes(home.athletes) };
+  return {
+    ...home,
+    athletes: visibleAthletes(home.athletes),
+    competitions: byStart(home.competitions),
+    posts: latestPosts(home.posts),
+  };
 }

@@ -1,6 +1,6 @@
 ---
 import { formatRangeRo } from '../../lib/dates';
-import { bestRanking, disciplineLabel, pointsUnit, rosterOrder } from '../../lib/home';
+import { HOME_ROSTER, bestRanking, disciplineLabel, pointsUnit, rosterOrder } from '../../lib/home';
 import type { Athlete, Ranking, RankingWeek } from '../../lib/types';
 
 interface Props {
@@ -18,7 +18,7 @@ function rowLine(best: Ranking | undefined, isFirst: boolean): string | undefine
   return best.points === undefined ? base : `${base}, ${best.points} ${pointsUnit(best.points)}`;
 }
 
-const ordered = rosterOrder(athletes);
+const ordered = rosterOrder(athletes, HOME_ROSTER);
 // Ranked athletes come first, so an unranked first athlete means nobody has a place.
 const ranked = ordered.length > 0 && bestRanking(ordered[0]) !== undefined;
 

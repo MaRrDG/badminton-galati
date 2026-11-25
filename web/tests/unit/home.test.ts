@@ -3,13 +3,14 @@ import {
   bestRanking,
   countdownLabel,
   disciplineLabel,
+  groupsHeading,
   pointsUnit,
   postKindLabel,
   rosterOrder,
   splitCalendar,
   visibleAthletes,
 } from '../../src/lib/home';
-import type { Athlete, Competition } from '../../src/lib/types';
+import type { Athlete, Competition, Group } from '../../src/lib/types';
 
 const nistor = {
   id: '1', name: 'Nistor Cristian-Ionuț', slug: 'nistor-cristian-ionut', consent: true,
@@ -66,6 +67,12 @@ describe('rosterOrder', () => {
       ({ id, name, slug: id, consent: true, rankings: [] });
     const order = rosterOrder([unranked('t', 'Tudor Ana'), unranked('ș', 'Ștefan Ioana'), unranked('s', 'Sandu Maria')]);
     expect(order.map(a => a.name)).toEqual(['Sandu Maria', 'Ștefan Ioana', 'Tudor Ana']);
+  });
+
+  test('a limit keeps only the first athletes of the order', () => {
+    expect(rosterOrder([bordeianu, pazargic, nistor], 2).map(a => a.id)).toEqual(['1', '2']);
+    expect(rosterOrder([bordeianu, hidden, pazargic, nistor], 3).map(a => a.id)).toEqual(['1', '2', '3']);
+    expect(rosterOrder([bordeianu, pazargic, nistor]).map(a => a.id)).toEqual(['1', '2', '3']);
   });
 
   test('Romanian collation, not root: Szabo comes before Ștefan', () => {
@@ -168,5 +175,39 @@ describe('pointsUnit', () => {
     expect(pointsUnit(168)).toBe('de puncte');
     expect(pointsUnit(101)).toBe('puncte');
     expect(pointsUnit(200)).toBe('de puncte');
+  });
+});
+
+describe('groupsHeading', () => {
+  const group = (i: number, track: Group['track']): Group => ({ name: `G${i}`, audience: 'Toți', track });
+  const groups = (perf: number, amatori: number): Group[] => [
+    ...Array.from({ length: perf }, (_, i) => group(i, 'performanta')),
+    ...Array.from({ length: amatori }, (_, i) => group(perf + i, 'amatori')),
+  ];
+
+  test('the default five groups on both tracks read as before', () => {
+    expect(groupsHeading(groups(3, 2))).toBe('Cinci grupe, pe două drumuri');
+  });
+
+  test('number words from one to ten, feminine like "grupă"', () => {
+    const words = ['O grupă', 'Două grupe', 'Trei grupe', 'Patru grupe', 'Cinci grupe', 'Șase grupe',
+      'Șapte grupe', 'Opt grupe', 'Nouă grupe', 'Zece grupe'];
+    words.forEach((word, i) => expect(groupsHeading(groups(i + 1, 0))).toBe(word));
+  });
+
+  test('above ten the count is written in digits, with "de" from 20', () => {
+    expect(groupsHeading(groups(11, 0))).toBe('11 grupe');
+    expect(groupsHeading(groups(19, 0))).toBe('19 grupe');
+    expect(groupsHeading(groups(20, 0))).toBe('20 de grupe');
+  });
+
+  test('"pe două drumuri" only when both tracks have groups', () => {
+    expect(groupsHeading(groups(1, 1))).toBe('Două grupe, pe două drumuri');
+    expect(groupsHeading(groups(0, 2))).toBe('Două grupe');
+    expect(groupsHeading(groups(3, 0))).toBe('Trei grupe');
+  });
+
+  test('no groups says so instead of a count', () => {
+    expect(groupsHeading([])).toBe('Nicio grupă deocamdată');
   });
 });

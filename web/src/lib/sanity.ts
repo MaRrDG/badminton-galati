@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client';
 import { visibleAthletes } from './home';
+import { HOME_POSTS } from './home';
 import type { Athlete, Competition, Discipline, Group, HomeData, Img, Post, PostKind, Ranking } from './types';
 
 const API_VERSION = '2025-02-19';
@@ -26,7 +27,7 @@ export const HOME_QUERY = `{
   "competitions": *[_type == "competition"] | order(start asc){
     _id, title, city, start, end, home, "postSlug": post->slug.current
   },
-  "posts": *[_type == "post"] | order(date desc){ title, "slug": slug.current, kind, date, "cover": cover${IMAGE} }
+  "posts": *[_type == "post"] | order(date desc)[0...${HOME_POSTS}]{ title, "slug": slug.current, kind, date, "cover": cover${IMAGE} }
 }`;
 
 /** Runs `HOME_QUERY` against the public, read-only dataset: published documents only, no token. */

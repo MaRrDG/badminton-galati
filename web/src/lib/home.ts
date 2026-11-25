@@ -1,9 +1,12 @@
 import { daysBetween } from './dates';
-import type { Athlete, Competition, Discipline, PostKind, Ranking } from './types';
+import type { Athlete, Competition, Discipline, Group, Post, PostKind, Ranking } from './types';
 
 /** Beyond this many days the next event gets no countdown. */
 const COUNTDOWN_MAX_DAYS = 60;
 const PLAYED_MAX = 3;
+/** The homepage shows the newest posts and the first athletes of the roster, no more. */
+export const HOME_POSTS = 3;
+export const HOME_ROSTER = 3;
 
 const byRomanianName = new Intl.Collator('ro').compare;
 
@@ -21,8 +24,8 @@ export function bestRanking(a: Athlete): Ranking | undefined {
   return best;
 }
 
-/** Consented athletes: ranked first by best place, then unranked by name. */
-export function rosterOrder(a: Athlete[]): Athlete[] {
+/** Consented athletes: ranked first by best place, then unranked by name; the first `limit` of them. */
+export function rosterOrder(a: Athlete[], limit = Infinity): Athlete[] {
   const withBest = visibleAthletes(a).map(athlete => ({ athlete, best: bestRanking(athlete) }));
   withBest.sort((x, y) => {
     if (x.best && y.best) return x.best.place - y.best.place || byRomanianName(x.athlete.name, y.athlete.name);
@@ -30,7 +33,17 @@ export function rosterOrder(a: Athlete[]): Athlete[] {
     if (y.best) return 1;
     return byRomanianName(x.athlete.name, y.athlete.name);
   });
-  return withBest.map(entry => entry.athlete);
+  return withBest.slice(0, limit).map(entry => entry.athlete);
+}
+
+/** Newest first (ISO dates compare as strings), at most `HOME_POSTS`. */
+export function latestPosts(p: Post[]): Post[] {
+  return [...p].sort((x, y) => y.date.localeCompare(x.date)).slice(0, HOME_POSTS);
+}
+
+/** Earliest start first. */
+export function byStart(c: Competition[]): Competition[] {
+  return [...c].sort((x, y) => x.start.localeCompare(y.start));
 }
 
 /**
@@ -55,6 +68,22 @@ function takesDe(n: number): boolean {
 
 function daysRo(n: number): string {
   return takesDe(n) ? `${n} de zile` : `${n} zile`;
+}
+
+/** "grupă" is feminine: o grupă, două grupe. */
+const GROUP_COUNT_WORDS = ['O grupă', 'Două grupe', 'Trei grupe', 'Patru grupe', 'Cinci grupe', 'Șase grupe',
+  'Șapte grupe', 'Opt grupe', 'Nouă grupe', 'Zece grupe'];
+
+/**
+ * The groups heading, from the data: "Cinci grupe, pe două drumuri" when both tracks have groups,
+ * just "Cinci grupe" otherwise. Up to ten the count is a word, above it digits ("20 de grupe").
+ */
+export function groupsHeading(g: Group[]): string {
+  const n = g.length;
+  if (n === 0) return 'Nicio grupă deocamdată';
+  const count = GROUP_COUNT_WORDS[n - 1] ?? (takesDe(n) ? `${n} de grupe` : `${n} grupe`);
+  const bothTracks = g.some(x => x.track === 'performanta') && g.some(x => x.track === 'amatori');
+  return bothTracks ? `${count}, pe două drumuri` : count;
 }
 
 /** The words after a points total: 1 punct, 19 puncte, 168 de puncte. */

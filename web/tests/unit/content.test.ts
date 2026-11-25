@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { buildToday, getHomeData, parseHomeData } from '../../src/lib/content';
 import { todayInBucharest } from '../../src/lib/dates';
-import { toHomeData } from '../../src/lib/sanity';
+import { HOME_QUERY, toHomeData } from '../../src/lib/sanity';
 import fixture from '../../src/fixtures/home.json';
 
 const ENV_KEYS = ['CONTENT_SOURCE', 'SANITY_PROJECT_ID', 'SANITY_DATASET', 'HOME_FIXTURE', 'BUILD_TODAY'] as const;
@@ -121,6 +121,20 @@ describe('fixtures', () => {
         a.rankings.map(({ _key, _type, ...r }: Record<string, unknown>) => r)]));
   });
 
+  test('posts come newest first and at most three, whatever the file order', () => {
+    const post = (date: string) => ({ title: `Articol ${date}`, slug: `a-${date}`, kind: 'proiecte', date });
+    const shuffled = ['2026-03-01', '2026-06-30', '2025-12-24', '2026-05-13', '2026-04-01'].map(post);
+    const d = parseHomeData({ ...fixture, posts: shuffled }, 'home.json');
+    expect(d.posts.map(p => p.date)).toEqual(['2026-06-30', '2026-05-13', '2026-04-01']);
+  });
+
+  test('competitions come by start date, whatever the file order', () => {
+    const d = parseHomeData({ ...fixture, competitions: [...fixture.competitions].reverse() }, 'home.json');
+    const starts = d.competitions.map(c => c.start);
+    expect(starts).toEqual([...starts].sort());
+    expect(d.competitions).toHaveLength(fixture.competitions.length);
+  });
+
   test('competition titles use "și", never "&"', () => {
     for (const c of fixture.competitions) expect(c.title).not.toContain('&');
     expect(fixture.competitions.map(c => c.title)).toContain('CN U9 și CN U17');
@@ -140,6 +154,10 @@ describe('Sanity source', () => {
 });
 
 describe('toHomeData', () => {
+  test('the query asks Sanity for the three newest posts only', () => {
+    expect(HOME_QUERY).toMatch(/\*\[_type == "post"\] \| order\(date desc\)\[0\.\.\.3\]/);
+  });
+
   test('mapping drops athletes without consent', () => {
     const raw = { ...rawSample, athletes: [{ ...rawAthlete, consent: true }, { ...rawAthlete, _id: 'x', consent: false }, { ...rawAthlete, _id: 'y', consent: undefined /* consent missing */ }] };
     expect(toHomeData(raw).athletes).toHaveLength(1);
