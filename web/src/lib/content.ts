@@ -135,14 +135,14 @@ export function parseHomeData(value: unknown, source: string): HomeData {
 }
 
 type BlockOf<T extends BodyBlock['_type']> = Extract<BodyBlock, { _type: T }>;
+const BODY_TYPES = ['block', 'photo'] as const satisfies readonly BodyBlock['_type'][];
+const isBodyType = (t: unknown): t is BodyBlock['_type'] => BODY_TYPES.includes(t as BodyBlock['_type']);
 const BLOCK_STYLES = ['normal', 'h2', 'h3', 'blockquote'] as const satisfies readonly NonNullable<BlockOf<'block'>['style']>[];
 const LIST_ITEMS = ['bullet', 'number'] as const satisfies readonly NonNullable<BlockOf<'block'>['listItem']>[];
 const PARENT_ANSWERS = ['age', 'equipment', 'cost', 'firstWeeks', 'registration'] as const satisfies readonly (keyof ClubInfo['parents'])[];
 /** 24-hour time with two-digit hours: 09:00, 18:30. */
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-const BODY_TYPES = ['block', 'photo'] as const satisfies readonly BodyBlock['_type'][];
-const isBodyType = (t: unknown): t is BodyBlock['_type'] => BODY_TYPES.includes(t as BodyBlock['_type']);
 /** Fields the source may leave out; `parseSiteData` fills them in. */
 type Loose<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type CheckedSite = Omit<SiteData, 'groups' | 'competitions' | 'posts' | 'coaches' | 'info'> & {
@@ -224,6 +224,7 @@ export function parseSiteData(value: unknown, source: string): SiteData {
     fields(o, path, { _type: oneOf(['span']), _key: text, text: str });
     optionalList(o, 'marks', path, text);
   };
+  // Block types the site does not know yet (a new Studio field) are dropped below, not rejected.
   const bodyBlock = (v: unknown, path: string) => {
     const o = record(v, path);
     fields(o, path, { _type: text, _key: text });
@@ -231,7 +232,6 @@ export function parseSiteData(value: unknown, source: string): SiteData {
     if (o._type === 'photo') {
       fields(o, path, { photo: img });
       return;
-  // Block types the site does not know yet (a new Studio field) are dropped below, not rejected.
     }
     fields(o, path, { children: (c, cp) => list(c, cp, span) });
     optional(o, 'style', path, oneOf(BLOCK_STYLES));
