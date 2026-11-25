@@ -7,8 +7,11 @@ import { getAthletesPage, getSiteData } from '../../lib/content';
 
 const page = await getAthletesPage();
 const { trialText } = await getSiteData();
-const lede =
-  'Copiii și tinerii legitimați la club, de la primii pași până la competițiile naționale. Apasă pe un sportiv ca să vezi unde a ajuns.';
+// The invitation to press an athlete only when there is one to press.
+const lede = [
+  'Copiii și tinerii legitimați la club, de la primii pași până la competițiile naționale.',
+  ...(page.tiles.length > 0 ? ['Apasă pe un sportiv ca să vezi unde a ajuns.'] : []),
+].join(' ');
 ---
 
 <Base title="Sportivi | CS Siderurgistul Galați" description={lede}>

@@ -4,8 +4,10 @@ import { on } from './servers';
 test('the wall shows consented athletes as tiles, oldest category first', async ({ page }) => {
   await page.goto('/sportivi/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sportivii clubului');
+  await expect(page.getByText('Apasă pe un sportiv ca să vezi unde a ajuns.')).toBeVisible();
   await expect(page.locator('.wall h3')).toHaveText(['Nistor Cristian-Ionuț', 'Pazargic Ligia-Beatrice', 'Bordeianu Nectarie-Ioan']);
-  await expect(page.locator('.wall .mark').first()).toHaveText(/2\s*în țară/);
+  await expect(page.locator('.wall .mark').first()).toContainText('în țară');
+  await expect(page.locator('.wall .mark [data-roll]').first()).toHaveAttribute('data-roll', '2');
   await expect(page.locator('.wall .ini')).toHaveText(['NC', 'PL', 'BN']);
   await expect(page.getByRole('link', { name: 'Nistor Cristian-Ionuț' })).toHaveAttribute('href', '/sportivi/nistor-cristian-ionut/');
   await expect(page.locator('.roster')).toContainText('Locul în țară: Clasamentul FRB, săptămâna 46, 9–15 noiembrie 2026.');
@@ -56,6 +58,21 @@ test('the place digits roll to the place and are read as the place', async ({ pa
   await expect(mark).toMatchAriaSnapshot('- paragraph: 2 în țară');
 });
 
+test('a place rolls when the filter brings its tile into view', async ({ browser, baseURL }) => {
+  const ctx = await browser.newContext({ baseURL, viewport: { width: 390, height: 760 } });
+  const page = await ctx.newPage();
+  await page.goto('/sportivi/');
+  // Bordeianu (U13) sits on the second row, below the line where a place starts to roll.
+  const band = page.locator('.wall .tile', { hasText: 'Bordeianu' }).locator('[data-roll] i span').first();
+  const final = await band.evaluate(b => b.style.transform);
+  await page.waitForTimeout(400);
+  expect(await band.evaluate(b => b.style.transform)).toBe(final);
+  await page.locator('label', { hasText: 'U13' }).click();
+  // Moved up to the first row, the tile is in view, so its place rolls.
+  await expect.poll(() => band.evaluate(b => b.style.transform), { intervals: [50] }).not.toBe(final);
+  await ctx.close();
+});
+
 test.describe('an athlete without consent', on('mixed-strip'), () => {
   test('has no tile and is not counted', async ({ page }) => {
     const html = await (await page.goto('/sportivi/'))!.text();
@@ -74,6 +91,9 @@ test.describe('nobody may be shown', on('sparse'), () => {
     await expect(page.locator('.wall, .filter')).toHaveCount(0);
     await expect(page.getByText('Sportivii apar aici după ce părinții își dau acordul.')).toBeVisible();
     await expect(page.getByText('Locul în țară')).toHaveCount(0);
+    // Nobody to press: the lede and the description leave out the invitation.
+    await expect(page.getByText('Apasă pe un sportiv')).toHaveCount(0);
+    await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /Apasă/);
   });
 });
 

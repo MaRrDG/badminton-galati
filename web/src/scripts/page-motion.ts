@@ -47,7 +47,7 @@ function posterReveal(): void {
  * The place on each athlete tile (`.wall [data-roll]`) rolls through the digits to the number
  * once, when the tile comes into view. The bands start on the final digits, so a tile that
  * never scrolls into view still reads right. Screen readers hear the place from a hidden copy
- * of the digits, not the band.
+ * of the digits, not the band. Under reduced motion none of this runs, the filter included.
  */
 function tileRoll(): void {
   gsap.utils.toArray<HTMLElement>('.wall [data-roll]').forEach(el => {
@@ -69,4 +69,6 @@ function tileRoll(): void {
         ),
     });
   });
+  // The category filter moves tiles; measure again so a place rolls when its tile enters view.
+  document.querySelectorAll('input[name="cat"]').forEach(input => input.addEventListener('change', () => ScrollTrigger.refresh()));
 }
