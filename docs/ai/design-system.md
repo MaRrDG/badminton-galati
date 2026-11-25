@@ -24,6 +24,8 @@ săptămâna N, ..."), the footer from the shell.
 | `--mist-soft` | `#f0f4fa` | A calendar day cell; ink on it 14.46:1 |
 | `--ink-soft` | `#3a4866` | "De confirmat" text (`.tbc`), 9.14:1 on white |
 | `--ink-muted` | `#5d6b8a` | Weekday letters, "fără competiții", quiet borders; 5.34:1 on white |
+| `--court-hatch` | court orange at 50% | Stripes behind an example value (`Sample`: hours, coaches) |
+| `--court-hatch-strong` | court orange at 75% | Stripes of the small "example" square in the programme's note |
 | `--display` | Big Shoulders Display (800, 900) | Headings, uppercase, line-height 0.95 |
 | `--body` | Instrument Sans Variable | Body, 17px / 1.5 |
 | `--col` | `1180px` (+27% of `--lift`, 1482px at 2560) | Content column (`.wrap`) |
@@ -143,9 +145,40 @@ His rules:
 | `SectionHeading` | `h2.h2s` (or `h3`): modest section heading |
 | `FilterBar` | Radios + `:has()` CSS from `filterBarCss()` and `filterCss()` (`lib/filter.ts`), works without JS; variants `chips`, `links`, `swatches`; effect `hide` or `dim` (no reflow; `DIM_OPACITY` 0.8 + grayscale, so dimmed text keeps 3:1 on every surface, `tokens.test.ts`); a count shows as `<sup>` and names the radio "Toate, 15"; optional count line announced by `initFilterStatus()` (`scripts/filter-status.ts`). Items carry `data-f`, counts `data-count-for`. Filter values (and the radio name) must be lowercase slugs: pages that take values from content (e.g. "U17") slugify them first; a non-slug value fails the build on purpose |
 | `Tbc` | "**De confirmat de club:** …" with the hatched court-orange square (`.tbc` in `base.css`) |
+| `Sample` | An example value the club has not confirmed (`provisional` data): hatched with `--court-hatch`, plus a hidden note for screen readers ("oră dată ca exemplu", "antrenor dat ca exemplu"). Never used for unknown data, which is `Tbc` |
 | `ClosingCta` | Red closing section `#proba` "Vino la un antrenament de probă"; `display` big uppercase (programme, parents) or modest (athletes); `email` adds the club address |
 
 Counts in Romanian go through `lib/ro.ts` (`countRo`, `feminineCountRo`).
+
+**Dimming rule.** A filter that must not reflow the layout (calendar, news) dims the other
+items instead of hiding them: `opacity: 0.8` (`DIM_OPACITY`) plus `grayscale(1)`. Owner's ruling:
+dimmed items stay readable, so dimmed text keeps at least 3:1 on every surface it sits on;
+`tokens.test.ts` computes it from the tokens. Grayscale is the cue that does not rely on
+contrast. (An earlier 0.25 gave about 1.7:1; 0.7 failed 3:1 on played calendar rows.) Known
+gap: on rows that are already neutral, grayscale changes nothing and the dim is faint.
+
+### Each page's own parts
+
+| Page | Components | Notes |
+|---|---|---|
+| `/sportivi/` | `athletes/Wall`, `athletes/Tile` | Portrait tiles (photo or `InitialTile`), category line, place mark; filter by category (none below two categories); empty state is one quiet mist line, without the lede's "Apasă pe un sportiv…" |
+| `/sportivi/[slug]/` | `athletes/Ident` (mist band, poster on `PlatePhoto` offset 16, ratio 4/5, or a poster `InitialTile` in its slot), `Standing` (blue block with the rolling place), `Appearances` | Without articles the quiet block (tournaments, medals) starts from the left |
+| `/calendar/` | `calendar/Month`, `Panel`, `SeasonList` | Month grids from Monday; home events `--red-tint` with `--red-deep` text, played `--blue-tint`; a block shared by several competitions links to the first and lists the others under "Tot în aceste zile:"; filter chips dim (no reflow); the plain list is split by start month (spring ≤ July) |
+| `/noutati/` | `news/Front`, `FrontItem`, `Older` | Featured article on `PlatePhoto` (offset 16, ratio 3/2) or a blue tile, big display title; others `h3` mixed case; tiles cycle red, blue, mist from the featured tile's colour; filter `links` variant, dim |
+| `/noutati/[slug]/` | `news/ArticleHead`, `ArticleAside`, `Gallery`, `Share`, `PrevNext` | Body photos on `PlatePhoto`; "Fotografii" and "Sportivi în articol" are modest headings; one row per tagged athlete listing all results; share row hidden until JS builds it |
+| `/program/` | `program/Planner`, `GroupGuide` | Half-hour rows, overlapping sessions side by side in lanes, two empty hours collapse to a gap row; blocks of an hour or less one line; group picker with swatches (white and mist swatches get an edge); on phones days without the picked group hide; hour lines use `--blue-tint` (the mockup's ink at 16%, kept without a new token); without sessions one `Tbc` line, never an empty grid |
+| `/pentru-parinti/` | `parents/Question`, `Coaches` | Reading column (68ch) beside a sticky list of the questions (at least 14rem, at most the window's height, scrolls inside); missing answers are `Tbc` lines; coaches by name only (roles not shipped) |
+| `/contact/` | `contact/TrialForm`, `Place` | The form beside the hall's panel; states: errors (summary takes focus), e-mail opened, sent; the adult path ("Eu") hides the child's age |
+
+### Inner pages on large and middle screens
+
+The large-screen rules above apply to the inner pages through the shared tokens (`--col`,
+`--gut`, rem sizes) and `PlatePhoto`; nothing else grows on its own past 1440px. Short pages
+(a profile, an empty news page) fill the window to the footer. The band just above the
+breakpoint (861–1100px) is where two-column pages squeeze: a side column keeps a floor there
+(the article's aside `minmax(220px, 1fr)`, the parents' question list `minmax(14rem, 1fr)`)
+and the text column gives way first. The inner-pages sweep (`testing.md`) checks 1440, 1024,
+861, 860 and 380 for this reason.
 
 ### Motion: one moment per page (`web/src/scripts/page-motion.ts`)
 

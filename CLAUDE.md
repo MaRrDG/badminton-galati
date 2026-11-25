@@ -1,7 +1,8 @@
 # CLAUDE.md
 
 New website for CS Siderurgistul Galați, a badminton club, built by Mario as a gift to replace
-badmintongalati.ro. Plan 1 of 5 is done (foundation + homepage); see `docs/ai/roadmap.md`.
+badmintongalati.ro. Plans 1 (foundation + homepage) and 2a (inner pages) are done; next is 2b
+(Studio fields, images, trial endpoint, rebuild); see `docs/ai/roadmap.md`.
 
 Stack: pnpm workspace (pnpm only, npm is broken on the dev machine), Node 26. `web/` is Astro 7,
 static output, GSAP 3 + ScrollTrigger, Vitest 5, Playwright 1.65 (uses `/usr/bin/google-chrome`).
@@ -9,15 +10,22 @@ static output, GSAP 3 + ScrollTrigger, Vitest 5, Playwright 1.65 (uses `/usr/bin
 Repo artefacts (code, comments, docs, commits) are English; site copy and Studio labels are Romanian.
 
 ## Layout
-- `web/src/lib/` content layer (`content.ts`, `sanity.ts`), pure logic (`home.ts`, `dates.ts`), `types.ts`
-- `web/src/components/home/` homepage sections; `web/src/scripts/motion.ts` all GSAP code
+- `web/src/lib/` content layer (`content.ts`: `getSiteData` + one getter per page; `sanity.ts`),
+  one pure view module per page (`athletes`, `calendar`, `news`, `article`, `program`, `parents`,
+  `trial`), shared logic (`home`, `dates`, `filter`, `ro`, `body`, `nav`, `tiles`), `club.ts`
+  (club e-mail, Facebook, hall map), `types.ts`
+- `web/src/pages/` routes; `web/src/components/ui/` shared inner-page pieces; `components/home/`
+  and one folder per inner page (`athletes`, `calendar`, `news`, `program`, `parents`, `contact`)
+- `web/src/scripts/`: `motion.ts` (homepage GSAP), `page-motion.ts` (inner-page GSAP), browser
+  helpers (calendar today, filters, form, share, lightbox, 404 rally)
 - `web/src/styles/tokens.css` every colour/type/layout value; `web/src/fixtures/*.json` offline content
 - `web/tests/unit`, `web/tests/e2e`, `web/scripts/` (test runners); `studio/schemaTypes`, `studio/seed`
-- `deploy/` + `scripts/deploy.sh` test deployment; `mockups/varianta-d.html` approved visual reference
-- `docs/superpowers/` spec and plan 1 (history); `docs/ai/` the docs to read before working
+- `deploy/` + `scripts/deploy.sh` test deployment; `mockups/varianta-d.html`, `mockups/pagini/` approved visuals
+- `docs/superpowers/` spec and plans (history); `docs/ai/` the docs to read before working
 
 ## Commands (repo root)
-- `pnpm dev` (fixtures unless `SANITY_PROJECT_ID` is exported), `pnpm build`, `pnpm -C web check`
+- `pnpm dev` (fixtures unless `SANITY_PROJECT_ID` is exported), `pnpm build`, `pnpm -C web check`;
+  `TRIAL_ENDPOINT` unset = the trial form opens an e-mail (until plan 2b)
 - `pnpm test:changed`, `pnpm e2e:changed` (diff against `dev`); `pnpm e2e -- <spec or -g "title">`
 - `pnpm test`, `pnpm e2e` full suites; `pnpm --filter studio test|typecheck|validate`
 - `pnpm deploy:test [--dry-run]` (needs untracked `.deploy.env`)
@@ -35,9 +43,11 @@ Repo artefacts (code, comments, docs, commits) are English; site copy and Studio
   bordered table with empty cells, staircase layout, cream background, rounded shadow cards,
   dashed pills, all-caps eyebrows, 01/02/03 markers, fade-in per section, charts without real
   data. Also: arrow-suffixed buttons, one accented word in a headline. See `docs/ai/design-system.md`.
-- **Motion** only the five approved moments (hero load, hero scrub, roster numerals, heading drift,
-  hall strip), plus the rally on the 404 page. `prefers-reduced-motion` shows final states; all
-  content works without JS.
+- **Motion** only the approved moments: the five on the homepage (hero load, hero scrub, roster
+  numerals, heading drift, hall strip), one per inner page (table in `design-system.md`), the
+  rally on the 404 page. `prefers-reduced-motion` shows final states; all content works without JS.
+- **Example vs unknown.** Example values (`provisional` hours, `coachProvisional`) are hatched
+  with `Sample`; unknown ones are `Tbc` or omitted. Our own copy goes in `docs/ai/copy-to-confirm.md`.
 - Every `<img>` has `width` and `height` (motion distances depend on it).
 - Text on red fields uses `--red-field` (white 4.77:1); `--red` is for accents only (4.26:1).
 
@@ -60,7 +70,8 @@ Repo artefacts (code, comments, docs, commits) are English; site copy and Studio
 |---|---|
 | Any code change | `docs/ai/architecture.md` |
 | Studio schema, content, consent | `docs/ai/content-model.md` |
-| UI, CSS, motion | `docs/ai/design-system.md`, `mockups/varianta-d.html` |
+| UI, CSS, motion | `docs/ai/design-system.md`, `mockups/varianta-d.html`, `mockups/pagini/` |
 | Tests | `docs/ai/testing.md` |
 | "Why is it like this?" | `docs/ai/decisions.md` |
-| Starting plan 2–5 | `docs/ai/roadmap.md`, then the spec in `docs/superpowers/specs/` |
+| Site copy we wrote | `docs/ai/copy-to-confirm.md` |
+| Starting plan 2b–5 | `docs/ai/roadmap.md`, then the spec in `docs/superpowers/specs/` |

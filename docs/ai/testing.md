@@ -7,7 +7,7 @@ merge or push; keep e2e fast.
 
 | Layer | Where | Runs with |
 |---|---|---|
-| Web unit (Vitest) | `web/tests/unit/` (one file per `src/lib` module: `home`, `dates`, `content`, `nav`, `program`, …) | `pnpm -C web test` |
+| Web unit (Vitest) | `web/tests/unit/` (one file per `src/lib` module with logic: `article`, `athletes`, `body`, `calendar`, `content` (also covers `sanity.ts` mapping), `dates`, `filter`, `home`, `nav`, `news`, `parents`, `program`, `rally`, `ro`, `tiles`, `trial`; `tokens` for contrast and photo weight) | `pnpm -C web test` |
 | Studio unit (Vitest) | `studio/tests/schema.test.ts` (model + seed, no network) | `pnpm --filter studio test` |
 | E2E (Playwright, Chrome at `/usr/bin/google-chrome`) | `web/tests/e2e/*.spec.ts` against built previews | `pnpm e2e` |
 | Static checks | `pnpm -C web check` (astro check), `pnpm --filter studio typecheck`, `pnpm --filter studio validate` | |
@@ -17,12 +17,13 @@ no-JS, focus, built output). Put a rule in `web/src/lib/` and unit-test it there
 
 ## Commands and timings
 
-Measured on the dev machine (16 cores, 8 workers), from the test-speed work on 2026-11-25:
+Measured on the dev machine (16 cores, 8 workers); full-suite rows from the plan 2a full run
+(2026-11-26), single-spec rows from the test-speed work on 2026-11-25:
 
 | Command | What | Time |
 |---|---|---|
-| `pnpm test` | all unit tests, both workspaces (77 web + 14 studio) | ~3 s |
-| `pnpm e2e` | 50 tests + 4 setup builds | 22.9 s cold, 22.7 s warm |
+| `pnpm test` | all unit tests, both workspaces (325 web + 14 studio) | ~3 s |
+| `pnpm e2e` | 189 tests + 4 setup builds | 37.1 s cold (`rm -rf web/dist-e2e` first); budget 45 s |
 | `pnpm e2e -- shell.spec.ts` | one spec, builds `home` only | 5.4 s cold, 4.2 s warm |
 | `pnpm e2e -- -g "single photo"` | by title; builds `sparse` only | not measured |
 | `pnpm test:changed` | `vitest run --changed dev` in both workspaces | ≤ the full unit run |
@@ -44,9 +45,9 @@ and a dummy `SANITY_READ_TOKEN`.
 
 | Server (port) | Fixture | Covers |
 |---|---|---|
-| `home` (4329) | `home.json` | The real homepage content (dev default; must match the Studio seed) |
-| `quiet-season` (4330) | `quiet-season.json` | Athletes without rankings (no places, no source line, equal rows); the fictional `Zet Exemplu-Ana` with photo and birth year (athletes wall: category from the birth year); season over (three played, no countdown); 15 posts, three with a cover (the full news front, four older) |
-| `sparse` (4331) | `sparse.json` | No athlete may be shown (only one, without consent): roster and links omitted, section order; no competition at all (the calendar's one quiet line); a 20-character hero line wrapping at 380px; a single hall photo (never pins, fits its column with and without JS); no post with a cover (news: featured blue tile) |
+| `home` (4329) | `home.json` | The real content (dev default; must match the Studio seed): homepage; every inner page in its launch state (three ranked athletes, no birth years; the 2026 calendar with categories; three posts without body; no sessions, so the programme's `Tbc` line; coaches by name; no club answers, so the parents' and contact `Tbc` lines) |
+| `quiet-season` (4330) | `quiet-season.json` | Athletes without rankings (no places, no source line, equal rows); the fictional `Zet Exemplu-Ana` with photo, birth year (category from it) and an article result (medal row); season over (three played, no countdown) and the fictional "Turneu de test" sharing days with another event; 15 posts, three with a cover (the full news front, four older), one with a body (with a photo in the text), a gallery and results; the mockup's sample week with `provisional` hours and the example coach `Antrenor Exemplu` (hatched values and the page note); every parents' answer, the programme note and the contact details (test text, never in `home.json`) |
+| `sparse` (4331) | `sparse.json` | No athlete may be shown (only one, without consent): roster and links omitted, the athletes wall's empty state, section order; no competition at all (the calendar's one quiet line); a 20-character hero line wrapping at 380px; a single hall photo (never pins, fits its column with and without JS); no post with a cover (news: featured blue tile) |
 | `mixed-strip` (4332) | `mixed-strip.json` | Landscape + portrait strip (travels at 390/600, stays put at 1440, pins/unpins on resize); one ranked athlete; a non-consenting athlete holding place 1 |
 
 A test runs on `home` unless tagged: `test.describe('…', on('sparse'), () => …)`.
@@ -64,7 +65,8 @@ A test runs on `home` unless tagged: `test.describe('…', on('sparse'), () => �
   the build env). Editing one fixture rebuilds only that server; any source edit rebuilds all
   four (~2 s in parallel).
 - Previews start detached with a pid file; `global-teardown.ts` stops them, also after Ctrl-C.
-- `fullyParallel: true`. The wall time is set by the two 390px scroll scans (~11 s each).
+- `fullyParallel: true`. The two 390px scroll scans take ~11 s each; with the inner pages the
+  wall time is set by the total load on 8 workers.
 
 ## Source to spec mapping (`web/scripts/e2e-changed.mjs`, first match wins)
 
@@ -87,9 +89,7 @@ A test runs on `home` unless tagged: `test.describe('…', on('sparse'), () => �
 | `tests/unit/**`, `vitest.config.ts`, `.env.example`, `*.md` | none |
 | everything else (`src/lib/**`, `Site*.astro`, layouts, other pages, styles, `public/`, `src/fixtures/home.json`, e2e helpers and setup, build and runner config) | all |
 
-"+ inner" is `inner-pages` (every inner page at 1440, 1024, 861, 860 and 380 on `home` and
-`quiet-season`: no sideways scroll, no text off screen, no text on text or on a picture, no sticky
-column over the footer) and `shell` (every inner page at 380 with sized, described images and one
+"+ inner" is `inner-pages` (the sweep, below) and `shell` (every inner page at 380 with sized, described images and one
 display title; content without JavaScript). Outside `web/`: `studio/`, `docs/`, `deploy/`,
 `scripts/`, `.superpowers/`, root `*.md` select no spec; the lockfile and workspace files select all.
 
@@ -126,12 +126,39 @@ When you add a spec or a new source folder, update this table in the script's he
   with and without JS, focus ring colour equals text colour; the menu marks a page's section
   (`aria-current="page"` on the page itself, `"true"` under it); the footer links the parents'
   page and Facebook.
-- Inner pages (`inner-pages.spec`): every route at five widths on `home` and `quiet-season`, with
-  reduced motion; no overflow, no text off screen or on other text or a picture, sticky columns
-  clear of the footer. Text boxes are trimmed to their line height (tight display type) and to
-  any clipping box (ellipsis labels); screen-reader-only text is skipped.
+- Inner pages (`inner-pages.spec`): see "The inner-pages sweep" below. Per-page specs
+  (`athletes`, `calendar`, `news`, `article`, `program`, `parents`, `contact`) cover each page's
+  behaviour: consent (no tile, no profile route for a non-consenting athlete), filters with and
+  without JS, the calendar following the visitor's date, the trial form's paths and states, the
+  lightbox and share row, hatched example hours, each page's motion moment and reduced motion.
 - Unit: date formatting and Bucharest "today", Romanian plurals, roster order/layout, calendar
   split, fixture shape and parity with the seed, photo sizes and weight, WCAG token contrast.
+
+## The inner-pages sweep (`web/tests/e2e/inner-pages.spec.ts`)
+
+Every inner route (`ROUTES`, one list per server: `home` has the real content, `quiet-season`
+fills what `home` leaves empty) at 1440, 1024, 861, 860 and 380px wide (900 high), with reduced
+motion, checked at the top and scrolled to the bottom. Faults, one line each:
+
+- the page scrolls sideways;
+- a line of text off screen (except inside an element that scrolls sideways on purpose);
+- text on other text, or text on a picture in `main`;
+- a sticky element over the footer, or taller than the window (it would hide its own end);
+- a squeezed column: a grid or flex item narrower than 120px whose text wraps to three lines or
+  more.
+
+Text boxes are taken per line, trimmed to the line height (tight display type) and to any
+clipping box (ellipsis labels); screen-reader-only and `aria-hidden` text is skipped. On the
+first run with the last two checks (plan 2a, Task 12) nothing was flagged; both were proved to
+fire by loosening their thresholds (the calendar panel and the parents' question list are the
+sticky elements; month grids and news tiles the nearest grid items).
+
+**Adding a page to the sweep:** add its route to both lists in `ROUTES` (with a slug that exists
+in each fixture), and add `...INNER` to its rule in `web/scripts/e2e-changed.mjs` (and to the
+table above). Fix what it finds in the page that owns the layout, not in the sweep.
+
+Large screens are checked outside the sweep, on the homepage, the 404 page and one profile
+(2560×1300, 2560×1600, 1920×1080, 3440×1440; see the risks above).
 
 ## Adding a test without slowing the suite
 
