@@ -119,6 +119,7 @@ const css = filterBarCss(scope, name, options, { effect, container, status });
 
   /* links: plain words, the chosen one underlined in red like the menu */
   .links .filter {
+    position: relative; /* the radios' containing block, since .opts has no box here */
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -132,9 +133,9 @@ const css = filterBarCss(scope, name, options, { effect, container, status });
     font-weight: 600;
     font-size: 0.95rem;
   }
+  /* The words flow on after the legend as one line of text that wraps, not as a block under it. */
   .links .opts {
-    align-items: baseline;
-    gap: 6px clamp(16px, 2vw, 28px);
+    display: contents;
   }
   .links label {
     font-size: 1.02rem;

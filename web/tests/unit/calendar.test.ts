@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { calendarFilters, calendarIntro, calendarView, eventLabel, monthCells, type MonthCell } from '../../src/lib/calendar';
+import {
+  blockLabel, blockStatus, calendarFilters, calendarIntro, calendarView, eventLabel, eventStatus, eventView, monthCells, todayLabel, type MonthCell,
+} from '../../src/lib/calendar';
 import { parseSiteData } from '../../src/lib/content';
 import type { Competition } from '../../src/lib/types';
 import home from '../../src/fixtures/home.json';
@@ -71,7 +73,7 @@ describe('monthCells', () => {
     const [first, second] = events(monthCells(2026, 6, [a, b], TODAY));
     // 7 June 2026 is a Sunday, so the shared block wraps to the next week.
     expect([first.days, second.days]).toEqual([[5, 6, 7], [8]]);
-    expect(first).toMatchObject({ home: true, filter: 'u9 u11 echipe', status: 'played' });
+    expect(first).toMatchObject({ home: true, filter: 'u9 u11 echipe', status: 'played', ids: ['a', 'b'] });
     expect(first.label).toBe('a, 5–7 iunie, București, s-a jucat; b, 7–8 iunie, București, acasă, s-a jucat');
   });
 
@@ -89,6 +91,23 @@ describe('monthCells', () => {
   test('events after the next one are upcoming', () => {
     const nov = monthCells(2026, 11, comps, '2026-11-01');
     expect(events(nov).map(c => c.status)).toEqual(['next', 'upcoming']);
+  });
+
+  test('a shared block takes the most live status of its competitions', () => {
+    const a = comp('a', '2026-11-20', '2026-11-22'), b = comp('b', '2026-11-22', '2026-11-24');
+    const [block] = events(monthCells(2026, 11, [a, b], '2026-11-23'));
+    expect(block.status).toBe('next');
+    expect(block.label).toBe('a, 20–22 noiembrie, București, s-a jucat; b, 22–24 noiembrie, București, urmează');
+  });
+
+  test('a block knows which of its days is today', () => {
+    const nov = events(monthCells(2026, 11, comps, '2026-11-28'));
+    expect(nov.map(c => c.todayDay)).toEqual([undefined, 28]);
+  });
+
+  test('the next event can be given, so the grid agrees with the whole calendar', () => {
+    const nov = events(monthCells(2026, 11, comps, '2026-11-01', 'elsewhere'));
+    expect(nov.map(c => c.status)).toEqual(['upcoming', 'upcoming']);
   });
 
   test('a year other than today’s has no today', () => {
@@ -200,5 +219,75 @@ describe('calendarView', () => {
     calendarView(site, TODAY);
     calendarView(site, '2026-03-01');
     expect(JSON.stringify(site.competitions)).toBe(before);
+  });
+});
+
+describe('status by id', () => {
+  test('a copy of the next competition is still the next one', () => {
+    const next = comps.at(-1)!;
+    expect(eventStatus({ ...next }, TODAY, next.id)).toBe('next');
+    expect(eventStatus(comps[0], TODAY, next.id)).toBe('played');
+    expect(eventStatus(comps.at(-2)!, '2026-11-01', next.id)).toBe('upcoming');
+  });
+
+  test('blockStatus: next over upcoming over played', () => {
+    const [played, next] = [comps.at(-2)!, comps.at(-1)!];
+    expect(blockStatus([played, next], TODAY, next.id)).toBe('next');
+    expect(blockStatus([played, next], TODAY, undefined)).toBe('upcoming');
+    expect(blockStatus([played], TODAY, next.id)).toBe('played');
+    expect(blockLabel([played, next], TODAY, next.id)).toBe(
+      'CN U15 și CN Seniori, 20–22 noiembrie, Blejoi/Bacău, s-a jucat; CN U9 și CN U17, 27–29 noiembrie, București, urmează',
+    );
+  });
+});
+
+describe('eventView and todayLabel', () => {
+  test('everything the list and the panel show for one competition', () => {
+    expect(eventView(cnEchipeSeniori, 'played')).toEqual({
+      id: cnEchipeSeniori.id, title: 'CN Echipe Seniori', start: '2026-09-04', end: '2026-09-06', home: false,
+      city: 'loc de confirmat', cityKnown: false, short: '4–6 sept.', days: '4–6', rest: 'septembrie 2026',
+      filter: 'seniori echipe', status: 'played', statusText: 's-a jucat',
+      label: 'CN Echipe Seniori, 4–6 septembrie, loc de confirmat, s-a jucat',
+    });
+    const linked = { ...comps[1], postSlug: 'articol', resultsUrl: 'https://badminton.ro/r' };
+    expect(eventView(linked, 'played')).toMatchObject({ postSlug: 'articol', resultsUrl: 'https://badminton.ro/r', cityKnown: true });
+  });
+
+  test('today in words', () => {
+    expect(todayLabel('2026-11-25')).toBe('azi, 25 noiembrie');
+    expect(todayLabel('2027-01-01')).toBe('azi, 1 ianuarie');
+  });
+});
+
+describe('calendarView: one next event for the whole page', () => {
+  test('rows carry their status; the legend names what the grid shows', () => {
+    const page = calendarView(site, TODAY);
+    expect(page.today).toBe(TODAY);
+    expect(page.spring.map(r => r.status)).toEqual(['played', 'played', 'played', 'played', 'played']);
+    expect(page.autumn.at(-1)).toMatchObject({ title: 'CN U9 și CN U17', status: 'next', statusText: 'urmează' });
+    expect(page.nextView).toMatchObject({ title: 'CN U9 și CN U17', days: '27–29', rest: 'noiembrie 2026', status: 'next' });
+    expect(page.legend).toEqual({ upcoming: true, played: true, home: true });
+    expect(page.events.map(c => c.id)).toEqual(comps.map(c => c.id));
+  });
+
+  test('an event across the new year is next for the panel, and no block of the year pretends to be', () => {
+    const across = comp('across', '2025-12-30', '2026-01-02');
+    const page = calendarView({ ...site, competitions: [across, ...comps] }, '2026-01-01');
+    expect(page.next?.id).toBe('across');
+    const statuses = page.months.flatMap(m => events(m.cells)).map(e => e.status);
+    expect(statuses).not.toContain('next');
+    expect(statuses[0]).toBe('upcoming');
+    expect([...page.spring, ...page.autumn].map(r => r.status)).not.toContain('next');
+    expect(page.events.map(c => c.id)).toContain('across'); // the browser recomputes from every competition
+  });
+
+  test('a season over: the legend has nothing coming', () => {
+    const page = calendarView(parseSiteData(quiet, 'quiet-season.json'), TODAY);
+    expect(page.legend).toEqual({ upcoming: false, played: true, home: true });
+    expect(page.nextView).toBeUndefined();
+  });
+
+  test('no competition: no legend', () => {
+    expect(calendarView({ ...site, competitions: [] }, TODAY).legend).toBeUndefined();
   });
 });

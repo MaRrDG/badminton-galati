@@ -59,6 +59,14 @@
       "home": false
     },
     {
+      "id": "competition-2026-03-28-turneu-de-test",
+      "title": "Turneu de test",
+      "city": "București",
+      "start": "2026-03-28",
+      "end": "2026-03-28",
+      "home": false
+    },
+    {
       "id": "competition-2026-04-03-cr-u11-cr-u17",
       "title": "CR U11 și CR U17",
       "city": "Galați",

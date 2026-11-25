@@ -4,17 +4,17 @@ import type { Month } from '../../lib/calendar';
 interface Props {
   month: Month;
   year: number;
-  /** The build date, 'YYYY-MM-DD' in Bucharest: marks today inside an event block. */
-  today: string;
 }
 
-const { month, year, today } = Astro.props;
-// Today's day number when today falls in this month.
-const todayDay = today.startsWith(`${year}-${String(month.month).padStart(2, '0')}-`) ? Number(today.slice(8, 10)) : undefined;
+const { month, year } = Astro.props;
 const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Jo', 'Vi', 'Sâ', 'Du'];
 ---
 
-<section class:list={['mo', { empty: month.empty }]} aria-label={`${month.name} ${year}`}>
+<!--
+  Plain days are hidden from screen readers (the list below the grids is their route); today
+  and the competition blocks are read. calendar-today.ts moves the marks when the page is stale.
+-->
+<section class:list={['mo', { empty: month.empty }]} aria-label={`${month.name} ${year}`} data-ym={`${year}-${String(month.month).padStart(2, '0')}`}>
   <h3>{month.name}{month.empty && <span class="none"> fără competiții</span>}</h3>
   <div class="grid">
     {WEEKDAYS.map(w => <span class="wd" aria-hidden="true">{w}</span>)}
@@ -23,18 +23,18 @@ const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Jo', 'Vi', 'Sâ', 'Du'];
         cell.kind === 'pad' ? (
           <span class="pad" style={`grid-column:span ${cell.span}`} />
         ) : cell.kind === 'day' ? (
-          <span class:list={['d', { today: cell.today }]} aria-current={cell.today ? 'date' : undefined}>{cell.day}</span>
+          <span class:list={['d', { today: cell.today }]} aria-current={cell.today ? 'date' : undefined} aria-hidden={cell.today ? undefined : 'true'}>{cell.day}</span>
         ) : (
           <a
             class:list={['evb', cell.status, { home: cell.home }]}
-            href={`#ev-${cell.comps[0].id}`}
-            data-ev={`ev-${cell.comps[0].id}`}
+            href={`#ev-${cell.ids[0]}`}
+            data-ids={cell.ids.join(' ')}
             data-f={cell.filter}
             style={`grid-column:span ${cell.days.length};--n:${cell.days.length}`}
             aria-label={cell.label}
           >
             {cell.days.map(d => (
-              <span class:list={{ today: d === todayDay }} aria-current={d === todayDay ? 'date' : undefined}>{d}</span>
+              <span class:list={{ today: d === cell.todayDay }} aria-current={d === cell.todayDay ? 'date' : undefined}>{d}</span>
             ))}
           </a>
         ),

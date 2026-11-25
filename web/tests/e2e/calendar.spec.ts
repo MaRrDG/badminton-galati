@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { pinClock } from './clock';
+import { at, pinClock } from './clock';
 import { on } from './servers';
 
 // The countdown reads the browser clock: every page runs on the pinned build date.
@@ -128,6 +128,99 @@ test('the blocks fill in on load and end unclipped', async ({ page }) => {
   expect(new Set(clips)).toEqual(new Set(['none']));
 });
 
+test('plain days are hidden from screen readers; today and the blocks are not', async ({ page }) => {
+  await page.goto('/calendar/');
+  await expect(page.locator('.d:not([aria-hidden="true"])')).toHaveText(['25']);
+  await expect(page.locator('.evb[aria-hidden]')).toHaveCount(0);
+});
+
+test('a modified click leaves the link to the browser', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/calendar/');
+  const popup = page.context().waitForEvent('page');
+  await page.locator(block('CR U9 și CR Seniori')).click({ modifiers: ['ControlOrMeta'] });
+  await (await popup).close();
+  await page.mouse.move(0, 0); // leave the block, so the panel shows what is pinned
+  await expect(page.locator('.evb.on')).toHaveCount(0);
+  await expect(page).not.toHaveURL(/#ev-/);
+  await expect(page.locator('.panel')).toContainText('CN U9 și CN U17');
+});
+
+test('pinning the same event twice is announced twice', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/calendar/');
+  await page.evaluate(() => {
+    const live = document.querySelector('[data-panel-live]')!;
+    (window as unknown as { said: string[] }).said = [];
+    new MutationObserver(() => (window as unknown as { said: string[] }).said.push(live.textContent ?? '')).observe(live, { childList: true, characterData: true, subtree: true });
+  });
+  const ev = page.locator(block('CR U9 și CR Seniori'));
+  await ev.click();
+  await expect(page.locator('[data-panel-live]')).not.toBeEmpty();
+  await ev.click();
+  const label = 'CR U9 și CR Seniori, 13–15 martie, București, s-a jucat';
+  await expect.poll(() => page.evaluate(() => (window as unknown as { said: string[] }).said.filter(Boolean))).toEqual([label, label]);
+});
+
+test.describe('a page built days before it is read', () => {
+  test('with the clock on the build date nothing changes', async ({ browser, baseURL }) => {
+    const ctx = await browser.newContext({ baseURL, reducedMotion: 'reduce' });
+    const page = await ctx.newPage();
+    await pinClock(page);
+    const html = await (await page.goto('/calendar/'))!.text();
+    const built = await page.evaluate(source => {
+      const doc = new DOMParser().parseFromString(source, 'text/html');
+      return ['.months', '.list', '.legend'].map(s => doc.querySelector(s)!.innerHTML);
+    }, html);
+    const live = await page.evaluate(() => ['.months', '.list', '.legend'].map(s => document.querySelector(s)!.innerHTML));
+    expect(live).toEqual(built);
+    await expect(page.locator('.cal')).toHaveAttribute('data-today', '2026-11-25');
+    await ctx.close();
+  });
+
+  test('after the next event has ended: everything played, season over', async ({ page }) => {
+    await page.clock.setSystemTime(at('2026-11-30'));
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/calendar/');
+    await expect(page.locator('.panel')).toContainText('Nicio competiție programată deocamdată.');
+    await expect(page.locator('.panel')).not.toContainText('CN U9 și CN U17');
+    await expect(page.locator('[aria-current="date"]')).toHaveText('30');
+    await expect(page.locator('.legend')).toContainText('azi, 30 noiembrie');
+    await expect(page.locator('[data-legend="upcoming"]')).toBeHidden();
+    await expect(page.locator('.evb.next, .evb.upcoming, .li.next, .li.upcoming')).toHaveCount(0);
+    await expect(page.locator(block('CN U9 și CN U17'))).toHaveAttribute('aria-label', 'CN U9 și CN U17, 27–29 noiembrie, București, s-a jucat');
+    await expect(page.locator('#ev-competition-2026-11-27-cn-u9-cn-u17 .st')).toHaveText('s-a jucat');
+    // Pinning still works, with no "next" to return to.
+    await page.locator(block('CN U9 și CN U17')).click();
+    await expect(page.locator('.panel')).toContainText('S-a jucat');
+    await expect(page.getByRole('button', { name: 'Arată următoarea competiție' })).toHaveCount(0);
+  });
+
+  test('a date in another month: the mark, the legend, the statuses and the next event move', async ({ page }) => {
+    await page.clock.setSystemTime(at('2026-10-01'));
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/calendar/');
+    await expect(page.locator('[aria-current="date"]')).toHaveCount(1);
+    await expect(page.locator('.mo[data-ym="2026-10"] [aria-current="date"]')).toHaveText('1');
+    await expect(page.locator('.mo[data-ym="2026-11"] .d.today')).toHaveCount(0);
+    await expect(page.locator('.legend')).toContainText('azi, 1 octombrie');
+    await expect(page.locator('.panel')).toContainText('CN U11 și CN U19');
+    await expect(page.locator('.panel')).toContainText('acasă');
+    await expect(page.locator('.panel [data-countdown]')).toHaveText('peste 22 de zile');
+    await expect(page.locator(block('CN U11 și CN U19'))).toHaveClass(/\bnext\b/);
+    await expect(page.locator(block('CN U9 și CN U17'))).toHaveClass(/\bupcoming\b/);
+    await expect(page.locator(block('CN U13 și CN U23'))).toHaveClass(/\bplayed\b/);
+    await expect(page.locator(block('CN U15 și CN Seniori'))).toHaveAttribute('aria-label', /, urmează$/);
+    await expect(page.locator('#ev-competition-2026-10-23-cn-u11-cn-u19')).toHaveClass(/\bnext\b/);
+    await expect(page.locator('#ev-competition-2026-10-23-cn-u11-cn-u19 .st')).toHaveText('urmează');
+    // The panel's way back leads to the new next event.
+    await page.locator(block('CR U9 și CR Seniori')).click();
+    await page.getByRole('button', { name: 'Arată următoarea competiție' }).click();
+    await expect(page.locator('.panel')).toContainText('CN U11 și CN U19');
+    await expect(page.locator(block('CN U11 și CN U19'))).toBeFocused();
+  });
+});
+
 test('no overflow at 390 and 1440', async ({ page }) => {
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -146,6 +239,22 @@ test.describe('season over', on('quiet-season'), () => {
     await expect(page.locator('.filter')).toHaveCount(0);
     await expect(page.locator('.evb.next, .evb.upcoming')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Arată următoarea competiție' })).toHaveCount(0);
+  });
+
+  test('competitions sharing days share a block; the panel switches between them', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/calendar/');
+    const shared = page.locator(block('CR U15 și CR U23'));
+    await expect(shared).toHaveAttribute('aria-label', 'CR U15 și CR U23, 27–29 martie, București, s-a jucat; Turneu de test, 28 martie, București, s-a jucat');
+    await shared.click();
+    const panel = page.locator('.panel');
+    await expect(panel).toContainText('CR U15 și CR U23');
+    await panel.getByRole('button', { name: 'Turneu de test' }).click();
+    await expect(panel.locator('.pt')).toHaveText('Turneu de test');
+    await expect(panel.getByRole('button', { name: 'CR U15 și CR U23' })).toBeFocused();
+    await expect(page.locator('[data-panel-live]')).toHaveText('Turneu de test, 28 martie, București, s-a jucat');
+    await panel.getByRole('button', { name: 'CR U15 și CR U23' }).click();
+    await expect(panel.locator('.pt')).toHaveText('CR U15 și CR U23');
   });
 
   test('pinning a played event shows its article in the panel', async ({ page }) => {

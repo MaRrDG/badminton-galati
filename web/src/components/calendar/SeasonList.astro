@@ -1,29 +1,23 @@
 ---
 import SectionHeading from '../ui/SectionHeading.astro';
-import { categoryFilter, cityLabel, eventStatus, statusWord } from '../../lib/calendar';
-import { formatShortRangeRo, splitRangeRo } from '../../lib/dates';
-import { splitCalendar } from '../../lib/home';
-import type { Competition } from '../../lib/types';
+import type { EventView } from '../../lib/calendar';
 
 interface Props {
-  spring: Competition[];
-  autumn: Competition[];
-  /** The build date, 'YYYY-MM-DD' in Bucharest. */
-  today: string;
+  spring: EventView[];
+  autumn: EventView[];
 }
 
-const { spring, autumn, today } = Astro.props;
-// The same next event as the grid: the earliest of the year not yet over.
-const { next } = splitCalendar([...spring, ...autumn], today);
+const { spring, autumn } = Astro.props;
 const halves = [
-  { heading: 'Primăvara, Cupele României', comps: spring },
-  { heading: 'Toamna, Campionatele Naționale', comps: autumn },
-].filter(h => h.comps.length > 0);
+  { heading: 'Primăvara, Cupele României', rows: spring },
+  { heading: 'Toamna, Campionatele Naționale', rows: autumn },
+].filter(h => h.rows.length > 0);
 ---
 
 <!--
   The season as a plain list in date order: the target of every block in the grid, and the
-  calendar for screen readers and for pages without JavaScript. The panel reads its data-*.
+  calendar for screen readers and for pages without JavaScript. calendar-today.ts rewrites the
+  statuses when the page has gone stale.
 -->
 <section class="list" aria-labelledby="list-h">
   <SectionHeading id="list-h">Toate competițiile, pe rând</SectionHeading>
@@ -32,39 +26,25 @@ const halves = [
       <div>
         <h3>{h.heading}</h3>
         <ol>
-          {h.comps.map(c => {
-            const status = eventStatus(c, today, next);
-            const when = splitRangeRo(c.start, c.end);
-            return (
-              <li
-                id={`ev-${c.id}`}
-                class:list={['li', status, { home: c.home }]}
-                data-f={categoryFilter([c])}
-                data-status={status}
-                data-home={c.home ? '' : undefined}
-                data-days={when.days}
-                data-rest={when.rest}
-                data-title={c.title}
-                data-city={cityLabel(c)}
-              >
-                <span class="ld">
-                  <time datetime={c.start}>{formatShortRangeRo(c.start, c.end)}</time>
+          {h.rows.map(r => (
+            <li id={`ev-${r.id}`} class:list={['li', r.status, { home: r.home }]} data-id={r.id} data-f={r.filter}>
+              <span class="ld">
+                <time datetime={r.start}>{r.short}</time>
+              </span>
+              <span class="lt">{r.title}</span>
+              <span class:list={['lc', { unknown: !r.cityKnown }]}>
+                {r.city}
+                {r.home && <span class="home-tag">acasă</span>}
+              </span>
+              {(r.postSlug || r.resultsUrl) && (
+                <span class="la">
+                  {r.postSlug && <a class="textlink" href={`/noutati/${r.postSlug}/`}>Articolul clubului</a>}
+                  {r.resultsUrl && <a class="textlink" href={r.resultsUrl}>Rezultatele pe badminton.ro</a>}
                 </span>
-                <span class="lt">{c.title}</span>
-                <span class:list={['lc', { unknown: c.city === 'de confirmat' }]}>
-                  {cityLabel(c)}
-                  {c.home && <span class="home-tag">acasă</span>}
-                </span>
-                {(c.postSlug || c.resultsUrl) && (
-                  <span class="la">
-                    {c.postSlug && <a class="textlink" href={`/noutati/${c.postSlug}/`}>Articolul clubului</a>}
-                    {c.resultsUrl && <a class="textlink" href={c.resultsUrl}>Rezultatele pe badminton.ro</a>}
-                  </span>
-                )}
-                <span class="visually-hidden">{statusWord(status)}</span>
-              </li>
-            );
-          })}
+              )}
+              <span class="visually-hidden st">{r.statusText}</span>
+            </li>
+          ))}
         </ol>
       </div>
     ))

@@ -1,10 +1,8 @@
 ---
-import { cityLabel } from '../../lib/calendar';
-import { splitRangeRo } from '../../lib/dates';
-import type { Competition } from '../../lib/types';
+import type { EventView } from '../../lib/calendar';
 
 interface Props {
-  next?: Competition;
+  next?: EventView;
   countdown?: string;
   todayLabel: string;
   /** What the grid shows, so the legend names only that; without a grid, no legend and no hint. */
@@ -12,26 +10,26 @@ interface Props {
 }
 
 const { next, countdown, todayLabel, legend } = Astro.props;
-const when = next && splitRangeRo(next.start, next.end);
 ---
 
 <!--
   The details panel: the next competition until a block in the grid is chosen
-  (calendar-panel.ts). Without JavaScript and on narrow screens it keeps the next one.
+  (calendar-panel.ts, which fills it from the templates below). Without JavaScript and on
+  narrow screens it keeps the next one. The back button shows only while another is pinned.
 -->
-<div class:list={['panel', next ? { home: next.home } : 'none']} data-panel data-next={next && `ev-${next.id}`}>
+<div class:list={['panel', next ? { home: next.home } : 'none']} data-panel data-next={next?.id}>
   <div class="pbody">
     {
-      next && when ? (
+      next ? (
         <>
           <p class="ps">Următoarea competiție</p>
           <p class="pd">
-            <span class="pdn">{when.days}</span>
-            <small class="pdm">{when.rest}</small>
+            <span class="pdn">{next.days}</span>
+            <small class="pdm">{next.rest}</small>
           </p>
           <p class="pt">{next.title}</p>
           <p class="pc">
-            <span class="pcity">{cityLabel(next)}</span>
+            <span class="pcity">{next.city}</span>
             {next.home && <span class="home-tag">acasă</span>}
           </p>
           {(next.postSlug || next.resultsUrl) && (
@@ -49,24 +47,29 @@ const when = next && splitRangeRo(next.start, next.end);
       )
     }
   </div>
-  {next && <button type="button" class="back" hidden>Arată următoarea competiție</button>}
+  <button type="button" class="back" hidden>Arată următoarea competiție</button>
 </div>
-<template data-panel-pick>
+<template data-panel-event>
   <p class="ps"></p>
   <p class="pd"><span class="pdn"></span><small class="pdm"></small></p>
   <p class="pt"></p>
   <p class="pc"><span class="pcity"></span><span class="home-tag">acasă</span></p>
-  <p class="pa"></p>
+  <p class="pa"><a class="textlink post">Articolul clubului</a><a class="textlink results">Rezultatele pe badminton.ro</a></p>
+  <p class="also">Tot în aceste zile: <button type="button" class="other"></button></p>
+  <p class="days" data-countdown hidden></p>
+</template>
+<template data-panel-none>
+  <p class="pnone">Nicio competiție programată deocamdată.</p>
 </template>
 <p class="visually-hidden" aria-live="polite" data-panel-live></p>
 {
   legend && (
     <>
       <ul class="legend">
-        {legend.upcoming && <li><span class="sw up" />urmează</li>}
-        {legend.played && <li><span class="sw pl" />s-a jucat</li>}
-        {legend.home && <li><span class="sw hm" />roșu: acasă, la Galați</li>}
-        <li><span class="sw td" />{todayLabel}</li>
+        <li data-legend="upcoming" hidden={!legend.upcoming}><span class="sw up" />urmează</li>
+        <li data-legend="played" hidden={!legend.played}><span class="sw pl" />s-a jucat</li>
+        <li data-legend="home" hidden={!legend.home}><span class="sw hm" />roșu: acasă, la Galați</li>
+        <li><span class="sw td" /><span data-today-label>{todayLabel}</span></li>
       </ul>
       <p class="hint">Apasă pe o competiție din calendar ca să vezi detaliile.</p>
     </>
@@ -143,8 +146,25 @@ const when = next && splitRangeRo(next.start, next.end);
   .days[hidden] {
     display: none;
   }
-  .back[hidden] {
+  .back[hidden],
+  .legend li[hidden] {
     display: none;
+  }
+  .also {
+    margin-top: 12px;
+    font-size: 0.95rem;
+  }
+  .other {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin-right: 12px;
+    color: inherit;
+    font: 600 0.95rem var(--body);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+    cursor: pointer;
   }
   .back {
     display: block;

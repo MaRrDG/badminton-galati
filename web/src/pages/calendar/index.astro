@@ -4,24 +4,16 @@ import FilterBar from '../../components/ui/FilterBar.astro';
 import Month from '../../components/calendar/Month.astro';
 import Panel from '../../components/calendar/Panel.astro';
 import SeasonList from '../../components/calendar/SeasonList.astro';
-import { buildToday, getCalendarPage } from '../../lib/content';
+import { getCalendarPage } from '../../lib/content';
 
 const page = await getCalendarPage();
-const today = buildToday();
-const { year, months, next, countdown, intro, filters, spring, autumn, todayLabel } = page;
-const blocks = months.flatMap(m => m.cells.filter(c => c.kind === 'event'));
-const legend =
-  months.length > 0
-    ? {
-        upcoming: blocks.some(b => b.status !== 'played'),
-        played: blocks.some(b => b.status === 'played'),
-        home: blocks.some(b => b.home),
-      }
-    : undefined;
+const { year, today, months, nextView, countdown, intro, filters, spring, autumn, todayLabel, legend, events } = page;
+// For calendar-today.ts; "<" is escaped so the JSON can never close its script element.
+const eventsJson = JSON.stringify(events).replace(/</g, '\\u003c');
 ---
 
 <Base title="Calendar | CS Siderurgistul Galați" description={intro}>
-  <div class="cal">
+  <div class="cal" data-today={today}>
     <div class="wrap">
       <div class="layout">
         <div class="head">
@@ -30,7 +22,7 @@ const legend =
         </div>
 
         <aside class="side" aria-label="Detaliile competiției">
-          <Panel next={next} countdown={countdown} todayLabel={todayLabel} legend={legend} />
+          <Panel next={nextView} countdown={countdown} todayLabel={todayLabel} legend={legend} />
         </aside>
 
         {
@@ -45,23 +37,28 @@ const legend =
           months.length > 0 && (
             <section class="months" aria-labelledby="months-h">
               <h2 class="visually-hidden" id="months-h">Lunile anului {year}</h2>
-              {months.map(m => <Month month={m} year={year} today={today} />)}
+              {months.map(m => <Month month={m} year={year} />)}
             </section>
           )
         }
       </div>
 
-      {spring.length + autumn.length > 0 && <SeasonList spring={spring} autumn={autumn} today={today} />}
+      {spring.length + autumn.length > 0 && <SeasonList spring={spring} autumn={autumn} />}
     </div>
+    <script type="application/json" id="calendar-events" set:html={eventsJson} />
   </div>
 </Base>
 
 <script>
   import { initCalendarPanel } from '../../scripts/calendar-panel';
+  import { initCalendarToday } from '../../scripts/calendar-today';
   import { initCountdowns } from '../../scripts/countdown';
   import { initPageMotion } from '../../scripts/page-motion';
 
-  initCountdowns(); // first: the panel keeps a copy of the next event with its countdown
+  // In this order: today's statuses and next event, then its countdown, then the panel, which
+  // keeps a copy of what the first two left in it.
+  initCalendarToday();
+  initCountdowns();
   initCalendarPanel();
   initPageMotion('season-fill');
 </script>
@@ -98,11 +95,6 @@ const legend =
   .filters {
     grid-area: filter;
     padding: 22px 0 26px;
-  }
-  /* As in the approved calendar, the words wrap as one line of text after "Categoria",
-     not as a block of their own under it. */
-  .filters :global(.opts) {
-    display: contents;
   }
   .months {
     grid-area: months;
