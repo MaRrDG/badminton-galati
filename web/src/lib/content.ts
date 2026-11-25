@@ -324,6 +324,7 @@ export function parseSiteData(value: unknown, source: string): SiteData {
     });
     optional(info, 'programNote', p, text);
     optional(info, 'venuePhoto', p, img);
+    optional(info, 'parentsPhoto', p, img);
     optional(info, 'contact', p, (x, q) => {
       const contact = record(x, q);
       optional(contact, 'phone', q, text);

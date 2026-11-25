@@ -23,8 +23,8 @@ const IMAGE = `{ alt, "url": asset->url, "width": asset->metadata.dimensions.wid
 
 /**
  * Everything the homepage needs, in one request; until plan 2b this is all the Sanity source
- * serves (three posts; of the inner-page fields only the venue photo, whose Studio field comes
- * in plan 2b). Athletes without parental consent are filtered here already, so their data never
+ * serves (three posts; of the inner-page fields only the venue and parents' photos, whose
+ * Studio fields come in plan 2b). Athletes without parental consent are filtered here already, so their data never
  * leaves Sanity; `toHomeData` filters again.
  */
 export const HOME_QUERY = `{
@@ -32,7 +32,8 @@ export const HOME_QUERY = `{
     heroLines, heroText, "heroPhoto": heroPhoto${IMAGE},
     whyIntro, "whyPhoto": whyPhoto${IMAGE}, whyPoints[]{ title, text },
     hallText, "hallPhotos": hallPhotos[]${IMAGE},
-    groupsIntro, trialText, rankingWeek{ week, from, to }, "venuePhoto": venuePhoto${IMAGE}
+    groupsIntro, trialText, rankingWeek{ week, from, to },
+    "venuePhoto": venuePhoto${IMAGE}, "parentsPhoto": parentsPhoto${IMAGE}
   },
   "athletes": *[_type == "athlete" && consent == true] | order(name asc){
     _id, name, "slug": slug.current, consent, frbUrl, "photo": photo${IMAGE},
@@ -73,7 +74,7 @@ type RawSettings = Raw<{
   heroLines: string[]; heroText: string; heroPhoto: RawImg; whyIntro: string; whyPhoto: RawImg;
   whyPoints: Raw<{ title: string; text: string }>[]; hallText: string; hallPhotos: (RawImg | null)[];
   groupsIntro: string; trialText: string; rankingWeek: Raw<{ week: number; from: string; to: string }>;
-  venuePhoto: RawImg; // no Studio field until plan 2b; null until then
+  venuePhoto: RawImg; parentsPhoto: RawImg; // no Studio fields until plan 2b; null until then
 }>;
 type RawHome = Raw<{
   settings: RawSettings; athletes: RawAthlete[]; groups: RawGroup[]; competitions: RawCompetition[]; posts: RawPost[];
@@ -176,6 +177,9 @@ export function toHomeData(raw: unknown): SiteData {
     groupsIntro: s.groupsIntro as string,
     trialText: s.trialText as string,
     coaches: [],
-    info: { parents: {}, contact: {}, ...optional('venuePhoto', toImg(s.venuePhoto)) },
+    info: {
+      parents: {}, contact: {},
+      ...optional('venuePhoto', toImg(s.venuePhoto)), ...optional('parentsPhoto', toImg(s.parentsPhoto)),
+    },
   };
 }

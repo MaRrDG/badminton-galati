@@ -16,11 +16,10 @@ interface Props {
 
 const { id, question, answer, tbc, class: className } = Astro.props;
 const paragraphs = answerParagraphs(answer);
-const figure = Astro.slots.has('figure');
 const headingId = `${id}-h`;
 ---
 
-<section class:list={['q', className, { 'with-figure': figure }]} id={id} aria-labelledby={headingId}>
+<section class:list={['q', className]} id={id} aria-labelledby={headingId}>
   <slot name="figure" />
   <div class="qbody">
     <h2 class="qh" id={headingId}>{question}</h2>

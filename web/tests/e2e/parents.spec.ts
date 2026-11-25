@@ -48,22 +48,43 @@ test('following a question from the list moves the reader there', async ({ page 
   expect(after).toBe(true);
 });
 
-test('the list of questions stays clear of the text and the footer on a wide screen', async ({ browser, baseURL }) => {
-  const ctx = await browser.newContext({ baseURL, viewport: { width: 1440, height: 900 } });
-  const page = await ctx.newPage();
-  await page.goto('/pentru-parinti/');
-  await expect(page.locator('.toc-wrap')).toHaveCSS('position', 'sticky');
-  await page.evaluate(() => window.scrollTo(0, 1600));
-  expect((await page.locator('.toc').boundingBox())!.y).toBe(20); // it follows the reader
-  for (const y of [0, 1200, 2400, 99999]) {
-    await page.evaluate(top => window.scrollTo(0, top), y);
-    const [t, text, footer, venue] = await Promise.all(['.toc', '.reading .text', '.site-footer', '#sala'].map(s => page.locator(s).first().boundingBox()));
-    expect(t!.x).toBeGreaterThanOrEqual(text!.x + text!.width);
-    expect(t!.y + t!.height).toBeLessThanOrEqual(venue!.y);
-    expect(t!.y + t!.height).toBeLessThanOrEqual(footer!.y);
-  }
-  await ctx.close();
-});
+for (const width of [1440, 1024, 861, 860, 390]) {
+  test(`the list of questions stays readable and clear of the text and the footer at ${width}px`, async ({ browser, baseURL }) => {
+    const ctx = await browser.newContext({ baseURL, viewport: { width, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto('/pentru-parinti/');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    const tocLinksInside = async () => {
+      for (const box of await page.locator('.toc a').evaluateAll(as => as.map(a => a.getBoundingClientRect().toJSON()))) {
+        expect(box.left).toBeGreaterThanOrEqual(0);
+        expect(box.right).toBeLessThanOrEqual(width);
+      }
+    };
+    await tocLinksInside();
+    if (width <= 860) {
+      // One column: the list comes first, static, as wide as the text.
+      await expect(page.locator('.toc-wrap')).toHaveCSS('position', 'static');
+      const [toc, text] = await Promise.all(['.toc', '.reading .text'].map(s => page.locator(s).boundingBox()));
+      expect(toc!.y + toc!.height).toBeLessThanOrEqual(text!.y);
+      await ctx.close();
+      return;
+    }
+    await expect(page.locator('.toc-wrap')).toHaveCSS('position', 'sticky');
+    expect((await page.locator('.toc').boundingBox())!.width).toBeGreaterThanOrEqual(200);
+    await page.evaluate(() => window.scrollTo(0, 1600));
+    expect((await page.locator('.toc').boundingBox())!.y).toBe(20); // it follows the reader
+    for (const y of [0, 1200, 2400, 99999]) {
+      await page.evaluate(top => window.scrollTo(0, top), y);
+      const [t, text, footer, venue] = await Promise.all(['.toc', '.reading .text', '.site-footer', '#sala'].map(s => page.locator(s).first().boundingBox()));
+      expect(t!.x).toBeGreaterThanOrEqual(text!.x + text!.width);
+      expect(t!.y + t!.height).toBeLessThanOrEqual(venue!.y);
+      expect(t!.y + t!.height).toBeLessThanOrEqual(footer!.y);
+      expect(t!.height).toBeLessThanOrEqual(900);
+      await tocLinksInside();
+    }
+    await ctx.close();
+  });
+}
 
 test('reduced motion shows the opening photo at rest', async ({ browser, baseURL }) => {
   const ctx = await browser.newContext({ baseURL, reducedMotion: 'reduce' });

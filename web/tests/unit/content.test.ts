@@ -175,8 +175,8 @@ describe('site data', () => {
     const site = await getSiteData();
     expect(site.posts).toHaveLength(3);
     expect(site.coaches.map(c => c.name)).toEqual(['Dorel Badiu', 'Iulian Călin', 'Adrian Panfil']);
-    // Only the hall photo is known; the club's answers are not yet.
-    expect(site.info).toEqual({ parents: {}, contact: {}, venuePhoto: fixture.info.venuePhoto });
+    // Only the two photos are known; the club's answers are not yet.
+    expect(site.info).toEqual({ parents: {}, contact: {}, venuePhoto: fixture.info.venuePhoto, parentsPhoto: fixture.info.parentsPhoto });
     expect(site.competitions.find(c => c.title === 'CR Echipe Seniori și Cupa U15')!.categories).toEqual(['U15', 'Seniori', 'Echipe']);
     expect((await getHomeData()).posts).toHaveLength(3);
   });
@@ -214,10 +214,12 @@ describe('site data', () => {
     for (const p of site.posts) expect([p.body, p.gallery, p.results]).toEqual([[], [], []]);
   });
 
-  test('the venue photo is optional and checked like every image', () => {
-    const venuePhoto = { url: '/img/sala-turneu-2.jpg', width: 1280, height: 720, alt: 'Sala' };
-    expect(parseSiteData({ ...fixture, info: { venuePhoto } }, 't').info.venuePhoto).toEqual(venuePhoto);
-    expect(() => parseSiteData({ ...fixture, info: { venuePhoto: { ...venuePhoto, width: 0 } } }, 't')).toThrow('info.venuePhoto.width');
+  test('the venue and parents photos are optional and checked like every image', () => {
+    const photo = { url: '/img/sala-turneu-2.jpg', width: 1280, height: 720, alt: 'Sala' };
+    for (const key of ['venuePhoto', 'parentsPhoto'] as const) {
+      expect(parseSiteData({ ...fixture, info: { [key]: photo } }, 't').info[key]).toEqual(photo);
+      expect(() => parseSiteData({ ...fixture, info: { [key]: { ...photo, width: 0 } } }, 't')).toThrow(`info.${key}.width`);
+    }
   });
 
   test('groups take the seed ids and slugs; a fixture without them gets the same from the name', () => {
@@ -332,10 +334,12 @@ describe('toHomeData', () => {
     expect(d.hallPhotos).toEqual([]); expect(d.rankingWeek).toBeUndefined();
   });
 
-  test('the venue photo is read when set and left out when not', () => {
+  test('the venue and parents photos are read when set and left out when not', () => {
     expect(HOME_QUERY).toContain('"venuePhoto": venuePhoto{');
-    expect(toHomeData({ ...rawSample, settings: { ...rawSample.settings, venuePhoto: rawImg('sala') } }).info.venuePhoto).toEqual(rawImg('sala'));
-    expect(toHomeData({ ...rawSample, settings: { ...rawSample.settings, venuePhoto: null } }).info).toEqual({ parents: {}, contact: {} });
+    expect(HOME_QUERY).toContain('"parentsPhoto": parentsPhoto{');
+    const set = toHomeData({ ...rawSample, settings: { ...rawSample.settings, venuePhoto: rawImg('sala'), parentsPhoto: rawImg('copii') } });
+    expect(set.info).toEqual({ parents: {}, contact: {}, venuePhoto: rawImg('sala'), parentsPhoto: rawImg('copii') });
+    expect(toHomeData({ ...rawSample, settings: { ...rawSample.settings, venuePhoto: null, parentsPhoto: null } }).info).toEqual({ parents: {}, contact: {} });
   });
 
   test('missing hero and why photos map to undefined', () => {

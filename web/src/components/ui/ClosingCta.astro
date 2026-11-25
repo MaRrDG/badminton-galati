@@ -1,4 +1,6 @@
 ---
+import { CLUB_EMAIL as address } from '../../lib/club';
+
 interface Props {
   text: string;
   /** The big uppercase heading (programme, parents) or the modest one (athletes). */
@@ -10,7 +12,6 @@ interface Props {
 }
 
 const { text, display, label, href, email = false } = Astro.props;
-const address = 'siderurgistul@badmintongalati.ro';
 ---
 
 <section class:list={['cta', display ? 'big' : 'modest']} id="proba" aria-labelledby="cta-h">

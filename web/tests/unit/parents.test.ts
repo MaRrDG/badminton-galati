@@ -43,10 +43,11 @@ describe('parentsView', () => {
     expect(parentsView(site({ coaches })).coaches.map(c => [c.coach.id, c.tone])).toEqual([['a', 'blue'], ['b', 'deep'], ['c', 'red'], ['d', 'blue']]);
   });
 
-  test('the opening photo is the camp photo, else the first hall photo', () => {
+  test('the opening photo is the club\'s parents photo, else the first hall photo', () => {
     const hall = [img('meci-dublu'), img('cantonament'), img('medalii')];
-    expect(parentsView(site({ hallPhotos: hall })).openingPhoto).toEqual(img('cantonament'));
-    expect(parentsView(site({ hallPhotos: [img('meci-dublu'), img('medalii')] })).openingPhoto).toEqual(img('meci-dublu'));
+    const info = { parents: {}, contact: {}, parentsPhoto: img('copii') };
+    expect(parentsView(site({ hallPhotos: hall, info })).openingPhoto).toEqual(img('copii'));
+    expect(parentsView(site({ hallPhotos: hall })).openingPhoto).toEqual(img('meci-dublu'));
     expect(parentsView(site()).openingPhoto).toBeUndefined();
   });
 
@@ -54,8 +55,11 @@ describe('parentsView', () => {
     const hall = [img('meci-dublu'), img('cantonament')];
     const venue = img('sala-turneu-2');
     expect(parentsView(site({ hallPhotos: hall, info: { parents: {}, contact: {}, venuePhoto: venue } })).hallPhoto).toEqual(venue);
-    expect(parentsView(site({ hallPhotos: hall })).hallPhoto).toEqual(img('meci-dublu'));
-    expect(parentsView(site({ hallPhotos: [img('cantonament')] })).hallPhoto).toBeUndefined();
+    expect(parentsView(site({ hallPhotos: hall })).hallPhoto).toEqual(img('cantonament'));
+    // The opening photo is told apart by its url, so a copy of it is never shown twice.
+    const parentsPhoto = img('cantonament');
+    expect(parentsView(site({ hallPhotos: [img('cantonament'), img('medalii')], info: { parents: {}, contact: {}, parentsPhoto } })).hallPhoto).toEqual(img('medalii'));
+    expect(parentsView(site({ hallPhotos: [img('cantonament')], info: { parents: {}, contact: {}, parentsPhoto } })).hallPhoto).toBeUndefined();
     expect(parentsView(site()).hallPhoto).toBeUndefined();
   });
 

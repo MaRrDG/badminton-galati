@@ -4,6 +4,7 @@ import Sample from '../ui/Sample.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import Tbc from '../ui/Tbc.astro';
 import type { FilterOption } from '../../lib/filter';
+import { HALL_MAP_URL } from '../../lib/club';
 import { plannerRows, type Planner } from '../../lib/program';
 
 interface Props {
@@ -15,7 +16,6 @@ interface Props {
 }
 
 const { planner, filters, note, provisional } = Astro.props;
-const MAP = 'https://www.google.com/maps/search/?api=1&query=45.4194907,28.0277769';
 // The picker's swatches take their fill from the option; the light ones also need an edge.
 // Values are slugs (filterBarCss rejects anything else), so they are safe in a selector.
 const EDGE: Record<string, string> = { 'var(--white)': 'var(--blue)', 'var(--mist)': 'var(--blue-tint)' };
@@ -97,7 +97,7 @@ const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${
       )
     }
     <p class="where">
-      Sala Siderurgistul, Bd. Cloșca, Galați · patru terenuri · <a class="textlink" href={MAP}>sala pe hartă</a>{' · '}<a
+      Sala Siderurgistul, Bd. Cloșca, Galați · patru terenuri · <a class="textlink" href={HALL_MAP_URL}>sala pe hartă</a>{' · '}<a
         class="textlink"
         href="/contact/#drum">cum ajungeți</a
       >

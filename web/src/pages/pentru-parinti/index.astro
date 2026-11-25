@@ -7,12 +7,12 @@ import ClosingCta from '../../components/ui/ClosingCta.astro';
 import Question from '../../components/parents/Question.astro';
 import Coaches from '../../components/parents/Coaches.astro';
 import { getParentsPage } from '../../lib/content';
+import { HALL_MAP_URL } from '../../lib/club';
 import { answerParagraphs } from '../../lib/parents';
 
 const page = await getParentsPage();
 const { parents, groupSlugs } = page;
 const lede = 'Ce e bine să știți înainte de primul antrenament, în ordinea în care vă vin întrebările.';
-const MAP = 'https://www.google.com/maps/search/?api=1&query=45.4194907,28.0277769';
 const program = (slug?: string) => (slug ? `/program/#${slug}` : undefined);
 const firstWeeks = answerParagraphs(parents.firstWeeks);
 
@@ -124,7 +124,7 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
           <b>Sala Siderurgistul, Bd. Cloșca, Galați.</b> Are patru terenuri de badminton și aici se antrenează toate grupele. În aceeași sală
           s-a jucat Balcaniada din 2002 și cea din 2023.
         </p>
-        <p class="links"><a class="textlink" href={MAP}>Sala pe hartă</a><a class="textlink" href="/contact/#drum">Cum ajungeți</a></p>
+        <p class="links"><a class="textlink" href={HALL_MAP_URL}>Sala pe hartă</a><a class="textlink" href="/contact/#drum">Cum ajungeți</a></p>
       </Question>
     </div>
   </section>
@@ -178,19 +178,23 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
     max-width: 56ch;
   }
 
+  /* The list keeps a readable width (14rem); the text column gives way first, down to ~50ch at 861px. */
   .reading {
     display: grid;
-    grid-template-columns: minmax(0, 68ch) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 68ch) minmax(14rem, 1fr);
     gap: 32px clamp(40px, 7vw, 120px);
     align-items: start;
   }
-  /* Sticky inside the reading grid only, so the list stops before the venue and the footer. */
+  /* Sticky inside the reading grid only, so the list stops before the venue and the footer.
+     On a short window it never grows past the viewport: it scrolls on its own instead. */
   .toc-wrap {
     grid-column: 2;
     grid-row: 1;
     position: sticky;
     top: 20px;
     max-width: 22rem;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
   }
   .toc {
     background: var(--mist);
@@ -301,6 +305,8 @@ const q = Object.fromEntries(questions) as Record<(typeof questions)[number][0],
       grid-row: auto;
       position: static;
       max-width: none;
+      max-height: none;
+      overflow: visible;
     }
   }
 </style>

@@ -53,6 +53,8 @@ export type ClubInfo = {
   programNote?: string;
   /** The hall itself (the courts), for the parents' and contact pages. */
   venuePhoto?: Img;
+  /** The photo that opens the parents' page (children and coaches together). */
+  parentsPhoto?: Img;
   contact: { phone?: string; directions?: string; replyDays?: number };
 };
 export type HomeData = {

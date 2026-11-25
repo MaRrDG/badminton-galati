@@ -10,15 +10,15 @@ export type ParentsPage = {
   groupSlugs: { first?: string; play?: string };
   /** The venue answer's photo: the club's `venuePhoto`, else the first hall photo that is not the opening one. */
   hallPhoto?: Img;
-  /** The camp photo (`cantonament.jpg`), else the first hall photo. */
+  /** The club's `parentsPhoto`, else the first hall photo. */
   openingPhoto?: Img;
 };
 
 export function parentsView(site: SiteData): ParentsPage {
   const first = site.groups.find(g => g.track === 'performanta')?.slug;
   const play = site.groups.find(g => g.track === 'amatori')?.slug;
-  const openingPhoto = site.hallPhotos.find(p => p.url.endsWith('cantonament.jpg')) ?? site.hallPhotos[0];
-  const hallPhoto = site.info.venuePhoto ?? site.hallPhotos.find(p => p !== openingPhoto);
+  const openingPhoto = site.info.parentsPhoto ?? site.hallPhotos[0];
+  const hallPhoto = site.info.venuePhoto ?? site.hallPhotos.find(p => p.url !== openingPhoto?.url);
   return {
     parents: site.info.parents,
     coaches: site.coaches.map((coach, i) => ({ coach, tone: toneAt(i) })),
