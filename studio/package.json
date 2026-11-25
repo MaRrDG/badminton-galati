@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@sanity/icons": "^5.4.0",
     "@sanity/locale-ro-ro": "^1.0.18",
+    "@sanity/ui": "^4.4.12",
     "react": "^19.2.2",
     "react-dom": "^19.2.2",
     "sanity": "^6.25.0",

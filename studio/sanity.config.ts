@@ -1,7 +1,10 @@
 import { roROLocale } from '@sanity/locale-ro-ro';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { documentActions } from './actions';
 import { schemaTypes } from './schemaTypes';
+import { startTool } from './start/StartTool';
+import { STRUCTURE_TOOL, newDocumentOptions, structure } from './structure';
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? '';
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production';
@@ -11,25 +14,19 @@ export default defineConfig({
   title: 'Siderurgistul Galați',
   projectId,
   dataset,
-  plugins: [
-    structureTool({
-      title: 'Conținut',
-      structure: (S) =>
-        S.list()
-          .title('Conținut')
-          .items([
-            S.listItem().singleton('siteSettings').title('Pagina principală'),
-            S.divider(),
-            S.documentTypeListItem('post').title('Articole'),
-            S.documentTypeListItem('competition').title('Calendar competițional'),
-            S.documentTypeListItem('athlete').title('Sportivi'),
-            S.documentTypeListItem('group').title('Grupe'),
-          ]),
-    }),
-    roROLocale(),
-  ],
+  plugins: [structureTool({ name: STRUCTURE_TOOL, title: 'Conținut', structure }), roROLocale()],
+  // The start screen is the first tool, so the Studio opens on it.
+  tools: (prev) => [startTool, ...prev],
   schema: { types: schemaTypes },
   document: {
     singletons: ['siteSettings'],
+    newDocumentOptions,
+    actions: documentActions,
   },
+  // Coaches publish one article at a time: no releases, scheduling or tasks in their navigation.
+  // Without releases every publish also goes through the publish button (and `documentActions`).
+  releases: { enabled: false },
+  scheduledPublishing: { enabled: false },
+  scheduledDrafts: { enabled: false },
+  tasks: { enabled: false },
 });

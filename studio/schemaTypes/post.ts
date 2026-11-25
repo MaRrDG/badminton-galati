@@ -1,58 +1,44 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { altField, disciplines, imageOptions, slugifyRo } from './shared';
+import { MORE_GROUP, altField, disciplines, formatDateRo, formGroups, imageOptions, slugifyRo, todayInBucharest } from './shared';
+
+const MAIN = 'articol';
+
+export const POST_KINDS = [
+  { title: 'Competiție', value: 'competitie' },
+  { title: 'Viața clubului', value: 'viata-clubului' },
+  { title: 'Proiecte', value: 'proiecte' },
+];
 
 export const post = defineType({
   name: 'post',
   title: 'Articol',
   type: 'document',
-  fieldsets: [
-    {
-      name: 'legaturi',
-      title: 'Legături',
-      description: 'Opțional: competiția din calendar și rezultatele sportivilor.',
-      options: { collapsible: true, collapsed: true },
-    },
-  ],
+  groups: formGroups({ name: MAIN, title: 'Articolul' }),
   fields: [
     defineField({
       name: 'title',
       title: 'Titlul',
       type: 'string',
-      description: 'De exemplu „București, Cupa României U15 – 2026”.',
+      group: MAIN,
+      description: 'De exemplu „Cupa României U15, București”.',
       validation: (rule) => rule.required().error('Scrie titlul articolului.'),
-    }),
-    defineField({
-      name: 'kind',
-      title: 'Despre ce este',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Competiție', value: 'competitie' },
-          { title: 'Viața clubului', value: 'viata-clubului' },
-          { title: 'Proiecte', value: 'proiecte' },
-        ],
-        layout: 'radio',
-      },
-      validation: (rule) => rule.required().error('Alege despre ce este articolul.'),
-    }),
-    defineField({
-      name: 'date',
-      title: 'Data',
-      type: 'date',
-      validation: (rule) => rule.required().error('Alege data articolului.'),
     }),
     defineField({
       name: 'cover',
       title: 'Poza principală',
       type: 'image',
-      description: 'Apare în lista de noutăți și în capul articolului.',
+      group: MAIN,
+      description: 'Apare în lista de noutăți și sus în articol.',
       options: imageOptions,
       fields: [altField],
+      validation: (rule) => rule.required().warning('Alege o poză principală: articolul arată mai bine cu ea.'),
     }),
     defineField({
       name: 'body',
-      title: 'Textul articolului',
+      title: 'Textul',
       type: 'array',
+      group: MAIN,
+      description: 'Câteva rânduri despre ce s-a întâmplat. Poți lipi textul scris în WhatsApp.',
       of: [
         defineArrayMember({
           type: 'block',
@@ -81,7 +67,12 @@ export const post = defineType({
                     name: 'href',
                     title: 'Adresa',
                     type: 'url',
-                    validation: (rule) => rule.required().uri({ scheme: ['https', 'http', 'mailto'] }),
+                    description: 'De exemplu https://badminton.ro',
+                    validation: (rule) =>
+                      rule
+                        .required()
+                        .uri({ scheme: ['https', 'http', 'mailto'] })
+                        .error('Lipește adresa întreagă, care începe cu https://'),
                   }),
                 ],
               }),
@@ -94,7 +85,8 @@ export const post = defineType({
       name: 'gallery',
       title: 'Galerie foto',
       type: 'array',
-      description: 'Pozele de la eveniment. Le poți adăuga mai multe deodată.',
+      group: MAIN,
+      description: 'Pozele de la eveniment. Poți alege mai multe deodată.',
       options: { layout: 'grid' },
       of: [
         defineArrayMember({
@@ -107,25 +99,38 @@ export const post = defineType({
       ],
     }),
     defineField({
-      name: 'slug',
-      title: 'Adresa paginii',
-      type: 'slug',
-      description: 'Se completează din titlu: apasă butonul de lângă câmp.',
-      options: { source: 'title', slugify: slugifyRo },
-      validation: (rule) => rule.required().error('Completează adresa paginii din titlu.'),
+      name: 'kind',
+      title: 'Despre ce este',
+      type: 'string',
+      group: MORE_GROUP,
+      description: 'Este deja „Competiție”. Schimbă doar dacă articolul e despre altceva.',
+      initialValue: 'competitie',
+      options: { list: POST_KINDS, layout: 'radio' },
+      validation: (rule) => rule.required().error('Alege despre ce este articolul.'),
+    }),
+    defineField({
+      name: 'date',
+      title: 'Data',
+      type: 'date',
+      group: MORE_GROUP,
+      description: 'Este deja data de azi. Articolele apar pe site de la cel mai nou la cel mai vechi.',
+      initialValue: () => todayInBucharest(),
+      validation: (rule) => rule.required().error('Alege data articolului.'),
     }),
     defineField({
       name: 'competition',
       title: 'Competiția din calendar',
       type: 'reference',
-      fieldset: 'legaturi',
+      group: MORE_GROUP,
+      description: 'Opțional. Alege competiția despre care scrii.',
       to: [{ type: 'competition' }],
     }),
     defineField({
       name: 'results',
-      title: 'Rezultate',
+      title: 'Rezultatele sportivilor',
       type: 'array',
-      fieldset: 'legaturi',
+      group: MORE_GROUP,
+      description: 'Opțional. Câte un rând pentru fiecare rezultat.',
       of: [
         defineArrayMember({
           name: 'resultRow',
@@ -161,10 +166,26 @@ export const post = defineType({
         }),
       ],
     }),
+    defineField({
+      // Never typed by a coach: the publish action (studio/actions.ts) writes it from the title
+      // on the first publish and never changes it afterwards, so links to the article keep working.
+      name: 'slug',
+      title: 'Adresa paginii',
+      type: 'slug',
+      group: MORE_GROUP,
+      description: 'Se face singură din titlu, la prima publicare, și nu se mai schimbă.',
+      readOnly: true,
+      hidden: ({ value }) => !(value as { current?: string } | undefined)?.current,
+      options: { source: 'title', slugify: slugifyRo },
+    }),
   ],
   preview: {
-    select: { title: 'title', date: 'date', media: 'cover' },
-    prepare: ({ title, date, media }) => ({ title, subtitle: date, media }),
+    select: { title: 'title', date: 'date', kind: 'kind', media: 'cover' },
+    prepare: ({ title, date, kind, media }) => ({
+      title: title || 'Articol fără titlu',
+      subtitle: [formatDateRo(date), POST_KINDS.find((k) => k.value === kind)?.title].filter(Boolean).join(' · '),
+      media,
+    }),
   },
   orderings: [{ title: 'Cele mai noi', name: 'dateDesc', by: [{ field: 'date', direction: 'desc' }] }],
 });
