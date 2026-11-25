@@ -1,0 +1,68 @@
+---
+const email = 'siderurgistul@badmintongalati.ro';
+const links = [
+  { label: 'Federația Română de Badminton', href: 'https://www.badminton.ro/' },
+  { label: 'Badminton Europe', href: 'https://www.badmintoneurope.com/' },
+  { label: 'BWF', href: 'https://bwfbadminton.com/' },
+];
+---
+
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div>
+      <h2>CS Siderurgistul Galați</h2>
+      <p>Club de badminton înființat la 7 martie 2002.</p>
+      <p>Afiliat la Federația Română de Badminton.</p>
+    </div>
+    <div>
+      <h2>Sala</h2>
+      <p>Sala Siderurgistul, Bd. Cloșca, Galați</p>
+      <p>Patru terenuri de badminton</p>
+    </div>
+    <div>
+      <h2>Contact</h2>
+      <p><a href={`mailto:${email}`}>{email}</a></p>
+    </div>
+    <div>
+      <h2>Badminton</h2>
+      {links.map((link) => <p><a href={link.href}>{link.label}</a></p>)}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--blue-deep);
+    color: var(--white);
+    padding: clamp(32px, 4.5vw, 56px) 0;
+    font-size: 0.98rem;
+  }
+  .site-footer .wrap {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+  }
+  .site-footer h2 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.4rem;
+    line-height: 1.1;
+    margin-bottom: 0.4em;
+  }
+  .site-footer p + p {
+    margin-top: 0.35em;
+  }
+  .site-footer a {
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 860px) {
+    .site-footer .wrap {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .site-footer .wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

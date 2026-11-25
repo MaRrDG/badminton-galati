@@ -1,0 +1,113 @@
+---
+import { groupsHeading } from '../../lib/home';
+import type { Group } from '../../lib/types';
+
+interface Props {
+  intro: string;
+  groups: Group[];
+}
+
+const { intro, groups } = Astro.props;
+
+const tracks = [
+  // The performance groups are steps in order, so they form an ordered list.
+  { title: 'Pentru cine vrea performanță', groups: groups.filter((g) => g.track === 'performanta'), play: false, List: 'ol' },
+  { title: 'Pentru cine vrea doar să joace', groups: groups.filter((g) => g.track === 'amatori'), play: true, List: 'ul' },
+].filter((t) => t.groups.length > 0);
+---
+
+<section class="groups" id="program" aria-labelledby="gr-h">
+  <div class="wrap">
+    <div class="groups-head">
+      <h2 class="display" id="gr-h">{groupsHeading(groups)}</h2>
+      <p>{intro}</p>
+    </div>
+    <div class="tracks">
+      {
+        tracks.map(({ title, groups, play, List }) => (
+          <div class:list={{ play }}>
+            <h3>{title}</h3>
+            <List>
+              {groups.map((g) => (
+                <li>
+                  <b>{g.name}</b>
+                  <span>
+                    {g.audience}
+                    {g.schedule && <span class="schedule">{g.schedule}</span>}
+                  </span>
+                </li>
+              ))}
+            </List>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .groups {
+    background: var(--blue);
+    color: var(--white);
+    padding: clamp(52px, 7vw, 104px) 0;
+  }
+  .groups-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px clamp(24px, 5vw, 72px);
+    align-items: end;
+    margin-bottom: clamp(22px, 3vw, 38px);
+  }
+  .groups-head p {
+    max-width: 42ch;
+  }
+  .tracks {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 36px clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  h3 {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding-bottom: 12px;
+    border-bottom: 4px solid var(--white);
+  }
+  ul,
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 4px 24px;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--white) 45%, transparent);
+  }
+  .play li {
+    grid-template-columns: 1fr;
+  }
+  b {
+    font-family: var(--display);
+    font-weight: 900;
+    line-height: 0.95;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  }
+  .schedule {
+    display: block;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+  @media (max-width: 860px) {
+    .groups-head,
+    .tracks,
+    li {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

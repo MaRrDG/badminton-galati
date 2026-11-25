@@ -1,0 +1,94 @@
+---
+import type { Img } from '../../lib/types';
+
+interface Props {
+  text: string;
+  photos: Img[];
+}
+
+const { text, photos } = Astro.props;
+// A strip that can scroll is a region keyboard users must reach; one photo never scrolls.
+const scrolls = photos.length > 1;
+---
+
+<section class="hall" aria-labelledby="hall-h">
+  <div class="wrap">
+    <div class="hall-head">
+      <h2 class="display" id="hall-h">Patru terenuri pe Bulevardul Cloșca</h2>
+      <p>{text}</p>
+    </div>
+    {
+      photos.length > 0 && (
+        <div class="track" role="region" aria-label="Fotografii din sală" tabindex={scrolls ? 0 : undefined}>
+          {photos.map((photo) => (
+            <figure>
+              <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
+            </figure>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hall {
+    background: var(--mist);
+    padding: clamp(44px, 6vw, 80px) 0;
+    overflow: hidden;
+  }
+  .hall-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px clamp(24px, 5vw, 72px);
+    align-items: end;
+    margin-bottom: clamp(20px, 3vw, 34px);
+  }
+  .hall-head h2 {
+    color: var(--blue);
+  }
+  .hall-head p {
+    max-width: 44ch;
+  }
+  .track {
+    display: flex;
+    gap: clamp(12px, 1.4vw, 20px);
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  /* The motion layer adds .js-rally and moves the strip itself. */
+  :global(.js-rally) .track {
+    overflow: visible;
+    width: max-content;
+    padding-bottom: 0;
+  }
+  figure {
+    flex: none;
+  }
+  img {
+    height: clamp(200px, 38vh, 340px);
+    width: auto;
+  }
+  /* A single photo fills the column instead of running past it. */
+  figure:only-child {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  figure:only-child img {
+    width: 100%;
+    height: auto;
+    max-height: clamp(200px, 38vh, 340px);
+    object-fit: cover;
+  }
+  figure:nth-child(3) {
+    margin-right: 12px;
+  }
+  figure:nth-child(3) img {
+    box-shadow: 12px 12px 0 var(--red);
+  }
+  @media (max-width: 860px) {
+    .hall-head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

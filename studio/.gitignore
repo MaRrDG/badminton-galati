@@ -1,0 +1,6 @@
+# Studio build output and local runtime files
+dist/
+.sanity/
+
+# The root .gitignore drops every .env* file; keep the empty template.
+!.env.example

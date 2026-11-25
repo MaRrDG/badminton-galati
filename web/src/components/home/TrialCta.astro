@@ -1,0 +1,71 @@
+---
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const email = 'siderurgistul@badmintongalati.ro';
+---
+
+<section class="cta" id="proba" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div>
+      <h2 class="display" id="cta-h">Vino la un antrenament de probă</h2>
+      <p>{text}</p>
+      <a class="btn" href={`mailto:${email}`}>Scrie-ne pentru o probă</a>
+    </div>
+    <img src="/logo.jpg" width="270" height="270" alt="" data-decorative loading="lazy" decoding="async" />
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: var(--red-field);
+    color: var(--white);
+    padding: clamp(48px, 7vw, 96px) 0;
+  }
+  .wrap {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 28px clamp(24px, 5vw, 72px);
+    align-items: center;
+  }
+  h2 {
+    font-size: clamp(2.6rem, 6.4vw, 6rem);
+    max-width: 12ch;
+  }
+  p {
+    margin-top: 1em;
+    max-width: 44ch;
+    font-size: 1.05rem;
+  }
+  .btn {
+    display: inline-block;
+    margin-top: 1.3em;
+    background: var(--white);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 15px 26px;
+    text-decoration: none;
+  }
+  .btn:focus-visible {
+    outline-color: var(--white);
+  }
+  .btn:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+  img {
+    width: clamp(150px, 18vw, 230px);
+    border-radius: 50%;
+  }
+  @media (max-width: 860px) {
+    .wrap {
+      grid-template-columns: 1fr;
+    }
+    img {
+      display: none;
+    }
+  }
+</style>

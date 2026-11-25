@@ -1,0 +1,23 @@
+/* Self-hosted fonts (no Google Fonts request at runtime). */
+@import "@fontsource/big-shoulders-display/800";
+@import "@fontsource/big-shoulders-display/900";
+@import "@fontsource-variable/instrument-sans/wght";
+
+/* Design tokens: the only place colour, type and layout values live. Ported from mockups/varianta-d.html. */
+:root {
+  --blue: #1549a8;
+  --blue-deep: #0c2f74;
+  --red: #e23a45; /* accents: plates, the first rank numeral, small marks */
+  --red-field: #d63340; /* red sections that carry white text (4.77:1) */
+  --red-ink: #c2222d; /* darker red for small text on white */
+  --white: #ffffff;
+  --mist: #e8eef8;
+  --court: #f39a1e;
+  --ink: #0a1f4d;
+
+  --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --body: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
+
+  --gut: clamp(16px, 4vw, 48px);
+  --col: 1180px;
+}

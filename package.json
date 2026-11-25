@@ -1,0 +1,15 @@
+{
+  "name": "badminton-galati",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "scripts": {
+    "dev": "pnpm -C web dev",
+    "build": "pnpm -C web build",
+    "test": "pnpm -r test",
+    "e2e": "pnpm -C web e2e",
+    "test:changed": "pnpm -r test:changed",
+    "e2e:changed": "pnpm -C web e2e:changed",
+    "deploy:test": "bash scripts/deploy.sh"
+  }
+}
