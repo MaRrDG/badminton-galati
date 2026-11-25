@@ -22,8 +22,8 @@ Measured on the dev machine (16 cores, 8 workers); full-suite rows from the plan
 
 | Command | What | Time |
 |---|---|---|
-| `pnpm test` | all unit tests, both workspaces (325 web + 14 studio) | ~3 s |
-| `pnpm e2e` | 189 tests + 4 setup builds | 37.1 s cold (`rm -rf web/dist-e2e` first); budget 45 s |
+| `pnpm test` | all unit tests, both workspaces (334 web + 14 studio) | ~3 s |
+| `pnpm e2e` | 198 tests + 4 setup builds | 37.0 s cold (`rm -rf web/dist-e2e` first, plan 2a fix wave); budget 45 s |
 | `pnpm e2e -- shell.spec.ts` | one spec, builds `home` only | 5.4 s cold, 4.2 s warm |
 | `pnpm e2e -- -g "single photo"` | by title; builds `sparse` only | not measured |
 | `pnpm test:changed` | `vitest run --changed dev` in both workspaces | ≤ the full unit run |
@@ -99,7 +99,10 @@ When you add a spec or a new source folder, update this table in the script's he
 
 - Consent: a non-consenting athlete with place 1 is absent from the HTML (`home.spec`,
   mixed-strip); empty roster omitted with its links (sparse); unit filters and the Studio filter.
-- Read token never in the built output of any server (`build-output.spec`).
+- Read token never in the built output of any server; no HTML comment in any built page; the
+  trial form's `data-who` fallback never shares a CSS selector list with `:has()` (`build-output.spec`).
+- GSAP is not requested under reduced motion (homepage and `/noutati/`, `motion.spec`); a fault in
+  the calendar's today logic leaves the panel and motion working (`calendar.spec`).
 - Countdown follows the visitor's clock, not the build date (clock overridden), and disappears
   after the event; season over shows three played events.
 - Photo strip reaches its last photo; a single photo never pins, with and without JS; mixed
