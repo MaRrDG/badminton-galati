@@ -9,7 +9,7 @@ export const competition = defineType({
       name: 'title',
       title: 'Numele competiției',
       type: 'string',
-      description: 'Ca în calendarul federației, de exemplu „CN U11 & CN U19”.',
+      description: 'Ca în calendarul federației, de exemplu „CN U11 și CN U19”.',
       validation: (rule) => rule.required().error('Scrie numele competiției.'),
     }),
     defineField({

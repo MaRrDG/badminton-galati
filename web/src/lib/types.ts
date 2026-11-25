@@ -10,6 +10,6 @@ export type Post = { title: string; slug: string; kind: PostKind; date: string; 
 export type HomeData = {
   athletes: Athlete[]; rankingWeek?: RankingWeek; competitions: Competition[];
   groups: Group[]; posts: Post[]; hallPhotos: Img[];
-  heroLines: string[]; heroText: string; heroPhoto: Img;
-  whyIntro: string; whyPhoto: Img; whyPoints: { title: string; text: string }[]; hallText: string; groupsIntro: string; trialText: string;
+  heroLines: string[]; heroText: string; heroPhoto?: Img;
+  whyIntro: string; whyPhoto?: Img; whyPoints: { title: string; text: string }[]; hallText: string; groupsIntro: string; trialText: string;
 };
