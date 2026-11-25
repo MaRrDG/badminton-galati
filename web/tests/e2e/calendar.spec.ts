@@ -162,6 +162,32 @@ test('pinning the same event twice is announced twice', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => (window as unknown as { said: string[] }).said.filter(Boolean))).toEqual([label, label]);
 });
 
+test('a fault in the today logic leaves the panel and the motion working', async ({ page }) => {
+  // The first date lookup (initCalendarToday's) throws; later ones (the countdown's) work.
+  await page.addInitScript(() => {
+    const real = Intl.DateTimeFormat.prototype.formatToParts;
+    let first = true;
+    Intl.DateTimeFormat.prototype.formatToParts = function (this: Intl.DateTimeFormat, d?: Date | number) {
+      if (first) { first = false; throw new Error('test fault'); }
+      return real.call(this, d);
+    };
+  });
+  const errors: string[] = [];
+  const logged: string[] = [];
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('console', m => { if (m.type() === 'error') logged.push(m.text()); });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const moments = page.waitForResponse(r => r.url().includes('/page-moments.'));
+  await page.goto('/calendar/');
+  // The blocks still fill in (the motion is fetched and runs) and end unclipped.
+  await moments;
+  await expect(page.locator('.months .evb').first()).toHaveCSS('clip-path', 'none');
+  await page.locator('.evb', { hasText: '13' }).first().click();
+  await expect(page.locator('[data-panel-live]')).toHaveText('CR U9 și CR Seniori, 13–15 martie, București, s-a jucat');
+  expect(errors).toEqual([]);
+  expect(logged.some(t => t.includes('test fault'))).toBe(true);
+});
+
 test.describe('a page built days before it is read', () => {
   test('with the clock on the build date nothing changes', async ({ browser, baseURL }) => {
     const ctx = await browser.newContext({ baseURL, reducedMotion: 'reduce' });

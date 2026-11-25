@@ -57,7 +57,13 @@ const eventsJson = JSON.stringify(events).replace(/</g, '\\u003c');
 
   // In this order: today's statuses and next event, then its countdown, then the panel, which
   // keeps a copy of what the first two left in it.
-  initCalendarToday();
+  // A fault in the date logic must not stop the panel and the motion below: the page as built
+  // stays readable, only its statuses may be a few days old.
+  try {
+    initCalendarToday();
+  } catch (error) {
+    console.error('calendar today:', error);
+  }
   initCountdowns();
   initCalendarPanel();
   initPageMotion('season-fill');
