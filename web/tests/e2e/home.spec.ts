@@ -101,7 +101,7 @@ test('all content is visible without JavaScript', async ({ browser }) => {
   await ctx.close();
 });
 
-for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${width}`, async ({ page }) => {
+for (const width of [380, 768, 1440, 2560, 3440]) test(`no overflow or clipped names at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 }); await page.goto('/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   const name = page.getByText('Bordeianu Nectarie-Ioan').first();
@@ -118,6 +118,23 @@ for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${wi
     expect(e.left, e.text).toBeGreaterThanOrEqual(0);
     expect(e.right, e.text).toBeLessThanOrEqual(width);
   }
+});
+
+test('body text keeps a readable measure on a 2560px screen', async ({ page }) => {
+  await page.setViewportSize({ width: 2560, height: 1300 }); await page.goto('/');
+  // Characters per rendered line of the why intro: group its characters by the line they sit on.
+  const perLine = await page.locator('.why-head p').evaluate(p => {
+    const text = p.firstChild as Text;
+    const lines = new Map<number, number>();
+    for (let i = 0; i < text.length; i++) {
+      const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1);
+      const top = Math.round(range.getBoundingClientRect().top);
+      lines.set(top, (lines.get(top) ?? 0) + 1);
+    }
+    return [...lines.values()];
+  });
+  expect(perLine.length).toBeGreaterThan(1);
+  expect(Math.max(...perLine)).toBeLessThan(80);
 });
 
 test('calendar: next event with countdown, then three played events', async ({ page }) => {

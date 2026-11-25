@@ -110,3 +110,26 @@ for (const width of [380, 1440])
     await page.waitForTimeout(600);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   });
+
+test('on a large screen the page is one full screen, the court standing on the footer', async ({ page }) => {
+  for (const [width, height] of [[2560, 1300], [1920, 1080], [3440, 1440]] as const) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/404.html');
+    const m = await page.evaluate(() => {
+      const foot = document.querySelector('footer')!.getBoundingClientRect();
+      const court = document.querySelector('.nf-court')!.getBoundingClientRect();
+      const text = document.querySelector('.nf-text')!.getBoundingClientRect();
+      return {
+        scroll: document.documentElement.scrollHeight, overflow: document.documentElement.scrollWidth - innerWidth,
+        footTop: foot.top, footBottom: foot.bottom, courtBottom: court.bottom, sky: court.top - text.bottom,
+      };
+    });
+    const size = `${width}×${height}`;
+    expect(m.scroll, size).toBe(height);
+    expect(Math.abs(m.footBottom - height), size).toBeLessThanOrEqual(1);
+    // The spare height is sky: the floor strip still meets the footer.
+    expect(Math.abs(m.courtBottom - m.footTop), size).toBeLessThanOrEqual(1);
+    expect(m.sky, size).toBeGreaterThan(0);
+    expect(m.overflow, size).toBeLessThanOrEqual(0);
+  }
+});
