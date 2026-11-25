@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { buildToday, getHomeData, parseHomeData } from '../../src/lib/content';
 import { todayInBucharest } from '../../src/lib/dates';
@@ -92,13 +92,33 @@ describe('fixtures', () => {
   });
 
   test('every fixture photo exists in public/ with its real pixel size', () => {
-    const d = parseHomeData(fixture, 'home.json');
-    const imgs = [d.heroPhoto!, d.whyPhoto!, ...d.hallPhotos, ...d.posts.flatMap(p => (p.cover ? [p.cover] : []))];
-    expect(d.hallPhotos).toHaveLength(7);
-    for (const img of imgs) {
-      const size = jpegSize(readFileSync(new URL(`../../public${img.url}`, import.meta.url)));
-      expect(size, img.url).toEqual({ width: img.width, height: img.height });
+    expect(parseHomeData(fixture, 'home.json').hallPhotos).toHaveLength(7);
+    const dir = new URL('../../src/fixtures/', import.meta.url);
+    const names = readdirSync(dir).filter(n => n.endsWith('.json'));
+    expect(names.length).toBeGreaterThan(1);
+    for (const name of names) {
+      const d = parseHomeData(JSON.parse(readFileSync(new URL(name, dir), 'utf8')), name);
+      const imgs = [d.heroPhoto, d.whyPhoto, ...d.hallPhotos, ...d.posts.map(p => p.cover), ...d.athletes.map(a => a.photo)]
+        .filter(img => img !== undefined);
+      for (const img of imgs) {
+        const size = jpegSize(readFileSync(new URL(`../../public${img.url}`, import.meta.url)));
+        expect(size, `${name}: ${img.url}`).toEqual({ width: img.width, height: img.height });
+      }
     }
+  });
+
+  test('local photos stay light: at most 1280px on the long side, under 1.6 MB together', () => {
+    const dir = new URL('../../public/img/', import.meta.url);
+    const files = readdirSync(dir).filter(n => n.endsWith('.jpg'));
+    expect(files.length).toBeGreaterThan(0);
+    let total = 0;
+    for (const name of files) {
+      const file = new URL(name, dir);
+      const { width, height } = jpegSize(readFileSync(file));
+      expect(Math.max(width, height), name).toBeLessThanOrEqual(1280);
+      total += statSync(file).size;
+    }
+    expect(total).toBeLessThan(1.6 * 1024 * 1024);
   });
 
   test('the fixture holds the same facts as the Studio seed', () => {

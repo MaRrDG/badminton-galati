@@ -182,8 +182,8 @@
       "date": "2026-06-30",
       "cover": {
         "url": "/img/echipa-u15.jpg",
-        "height": 1067,
-        "width": 1600,
+        "height": 854,
+        "width": 1280,
         "alt": "Echipa clubului în treninguri roșii, la un turneu"
       }
     },
@@ -203,44 +203,44 @@
   "hallPhotos": [
     {
       "url": "/img/meci-dublu.jpg",
-      "height": 1080,
-      "width": 1920,
+      "height": 720,
+      "width": 1280,
       "alt": "Meci de dublu în sala Siderurgistul"
     },
     {
       "url": "/img/sala-turneu-1.jpg",
-      "height": 1080,
-      "width": 1920,
+      "height": 720,
+      "width": 1280,
       "alt": "Sala Siderurgistul în timpul unui turneu"
     },
     {
       "url": "/img/echipa-rosu.jpg",
-      "height": 1281,
-      "width": 1920,
+      "height": 854,
+      "width": 1280,
       "alt": "Sportivi și antrenori în echipamentul roșu al clubului"
     },
     {
       "url": "/img/festivitate.jpg",
-      "height": 1080,
-      "width": 1920,
+      "height": 720,
+      "width": 1280,
       "alt": "Sportivi aliniați la o festivitate în sală"
     },
     {
       "url": "/img/cantonament.jpg",
-      "height": 1440,
-      "width": 1920,
+      "height": 960,
+      "width": 1280,
       "alt": "Grupul din cantonament, în tricouri verzi"
     },
     {
       "url": "/img/medalii.jpg",
-      "height": 868,
-      "width": 1920,
+      "height": 579,
+      "width": 1280,
       "alt": "Sportivi cu medalii după o competiție"
     },
     {
       "url": "/img/sala-turneu-2.jpg",
-      "height": 1080,
-      "width": 1920,
+      "height": 720,
+      "width": 1280,
       "alt": "Meciuri pe terenurile sălii"
     }
   ],
@@ -260,8 +260,8 @@
   "whyIntro": "Se joacă cu rachete, fluturași și fileu, în doi sau în patru, și poate fi practicat la orice vârstă. La noi găsești un climat prietenos pentru toate categoriile de vârstă.",
   "whyPhoto": {
     "url": "/img/echipa-u15.jpg",
-    "height": 1067,
-    "width": 1600,
+    "height": 854,
+    "width": 1280,
     "alt": "Sportivi și antrenori ai clubului la o competiție"
   },
   "whyPoints": [

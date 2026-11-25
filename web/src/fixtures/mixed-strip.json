@@ -182,8 +182,8 @@
       "date": "2026-06-30",
       "cover": {
         "url": "/img/echipa-u15.jpg",
-        "height": 1067,
-        "width": 1600,
+        "height": 854,
+        "width": 1280,
         "alt": "Echipa clubului în treninguri roșii, la un turneu"
       }
     },
@@ -203,8 +203,8 @@
   "hallPhotos": [
     {
       "url": "/img/cantonament.jpg",
-      "height": 1440,
-      "width": 1920,
+      "height": 960,
+      "width": 1280,
       "alt": "Grupul din cantonament, în tricouri verzi"
     },
     {
@@ -230,8 +230,8 @@
   "whyIntro": "Se joacă cu rachete, fluturași și fileu, în doi sau în patru, și poate fi practicat la orice vârstă. La noi găsești un climat prietenos pentru toate categoriile de vârstă.",
   "whyPhoto": {
     "url": "/img/echipa-u15.jpg",
-    "height": 1067,
-    "width": 1600,
+    "height": 854,
+    "width": 1280,
     "alt": "Sportivi și antrenori ai clubului la o competiție"
   },
   "whyPoints": [

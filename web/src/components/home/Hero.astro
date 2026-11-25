@@ -32,7 +32,7 @@ const lineClass = (i: number) => (i % 2 === 1 ? 'l2' : i % 4 === 0 ? 'l1' : 'l3'
         <figure class="poster">
           <div class="plate" aria-hidden="true" />
           <div class="shot">
-            <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} fetchpriority="high" />
+            <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} loading="eager" fetchpriority="high" />
           </div>
         </figure>
       )

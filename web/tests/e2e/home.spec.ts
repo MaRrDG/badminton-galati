@@ -55,6 +55,17 @@ test('every image declares its size and has alt text', async ({ page }) => {
   expect(bad).toBe(0);
 });
 
+test('the hero photo loads first, everything below the fold waits', async ({ page }) => {
+  await page.goto('/');
+  const hero = page.locator('.hero img');
+  await expect(hero).toHaveAttribute('fetchpriority', 'high');
+  await expect(hero).toHaveAttribute('loading', 'eager');
+  const below = await page.locator('main > section:not(.hero) img').evaluateAll(imgs =>
+    imgs.map(i => ({ src: i.getAttribute('src'), loading: i.getAttribute('loading'), decoding: i.getAttribute('decoding') })));
+  expect(below.length).toBeGreaterThan(8);
+  for (const img of below) expect(img, img.src!).toMatchObject({ loading: 'lazy', decoding: 'async' });
+});
+
 test('all content is visible without JavaScript', async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false }); const page = await ctx.newPage();
   await page.goto('/');
