@@ -1,0 +1,33 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/logo.jpg" type="image/jpeg" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <a class="skip-link" href="#continut">Sari la conținut</a>
+    <SiteHeader />
+    <main id="continut">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

@@ -1,0 +1,136 @@
+---
+const items = [
+  { label: 'Acasă', href: '/' },
+  { label: 'Sportivi', href: '/sportivi/' },
+  { label: 'Program', href: '/program/' },
+  { label: 'Calendar', href: '/calendar/' },
+  { label: 'Noutăți', href: '/noutati/' },
+  { label: 'Contact', href: '/contact/' },
+];
+const current = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img src="/logo.jpg" width="46" height="46" alt="" />
+      <span>CS Siderurgistul Galați</span>
+    </a>
+    <nav aria-label="Meniu principal">
+      <details class="menu">
+        <summary>Meniu</summary>
+        <ul>
+          {
+            items.map((item) => (
+              <li>
+                <a href={item.href} aria-current={item.href === current ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </details>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background: var(--white);
+    border-bottom: 3px solid var(--ink);
+    position: relative;
+    z-index: 20;
+  }
+  .site-header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    text-decoration: none;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  .brand img {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+  }
+  .menu summary {
+    display: block;
+    list-style: none;
+    background: var(--ink);
+    color: var(--white);
+    font: 600 0.95rem var(--body);
+    padding: 9px 16px;
+    cursor: pointer;
+  }
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .menu a {
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.98rem;
+    border-bottom: 3px solid transparent;
+  }
+  .menu a:hover,
+  .menu a[aria-current] {
+    border-bottom-color: var(--red);
+  }
+
+  /* Narrow: the list drops down under the header when "Meniu" is open. Works without JavaScript. */
+  @media (max-width: 860px) {
+    .menu ul {
+      position: absolute;
+      top: 100%;
+      right: var(--gut);
+      min-width: 200px;
+      background: var(--ink);
+      color: var(--white);
+      padding: 8px 20px;
+    }
+    .menu a {
+      display: block;
+      padding: 11px 0;
+    }
+  }
+
+  /* Wide: the list is always shown and the toggle is hidden. Browsers without
+     ::details-content keep the toggle, so the links stay reachable. */
+  @media (min-width: 861px) {
+    @supports selector(::details-content) {
+      .menu summary {
+        display: none;
+      }
+      .menu::details-content {
+        content-visibility: visible;
+        display: contents;
+      }
+      .menu ul {
+        display: flex;
+        gap: clamp(14px, 2.2vw, 32px);
+      }
+      .menu a {
+        display: inline-block;
+        padding: 6px 0;
+      }
+    }
+  }
+</style>
