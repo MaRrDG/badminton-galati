@@ -1,0 +1,146 @@
+---
+// The 404 scene as static SVG: two players, a net that spells 404 and a shuttle caught in its 0.
+// This markup is the whole picture without JavaScript and under reduced motion;
+// scripts/rally.ts moves the same nodes when motion is welcome.
+import { digitCords, digitOrigin, FOUR, makeLayout, NET, netCords, ZERO, type LayoutName } from '../../lib/rally/court';
+import { PARTS } from '../../lib/rally/figure';
+import { Rally } from '../../lib/rally/rally';
+
+interface Props {
+  layout: LayoutName;
+}
+
+const { layout } = Astro.props;
+const L = makeLayout(layout);
+const still = new Rally(L).frame();
+const digits = [FOUR, ZERO, FOUR].map((d, i) => ({ d, i, at: digitOrigin(L, i), clip: `nf-${layout}-d${i}` }));
+const shuttle = `nf-${layout}-shuttle`;
+const netRight = L.netX + NET.width;
+// Service and back lines, seen end-on as short marks under the floor line.
+const marks = [0.07, 0.36].flatMap(k => [L.netX * k, L.w - L.netX * k]).concat(L.netX - 90, netRight + 90);
+---
+
+<svg class:list={['rally', layout]} data-rally={layout} viewBox={`0 0 ${L.w} ${L.h}`} aria-hidden="true" focusable="false">
+  <defs>
+    <g id={shuttle} transform="scale(1.3)">
+      <path class="skirt" d="M4,-5.5L-21,-12.5V12.5L4,5.5Z"></path>
+      <path class="vane" d="M3,-2L-21,-6.5M3,2L-21,6.5M3,0H-21M-13,-10.5V10.5"></path>
+      <path class="cork" d="M4,-6H7A6,6 0 0 1 7,6H4Z"></path>
+    </g>
+    {digits.map(g => <clipPath id={g.clip}><path d={g.d} clip-rule="evenodd"></path></clipPath>)}
+  </defs>
+
+  <rect class="ground" x="0" y={L.floor} width={L.w} height={L.h - L.floor}></rect>
+  <rect class="line" x="0" y={L.floor} width={L.w} height="5"></rect>
+  {marks.map(x => <rect class="mark" x={x - 3} y={L.floor + 5} width="6" height="13"></rect>)}
+
+  <g class="net">
+    <rect class="post" x={L.netX - 13} y={L.netTop - 12} width="11" height={L.floor - L.netTop + 12}></rect>
+    <rect class="post" x={netRight + 2} y={L.netTop - 12} width="11" height={L.floor - L.netTop + 12}></rect>
+    <path class="fine" d={netCords(L)}></path>
+    {
+      digits.map(g => (
+        <g transform={`translate(${g.at[0]} ${g.at[1]})`}>
+          <path class="cords" clip-path={`url(#${g.clip})`} d={digitCords(g.i === 1 ? still.bulge : null)} data-zero={g.i === 1 ? '' : undefined}></path>
+          <path class="edge" d={g.d}></path>
+        </g>
+      ))
+    }
+    <rect class="tape" x={L.netX - 2} y={L.netTop} width={NET.width + 4} height={NET.tape}></rect>
+    <rect class="tape" x={L.netX - 2} y={L.netTop + NET.tape + NET.digitH - 2} width={NET.width + 4} height="4"></rect>
+  </g>
+
+  {still.fallen.map(t => <use href={`#${shuttle}`} transform={t} data-fallen></use>)}
+  {
+    still.players.map((parts, side) => (
+      <g class:list={['player', side === 0 ? 'red' : 'white']} data-player>
+        {PARTS.map((part, i) => <g class={part.tone} transform={parts[i]} set:html={part.html} />)}
+      </g>
+    ))
+  }
+  <ellipse class="shade" rx="13" ry="3.5" transform={still.shade} data-shade></ellipse>
+  <use href={`#${shuttle}`} transform={still.shuttle} data-shuttle></use>
+</svg>
+
+<style>
+  .rally {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* Tokens only; the in-between tones are mixed from them so the figures stay flat. */
+    --skin: color-mix(in srgb, var(--white) 80%, var(--blue));
+    --skin-far: color-mix(in srgb, var(--white) 56%, var(--blue));
+  }
+  .ground {
+    fill: var(--blue-deep);
+  }
+  .line,
+  .cork,
+  .player :global(.grip) {
+    fill: var(--court);
+  }
+  .mark,
+  .post,
+  .tape,
+  .skirt {
+    fill: var(--white);
+  }
+  .fine {
+    fill: none;
+    stroke: var(--skin-far);
+    stroke-width: 1.1;
+  }
+  .cords {
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 3.6;
+  }
+  .edge {
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 5;
+    stroke-linejoin: miter;
+  }
+  .vane {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 1.4;
+  }
+  .shade,
+  .player :global(.shade) {
+    fill: var(--ink);
+  }
+  .player :global(.skin) {
+    fill: var(--skin);
+  }
+  .player :global(.far) {
+    fill: var(--skin-far);
+  }
+  .player :global(.shoe) {
+    fill: var(--white);
+  }
+  .player :global(.shaft),
+  .player :global(.frame),
+  .player :global(.strings) {
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 3.4;
+  }
+  .player :global(.strings) {
+    stroke-width: 0.9;
+  }
+  .red :global(.kit) {
+    fill: var(--red);
+  }
+  .red :global(.kit-far) {
+    fill: var(--red-ink);
+  }
+  .white :global(.kit),
+  .white :global(.kit-far) {
+    fill: var(--white);
+  }
+  .player :global(.shorts),
+  .player :global(.shorts-far) {
+    fill: var(--ink);
+  }
+</style>
