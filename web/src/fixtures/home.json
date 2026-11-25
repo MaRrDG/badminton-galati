@@ -56,7 +56,11 @@
       "city": "București",
       "start": "2026-03-13",
       "end": "2026-03-15",
-      "home": false
+      "home": false,
+      "categories": [
+        "U9",
+        "Seniori"
+      ]
     },
     {
       "id": "competition-2026-03-27-cr-u15-cr-u23",
@@ -64,7 +68,11 @@
       "city": "București",
       "start": "2026-03-27",
       "end": "2026-03-29",
-      "home": false
+      "home": false,
+      "categories": [
+        "U15",
+        "U23"
+      ]
     },
     {
       "id": "competition-2026-04-03-cr-u11-cr-u17",
@@ -72,7 +80,11 @@
       "city": "Galați",
       "start": "2026-04-03",
       "end": "2026-04-05",
-      "home": true
+      "home": true,
+      "categories": [
+        "U11",
+        "U17"
+      ]
     },
     {
       "id": "competition-2026-04-24-cr-u13-cr-u19",
@@ -80,7 +92,11 @@
       "city": "Galați",
       "start": "2026-04-24",
       "end": "2026-04-26",
-      "home": true
+      "home": true,
+      "categories": [
+        "U13",
+        "U19"
+      ]
     },
     {
       "id": "competition-2026-05-08-cr-echipe-seniori-si-cupa-u15",
@@ -88,7 +104,12 @@
       "city": "București",
       "start": "2026-05-08",
       "end": "2026-05-10",
-      "home": false
+      "home": false,
+      "categories": [
+        "U15",
+        "Seniori",
+        "Echipe"
+      ]
     },
     {
       "id": "competition-2026-09-04-cn-echipe-seniori",
@@ -96,7 +117,11 @@
       "city": "de confirmat",
       "start": "2026-09-04",
       "end": "2026-09-06",
-      "home": false
+      "home": false,
+      "categories": [
+        "Seniori",
+        "Echipe"
+      ]
     },
     {
       "id": "competition-2026-09-11-cn-echipe-u19",
@@ -104,7 +129,11 @@
       "city": "Galați",
       "start": "2026-09-11",
       "end": "2026-09-13",
-      "home": true
+      "home": true,
+      "categories": [
+        "U19",
+        "Echipe"
+      ]
     },
     {
       "id": "competition-2026-09-18-cn-echipe-u15",
@@ -112,7 +141,11 @@
       "city": "Galați",
       "start": "2026-09-18",
       "end": "2026-09-20",
-      "home": true
+      "home": true,
+      "categories": [
+        "U15",
+        "Echipe"
+      ]
     },
     {
       "id": "competition-2026-09-25-cn-u13-cn-u23",
@@ -120,7 +153,11 @@
       "city": "Blejoi/Bacău",
       "start": "2026-09-25",
       "end": "2026-09-27",
-      "home": false
+      "home": false,
+      "categories": [
+        "U13",
+        "U23"
+      ]
     },
     {
       "id": "competition-2026-10-23-cn-u11-cn-u19",
@@ -128,7 +165,11 @@
       "city": "Galați",
       "start": "2026-10-23",
       "end": "2026-10-25",
-      "home": true
+      "home": true,
+      "categories": [
+        "U11",
+        "U19"
+      ]
     },
     {
       "id": "competition-2026-11-20-cn-u15-cn-seniori",
@@ -136,7 +177,11 @@
       "city": "Blejoi/Bacău",
       "start": "2026-11-20",
       "end": "2026-11-22",
-      "home": false
+      "home": false,
+      "categories": [
+        "U15",
+        "Seniori"
+      ]
     },
     {
       "id": "competition-2026-11-27-cn-u9-cn-u17",
@@ -144,36 +189,78 @@
       "city": "București",
       "start": "2026-11-27",
       "end": "2026-11-29",
-      "home": false
+      "home": false,
+      "categories": [
+        "U9",
+        "U17"
+      ]
     }
   ],
   "groups": [
     {
+      "id": "group-initiere",
+      "slug": "initiere",
       "name": "Inițiere",
       "audience": "Copii care țin prima dată racheta în mână",
       "track": "performanta"
     },
     {
+      "id": "group-performanta",
+      "slug": "performanta",
       "name": "Performanță",
       "audience": "Sportivi legitimați care merg la competiții",
       "track": "performanta"
     },
     {
+      "id": "group-elite",
+      "slug": "elite",
       "name": "Elite",
       "audience": "Sportivii din lotul de vârf al clubului",
       "track": "performanta"
     },
     {
+      "id": "group-amatori-copii",
+      "slug": "amatori-copii",
       "name": "Amatori copii",
       "audience": "Copii care joacă de plăcere",
       "track": "amatori"
     },
     {
+      "id": "group-amatori-adulti",
+      "slug": "amatori-adulti",
       "name": "Amatori adulți",
       "audience": "Adulți, indiferent de nivel",
       "track": "amatori"
     }
   ],
+  "coaches": [
+    {
+      "id": "coach-dorel-badiu",
+      "name": "Dorel Badiu"
+    },
+    {
+      "id": "coach-iulian-calin",
+      "name": "Iulian Călin"
+    },
+    {
+      "id": "coach-adrian-panfil",
+      "name": "Adrian Panfil"
+    }
+  ],
+  "info": {
+    "venuePhoto": {
+      "url": "/img/sala-turneu-2.jpg",
+      "width": 1280,
+      "height": 720,
+      "alt": "Meciuri pe cele patru terenuri ale sălii Siderurgistul"
+    },
+    "parentsPhoto": {
+      "url": "/img/cantonament.jpg",
+      "width": 1280,
+      "height": 960,
+      "alt": "Copii și antrenori ai clubului în tricouri verzi, în cantonament"
+    }
+  },
   "posts": [
     {
       "title": "Novi Sad – 2026",

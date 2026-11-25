@@ -1,10 +1,11 @@
 ---
+import { CLUB_EMAIL as email } from '../../lib/club';
+
 interface Props {
   text: string;
 }
 
 const { text } = Astro.props;
-const email = 'siderurgistul@badmintongalati.ro';
 ---
 
 <section class="cta" id="proba" aria-labelledby="cta-h">
@@ -12,7 +13,8 @@ const email = 'siderurgistul@badmintongalati.ro';
     <div>
       <h2 class="display" id="cta-h">Vino la un antrenament de probă</h2>
       <p>{text}</p>
-      <a class="btn" href={`mailto:${email}`}>Scrie-ne pentru o probă</a>
+      <a class="btn" href="/contact/#formular">Cere un antrenament de probă</a>
+      <p class="alt">sau scrie la <a href={`mailto:${email}`}>{email}</a></p>
     </div>
     <img src="/logo.jpg" width="270" height="270" alt="" data-decorative loading="lazy" decoding="async" />
   </div>
@@ -55,6 +57,13 @@ const email = 'siderurgistul@badmintongalati.ro';
   .btn:hover {
     background: var(--ink);
     color: var(--white);
+  }
+  .alt {
+    margin-top: 14px;
+    font-size: 0.98rem;
+  }
+  .alt a {
+    overflow-wrap: anywhere;
   }
   img {
     width: clamp(150px, 18vw, 230px);

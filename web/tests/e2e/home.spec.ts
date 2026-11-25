@@ -73,6 +73,25 @@ test('the hero photo loads first, everything below the fold waits', async ({ pag
   for (const img of below) expect(img, img.src!).toMatchObject({ loading: 'lazy', decoding: 'async' });
 });
 
+test('the homepage draws every red plate with one component', async ({ page }) => {
+  await page.goto('/');
+  // Hero, why, the third hall photo and the news cover.
+  await expect(page.locator('main .plated > .plate')).toHaveCount(4);
+  const shadowed = await page.locator('main *').evaluateAll(els =>
+    els.filter(e => getComputedStyle(e).boxShadow !== 'none').map(e => e.outerHTML.slice(0, 80)));
+  expect(shadowed).toEqual([]);
+});
+
+test('the plate under a hall photo gives the strip no vertical scroll', async ({ browser }) => {
+  // Without the motion layer (reduced motion, no JS) the strip is a sideways scroller of its own.
+  const ctx = await browser.newContext({ reducedMotion: 'reduce' }); const page = await ctx.newPage();
+  await page.goto('/');
+  await expect(page.locator('.hall .track .plated')).toHaveCount(1);
+  const { scrollHeight, clientHeight } = await page.locator('.hall .track').evaluate(t => ({ scrollHeight: t.scrollHeight, clientHeight: t.clientHeight }));
+  expect(scrollHeight).toBe(clientHeight);
+  await ctx.close();
+});
+
 test('all content is visible without JavaScript', async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false }); const page = await ctx.newPage();
   await page.goto('/');
@@ -82,7 +101,7 @@ test('all content is visible without JavaScript', async ({ browser }) => {
   await ctx.close();
 });
 
-for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${width}`, async ({ page }) => {
+for (const width of [380, 768, 1440, 2560, 3440]) test(`no overflow or clipped names at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 }); await page.goto('/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   const name = page.getByText('Bordeianu Nectarie-Ioan').first();
@@ -99,6 +118,41 @@ for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${wi
     expect(e.left, e.text).toBeGreaterThanOrEqual(0);
     expect(e.right, e.text).toBeLessThanOrEqual(width);
   }
+});
+
+test('the homepage leads to the inner pages', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.hero').getByRole('link', { name: 'Vezi toți sportivii' })).toHaveAttribute('href', '/sportivi/');
+  const roster = page.locator('#sportivi');
+  for (const [name, slug] of [['Nistor Cristian-Ionuț', 'nistor-cristian-ionut'], ['Pazargic Ligia-Beatrice', 'pazargic-ligia-beatrice'], ['Bordeianu Nectarie-Ioan', 'bordeianu-nectarie-ioan']])
+    await expect(roster.getByRole('heading', { name }).getByRole('link', { name })).toHaveAttribute('href', `/sportivi/${slug}/`);
+  const groups = page.locator('#program');
+  for (const [name, slug] of [['Inițiere', 'initiere'], ['Performanță', 'performanta'], ['Elite', 'elite'], ['Amatori copii', 'amatori-copii'], ['Amatori adulți', 'amatori-adulti']])
+    await expect(groups.getByRole('link', { name, exact: true })).toHaveAttribute('href', `/program/#${slug}`);
+  const cta = page.locator('#proba');
+  await expect(cta.getByRole('link', { name: 'Cere un antrenament de probă' })).toHaveAttribute('href', '/contact/#formular');
+  await expect(cta).toContainText('sau scrie la siderurgistul@badmintongalati.ro');
+  await expect(cta.getByRole('link', { name: 'siderurgistul@badmintongalati.ro' })).toHaveAttribute('href', 'mailto:siderurgistul@badmintongalati.ro');
+  await expect(page.getByRole('link', { name: 'Toate articolele' })).toHaveAttribute('href', '/noutati/');
+  await expect(page.getByRole('link', { name: 'Toți sportivii clubului' })).toHaveAttribute('href', '/sportivi/');
+  await expect(page.locator('main a[href^="#"]:not([href="#proba"])')).toHaveCount(0);
+});
+
+test('body text keeps a readable measure on a 2560px screen', async ({ page }) => {
+  await page.setViewportSize({ width: 2560, height: 1300 }); await page.goto('/');
+  // Characters per rendered line of the why intro: group its characters by the line they sit on.
+  const perLine = await page.locator('.why-head p').evaluate(p => {
+    const text = p.firstChild as Text;
+    const lines = new Map<number, number>();
+    for (let i = 0; i < text.length; i++) {
+      const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1);
+      const top = Math.round(range.getBoundingClientRect().top);
+      lines.set(top, (lines.get(top) ?? 0) + 1);
+    }
+    return [...lines.values()];
+  });
+  expect(perLine.length).toBeGreaterThan(1);
+  expect(Math.max(...perLine)).toBeLessThan(80);
 });
 
 test('calendar: next event with countdown, then three played events', async ({ page }) => {
@@ -156,11 +210,26 @@ test.describe('athletes without rankings', on('quiet-season'), () => {
   });
 });
 
+test.describe('groups with sessions', on('quiet-season'), () => {
+  test('each group shows its week in one line', async ({ page }) => {
+    await page.goto('/');
+    const g = page.locator('#program');
+    const initiere = g.getByRole('listitem').filter({ hasText: 'Inițiere' }).locator('.schedule');
+    await expect(initiere).toHaveText('Luni, miercuri, vineri, 17:00–18:30, oră dată ca exemplu');
+    await expect(g.locator('.schedule')).toHaveCount(5);
+    // Example hours are hatched as on /program/: the hours, not the days.
+    await expect(initiere.locator('.sample')).toHaveText('17:00–18:30');
+    // One time for Inițiere and Amatori copii; the others list each day's time (Amatori adulți
+    // ends earlier on Mondays).
+    await expect(g.locator('.schedule .sample')).toHaveCount(1 + 4 + 3 + 1 + 3);
+  });
+});
+
 test.describe('no athlete may be shown', on('sparse'), () => {
   test('the roster and every link to it are left out', async ({ page }) => {
     const html = await (await page.goto('/'))!.text();
     await expect(page.locator('#sportivi')).toHaveCount(0);
-    await expect(page.locator('a[href="#sportivi"]')).toHaveCount(0);
+    await expect(page.locator('main a[href="#sportivi"], main a[href^="/sportivi/"]')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Vezi toți sportivii' })).toHaveCount(0);
     expect(html).not.toContain('Fără-Acord');
   });
@@ -168,6 +237,14 @@ test.describe('no athlete may be shown', on('sparse'), () => {
   test('the other sections keep their order', async ({ page }) => {
     await page.goto('/');
     expect(await sectionIds(page)).toEqual(['hero', 'de-ce', 'program', 'calendar', 'hall', 'noutati', 'proba']);
+  });
+
+  test('an empty calendar is one quiet line', async ({ page }) => {
+    await page.goto('/');
+    const cal = page.locator('#calendar');
+    await expect(cal.getByText('Nicio competiție programată deocamdată.')).toBeVisible();
+    await expect(cal.locator('.nextev, .played, [data-countdown]')).toHaveCount(0);
+    await expect(cal.getByRole('link', { name: 'Tot calendarul 2026' })).toHaveAttribute('href', '/calendar/');
   });
 
   test('a long hero line wraps inside a 380px screen', async ({ page }) => {

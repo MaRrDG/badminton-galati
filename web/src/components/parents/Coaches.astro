@@ -1,0 +1,109 @@
+---
+import InitialTile from '../ui/InitialTile.astro';
+import Photo from '../ui/Photo.astro';
+import Tbc from '../ui/Tbc.astro';
+import { CLUB_EMAIL as address } from '../../lib/club';
+import { coachesLead, writeToCoaches } from '../../lib/parents';
+import type { ParentsPage } from '../../lib/parents';
+
+interface Props {
+  coaches: ParentsPage['coaches'];
+}
+
+const { coaches } = Astro.props;
+const lead = coachesLead(coaches.length);
+const missingPhoto = coaches.some(({ coach }) => !coach.photo);
+---
+
+<p class="intro">
+  {lead && <>{lead} </>}{writeToCoaches(coaches.length)} la adresa clubului, <a href={`mailto:${address}`}>{address}</a>.
+</p>
+{
+  coaches.length > 0 && (
+    <ul class="coaches">
+      {coaches.map(({ coach, tone }) => (
+        <li>
+          {coach.photo ? (
+            <div class="photo">
+              <Photo img={coach.photo} sizes="190px" decorative />
+            </div>
+          ) : (
+            <InitialTile name={coach.name} tone={tone} size="coach" />
+          )}
+          <p class="who">
+            <b>{coach.name}</b>
+            {coach.role && <span>{coach.role}</span>}
+          </p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+{missingPhoto && <Tbc what="câte o fotografie și o frază despre fiecare antrenor: de când antrenează și cu ce grupe lucrează." />}
+
+<style>
+  .intro {
+    max-width: 60ch;
+  }
+  .intro a {
+    overflow-wrap: anywhere;
+  }
+  /* A row of three on wide screens: a photo slot (or a flat initial tile), the name, the role when the club gives one. */
+  .coaches {
+    list-style: none;
+    margin: 18px 0 14px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 190px));
+    gap: 24px clamp(20px, 3vw, 40px);
+  }
+  .coaches li {
+    display: flex;
+    flex-direction: column;
+  }
+  .coaches li > :global(.initial),
+  .photo {
+    margin-bottom: 12px;
+  }
+  .photo {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--blue-deep);
+  }
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .who {
+    display: flex;
+    flex-direction: column;
+  }
+  b {
+    font-weight: 700;
+    font-size: 1.12rem;
+    line-height: 1.3;
+  }
+  span {
+    font-size: 0.96rem;
+  }
+
+  @media (max-width: 860px) {
+    .coaches {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    /* A row per coach: the square tile, then the name (and role) centred beside it. */
+    .coaches li {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      column-gap: 16px;
+      align-items: center;
+    }
+    .coaches li > :global(.initial),
+    .photo {
+      aspect-ratio: 1;
+      margin: 0;
+    }
+  }
+</style>

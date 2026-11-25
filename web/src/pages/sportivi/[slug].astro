@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import Appearances from '../../components/athletes/Appearances.astro';
+import Ident from '../../components/athletes/Ident.astro';
+import { getAthleteProfiles } from '../../lib/content';
+import type { AthleteProfile } from '../../lib/athletes';
+
+// Only consented athletes get a page: anyone else has no route at all, so their address is a 404.
+export async function getStaticPaths() {
+  return (await getAthleteProfiles()).map(profile => ({ params: { slug: profile.athlete.slug }, props: { profile } }));
+}
+
+interface Props {
+  profile: AthleteProfile;
+}
+
+const { profile } = Astro.props;
+const { name } = profile.athlete;
+const description = profile.standing
+  ? `${name}, CS Siderurgistul Galați. ${profile.standing.lead} ${profile.standing.rest}.`
+  : `${name}, CS Siderurgistul Galați.`;
+---
+
+<Base title={`${name} | CS Siderurgistul Galați`} description={description}>
+  <Ident profile={profile} />
+  <Appearances profile={profile} />
+</Base>
+
+<script>
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  initPageMotion('place-roll');
+</script>

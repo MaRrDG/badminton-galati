@@ -1,4 +1,5 @@
 import { daysBetween } from './dates';
+import { countRo, feminineCountRo, unitRo } from './ro';
 import type { Athlete, Competition, Discipline, Group, Post, PostKind, Ranking } from './types';
 
 /** Beyond this many days the next event gets no countdown. */
@@ -66,6 +67,11 @@ export function rosterLayout(a: Athlete[]): RosterBlock[] {
   ] satisfies RosterBlock[]).filter(b => b.rows.length > 0);
 }
 
+/** All posts, newest first (ISO dates compare as strings); the order of equal dates is kept. */
+export function newestFirst(p: Post[]): Post[] {
+  return [...p].sort((x, y) => y.date.localeCompare(x.date));
+}
+
 /** Newest first (ISO dates compare as strings), at most `HOME_POSTS`. */
 export function latestPosts(p: Post[]): Post[] {
   return [...p].sort((x, y) => y.date.localeCompare(x.date)).slice(0, HOME_POSTS);
@@ -90,20 +96,6 @@ export function splitCalendar(c: Competition[], today: string): { next?: Competi
   return { next: upcoming[0], played };
 }
 
-/** Romanian takes "de" when the last two digits are 00 or 20–99: "19 zile", "20 de zile". */
-function takesDe(n: number): boolean {
-  const lastTwo = n % 100;
-  return lastTwo === 0 || lastTwo >= 20;
-}
-
-function daysRo(n: number): string {
-  return takesDe(n) ? `${n} de zile` : `${n} zile`;
-}
-
-/** "grupă" is feminine: o grupă, două grupe. */
-const GROUP_COUNT_WORDS = ['O grupă', 'Două grupe', 'Trei grupe', 'Patru grupe', 'Cinci grupe', 'Șase grupe',
-  'Șapte grupe', 'Opt grupe', 'Nouă grupe', 'Zece grupe'];
-
 /**
  * The groups heading, from the data: "Cinci grupe, pe două drumuri" when both tracks have groups,
  * just "Cinci grupe" otherwise. Up to ten the count is a word, above it digits ("20 de grupe").
@@ -111,22 +103,22 @@ const GROUP_COUNT_WORDS = ['O grupă', 'Două grupe', 'Trei grupe', 'Patru grupe
 export function groupsHeading(g: Group[]): string {
   const n = g.length;
   if (n === 0) return 'Nicio grupă deocamdată';
-  const count = GROUP_COUNT_WORDS[n - 1] ?? (takesDe(n) ? `${n} de grupe` : `${n} grupe`);
+  const words = feminineCountRo(n, 'grupă', 'grupe');
+  const count = words[0].toLocaleUpperCase('ro') + words.slice(1);
   const bothTracks = g.some(x => x.track === 'performanta') && g.some(x => x.track === 'amatori');
   return bothTracks ? `${count}, pe două drumuri` : count;
 }
 
 /** The words after a points total: 1 punct, 19 puncte, 168 de puncte. */
 export function pointsUnit(n: number): string {
-  if (n === 1) return 'punct';
-  return takesDe(n) ? 'de puncte' : 'puncte';
+  return unitRo(n, 'punct', 'puncte');
 }
 
 /** Only the dates matter, so the browser can recompute the label from data attributes. */
 export function countdownLabel(next: Pick<Competition, 'start' | 'end'>, today: string): string | undefined {
   const untilStart = daysBetween(today, next.start);
   if (untilStart > COUNTDOWN_MAX_DAYS) return undefined;
-  if (untilStart > 1) return `peste ${daysRo(untilStart)}`;
+  if (untilStart > 1) return `peste ${countRo(untilStart, 'zi', 'zile')}`;
   if (untilStart === 1) return 'începe mâine';
   if (untilStart === 0) return 'începe azi';
   if (today <= next.end) return 'în desfășurare';

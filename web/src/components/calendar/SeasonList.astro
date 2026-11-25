@@ -1,0 +1,152 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import type { EventView } from '../../lib/calendar';
+
+interface Props {
+  spring: EventView[];
+  autumn: EventView[];
+}
+
+const { spring, autumn } = Astro.props;
+const halves = [
+  { heading: 'Primăvara, Cupele României', rows: spring },
+  { heading: 'Toamna, Campionatele Naționale', rows: autumn },
+].filter(h => h.rows.length > 0);
+---
+
+{/*
+  The season as a plain list in date order: the target of every block in the grid, and the
+  calendar for screen readers and for pages without JavaScript. calendar-today.ts rewrites the
+  statuses when the page has gone stale.
+*/}
+<section class="list" aria-labelledby="list-h">
+  <SectionHeading id="list-h">Toate competițiile, pe rând</SectionHeading>
+  {
+    halves.map(h => (
+      <div>
+        <h3>{h.heading}</h3>
+        <ol>
+          {h.rows.map(r => (
+            <li id={`ev-${r.id}`} class:list={['li', r.status, { home: r.home }]} data-id={r.id} data-f={r.filter}>
+              <span class="ld">
+                <time datetime={r.start}>{r.short}</time>
+              </span>
+              <span class="lt">{r.title}</span>
+              <span class:list={['lc', { unknown: !r.cityKnown }]}>
+                {r.city}
+                {r.home && <span class="home-tag">acasă</span>}
+              </span>
+              {(r.postSlug || r.resultsUrl) && (
+                <span class="la">
+                  {r.postSlug && <a class="textlink" href={`/noutati/${r.postSlug}/`}>Articolul clubului</a>}
+                  {r.resultsUrl && <a class="textlink" href={r.resultsUrl}>Rezultatele pe badminton.ro</a>}
+                </span>
+              )}
+              <span class="visually-hidden st">{r.statusText}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .list {
+    margin-top: clamp(52px, 6vw, 84px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px clamp(32px, 5vw, 72px);
+  }
+  /* The approved calendar keeps this heading small beside the grids. */
+  .list > :global(.h2s) {
+    grid-column: 1 / -1;
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: 0;
+  }
+  h3 {
+    font-weight: 600;
+    font-size: 0.98rem;
+    margin-bottom: 6px;
+    color: var(--ink-muted);
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .li {
+    display: grid;
+    grid-template-columns: 6.4rem minmax(0, 1fr) auto;
+    gap: 2px 16px;
+    align-items: baseline;
+    padding: 9px 10px;
+    margin: 0 -10px;
+  }
+  .ld {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .lt {
+    font-weight: 500;
+  }
+  .lc {
+    text-align: right;
+    font-size: 0.95rem;
+  }
+  .lc.unknown {
+    font-style: italic;
+  }
+  .la {
+    grid-column: 2 / -1;
+    justify-self: start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 18px;
+    margin-top: 2px;
+    font-size: 0.95rem;
+  }
+  .li.played {
+    color: var(--ink-muted);
+  }
+  .li.played .la {
+    color: var(--ink);
+  }
+  .li.next :is(.lt, .ld) {
+    color: var(--blue);
+    font-weight: 700;
+  }
+  .li:target {
+    background: var(--mist);
+  }
+  .home-tag {
+    display: inline-block;
+    background: var(--red-field);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.82rem;
+    line-height: 1;
+    padding: 4px 7px 5px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  @media (max-width: 860px) {
+    .list {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* Under 420px, and in the two-column list just above the breakpoint, the city goes under the
+     title so a long title is never squeezed beside it. */
+  @media (max-width: 420px), (min-width: 861px) and (max-width: 1000px) {
+    .li {
+      grid-template-columns: 6.4rem minmax(0, 1fr);
+      column-gap: 10px;
+    }
+    .lc {
+      grid-column: 2;
+      text-align: left;
+    }
+  }
+</style>

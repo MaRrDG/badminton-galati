@@ -1,0 +1,68 @@
+---
+import type { Img } from '../../lib/types';
+import Photo from './Photo.astro';
+
+interface Props {
+  /** The photo; without it the default slot fills the frame (an athlete's initials). */
+  img?: Img;
+  /** How far the red plate sits below and to the right of the photo, in px. */
+  offset?: 12 | 14 | 16 | 18;
+  /** Crops the photo to this aspect ratio (CSS, e.g. "4 / 5"); without it the photo keeps its own. */
+  ratio?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  priority?: boolean;
+  class?: string;
+}
+
+const { img, offset = 14, ratio, sizes, loading, priority, class: className } = Astro.props;
+
+/** The widest the frame can be without enlarging the photo past its own pixels (a crop fills by its height too). */
+const [rw, rh] = (ratio ?? '').split('/').map(Number);
+const natural = img && Math.floor(rw > 0 && rh > 0 ? Math.min(img.width, (img.height * rw) / rh) : img.width);
+const style = [`--plate:${offset}px`, ratio && `--ratio:${ratio}`, natural && `--natural:${natural}px`].filter(Boolean).join(';');
+---
+
+<figure class:list={['plated', className, { cropped: ratio }]} style={style}>
+  <div class="plate" aria-hidden="true"></div>
+  <div class="shot">{img ? <Photo img={img} sizes={sizes} loading={loading} priority={priority} /> : <slot />}</div>
+</figure>
+
+<style>
+  /* The photo as a poster with the kit-red plate offset behind it. The margin keeps the plate
+     inside the space the figure takes. The plate is an element, not a shadow, so the motion
+     layer can grow it (transform-origin at the bottom). */
+  .plated {
+    position: relative;
+    margin: 0 var(--plate) var(--plate) 0;
+  }
+  .plate {
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    translate: var(--plate) var(--plate);
+    transform-origin: 50% 100%;
+  }
+  .shot {
+    position: relative;
+    overflow: hidden;
+    background: var(--blue-deep);
+  }
+  .shot :global(img) {
+    width: 100%;
+    height: auto;
+  }
+  .cropped .shot {
+    aspect-ratio: var(--ratio);
+  }
+  .cropped .shot :global(img) {
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Large screens: a frame never grows past the photo's own size. */
+  @media (min-width: 1441px) {
+    .plated {
+      max-width: var(--natural, none);
+    }
+  }
+</style>

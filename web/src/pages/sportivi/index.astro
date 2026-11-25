@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import ClosingCta from '../../components/ui/ClosingCta.astro';
+import Wall from '../../components/athletes/Wall.astro';
+import { getAthletesPage, getSiteData } from '../../lib/content';
+
+const page = await getAthletesPage();
+const { trialText } = await getSiteData();
+// The invitation to press an athlete only when there is one to press.
+const lede = [
+  'Copiii și tinerii legitimați la club, de la primii pași până la competițiile naționale.',
+  ...(page.tiles.length > 0 ? ['Apasă pe un sportiv ca să vezi unde a ajuns.'] : []),
+].join(' ');
+---
+
+<Base title="Sportivi | CS Siderurgistul Galați" description={lede}>
+  <PageHead title="Sportivii clubului" lede={lede} tone="white" />
+  <Wall {...page} />
+  <ClosingCta text={trialText} display={false} label="Cere un antrenament de probă" href="/contact/#formular" />
+</Base>
+
+<script>
+  import { initFilterStatus } from '../../scripts/filter-status';
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  initFilterStatus();
+  initPageMotion('tile-roll');
+</script>

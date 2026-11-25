@@ -1,0 +1,63 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+{/*
+  Share links, filled in the browser from the page's own address (share.ts): the public address
+  is not known before launch, so without JavaScript the row stays hidden. No third-party script.
+*/}
+<div class="share" data-share-title={title} hidden>
+  <span class="lbl">Distribuie articolul</span>
+  <a href="https://www.facebook.com/sharer/sharer.php" data-share="fb">Facebook</a>
+  <a href="https://wa.me/" data-share="wa">WhatsApp</a>
+  <button type="button" data-share="copy">Copiază linkul</button>
+  <input class="url" type="text" readonly aria-label="Adresa articolului" data-share="url" hidden />
+  <span class="status" role="status" data-share="status"></span>
+</div>
+
+<style>
+  .share:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    align-items: baseline;
+  }
+  .lbl {
+    font-weight: 600;
+  }
+  .status {
+    font-weight: 600;
+    color: var(--red-ink);
+  }
+  a,
+  button {
+    font: 500 1rem var(--body);
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 2px;
+  }
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  .url:not([hidden]) {
+    flex-basis: 100%;
+    font: 400 0.95rem var(--body);
+    color: var(--ink);
+    padding: 8px 10px;
+    border: 1px solid var(--ink-muted);
+    max-width: 52ch;
+  }
+  @media (max-width: 860px) {
+    .lbl {
+      flex-basis: 100%;
+    }
+  }
+</style>

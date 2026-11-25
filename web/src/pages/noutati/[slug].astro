@@ -1,0 +1,168 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArticleAside from '../../components/news/ArticleAside.astro';
+import ArticleHead from '../../components/news/ArticleHead.astro';
+import Gallery from '../../components/news/Gallery.astro';
+import PrevNext from '../../components/news/PrevNext.astro';
+import Share from '../../components/news/Share.astro';
+import PlatePhoto from '../../components/ui/PlatePhoto.astro';
+import { getPostPages } from '../../lib/content';
+import { postDescription, type PostPage } from '../../lib/article';
+
+export async function getStaticPaths() {
+  return (await getPostPages()).map(page => ({ params: { slug: page.post.slug }, props: { page } }));
+}
+
+interface Props {
+  page: PostPage;
+}
+
+const { post, body, competition, inCalendar, tagged, mosaic, neighbours } = Astro.props.page;
+const aside = competition !== undefined || tagged.length > 0;
+// Without a text there is nothing to share: no share row and no empty text column.
+const text = body.length > 0;
+---
+
+<Base title={`${post.title} | CS Siderurgistul Galați`} description={postDescription(post)}>
+  <article class="art">
+    <ArticleHead post={post} />
+    {
+      (text || aside) && (
+        <div class="wrap">
+          <div class:list={['artbody', { solo: !aside || !text }]}>
+            {text && (
+              <div class="col">
+                {/* Text runs come from bodySegments (lib/body.ts), which escapes every content string. */}
+                <div class="prose">
+                  {body.map(segment =>
+                    segment.kind === 'html' ? (
+                      <Fragment set:html={segment.html} />
+                    ) : (
+                      <div class="pull">
+                        <PlatePhoto img={segment.photo} offset={14} sizes="(max-width: 520px) 300px, 42vw" />
+                      </div>
+                    ),
+                  )}
+                </div>
+                <Share title={post.title} />
+              </div>
+            )}
+            {aside && <ArticleAside competition={competition} inCalendar={inCalendar} tagged={tagged} />}
+          </div>
+        </div>
+      )
+    }
+    {mosaic.length > 0 && <Gallery mosaic={mosaic} />}
+    <PrevNext {...neighbours} />
+  </article>
+</Base>
+
+<script>
+  import { initLightbox } from '../../scripts/lightbox';
+  import { initPageMotion } from '../../scripts/page-motion';
+  import { initShare } from '../../scripts/share';
+
+  initShare();
+  initLightbox();
+  initPageMotion('cover-recrop');
+</script>
+
+<style>
+  .art {
+    overflow-x: clip;
+  }
+  /* A ~68ch text column, the competition and the athletes beside it. The side column keeps a
+     floor, or just above the breakpoint the full 68ch would squeeze it off the screen. */
+  .artbody {
+    display: grid;
+    grid-template-columns: minmax(0, 68ch) minmax(220px, 1fr);
+    gap: 40px clamp(36px, 6vw, 96px);
+    padding: clamp(40px, 5vw, 72px) 0 clamp(48px, 6vw, 84px);
+    align-items: start;
+  }
+  .artbody.solo {
+    grid-template-columns: minmax(0, 68ch);
+  }
+  /* The share row follows the text at a distance. */
+  .prose {
+    margin-bottom: clamp(32px, 4vw, 48px);
+  }
+  .prose > :global(* + *) {
+    margin-top: 1.1em;
+  }
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol),
+  .prose :global(blockquote) {
+    margin-bottom: 0;
+  }
+  .prose :global(.lead) {
+    font-size: clamp(1.15rem, 1.6vw, 1.3rem);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+  /* Subheadings in the text stay modest (owner's rule: big uppercase only for the page title). */
+  .prose :global(h2) {
+    font-weight: 700;
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-top: 1.4em;
+  }
+  .prose :global(h3) {
+    font-weight: 700;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin-top: 1.3em;
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.3em;
+  }
+  .prose :global(li + li) {
+    margin-top: 0.35em;
+  }
+  .prose :global(blockquote) {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 18px;
+    border-left: 4px solid var(--red);
+    font-size: 1.08rem;
+    font-weight: 500;
+  }
+  .prose :global(a) {
+    font-weight: 600;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    overflow-wrap: anywhere;
+  }
+  /* A photo in the text leaves the line on wide screens; PlatePhoto draws its plate. */
+  .pull {
+    float: right;
+    width: 42%;
+    margin: 6px 0 18px 32px;
+  }
+  .prose::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  @media (max-width: 860px) {
+    .artbody {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pull {
+      width: 46%;
+      margin-left: 20px;
+    }
+  }
+  @media (max-width: 520px) {
+    .pull {
+      float: none;
+      width: auto;
+      max-width: 300px;
+      margin: 28px 0;
+    }
+  }
+</style>

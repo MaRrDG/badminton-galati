@@ -1,5 +1,7 @@
 ---
 import type { Img } from '../../lib/types';
+import Photo from '../ui/Photo.astro';
+import PlatePhoto from '../ui/PlatePhoto.astro';
 
 interface Props {
   text: string;
@@ -20,11 +22,16 @@ const scrolls = photos.length > 1;
     {
       photos.length > 0 && (
         <div class="track" role="region" aria-label="Fotografii din sală" tabindex={scrolls ? 0 : undefined}>
-          {photos.map((photo) => (
-            <figure>
-              <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
-            </figure>
-          ))}
+          {photos.map((photo, i) =>
+            // The third photo carries the strip's one red plate.
+            i === 2 ? (
+              <PlatePhoto img={photo} offset={12} />
+            ) : (
+              <figure>
+                <Photo img={photo} />
+              </figure>
+            ),
+          )}
         </div>
       )
     }
@@ -54,6 +61,7 @@ const scrolls = photos.length > 1;
     display: flex;
     gap: clamp(12px, 1.4vw, 20px);
     overflow-x: auto;
+    overflow-y: hidden;
     padding-bottom: 6px;
   }
   /* The motion layer adds .js-rally and moves the strip itself. */
@@ -62,29 +70,34 @@ const scrolls = photos.length > 1;
     width: max-content;
     padding-bottom: 0;
   }
-  figure {
+  /* The photos come from Photo and PlatePhoto, hence :global(). */
+  .track > :global(figure) {
     flex: none;
   }
-  img {
-    height: clamp(200px, 38vh, 340px);
+  .track > :global(figure) :global(img) {
+    height: clamp(200px, 38vh, calc(340px + var(--lift) * 0.15));
     width: auto;
   }
+  /* The plate hangs below the photo without making the strip taller. */
+  .track > :global(.plated) {
+    margin-bottom: 0;
+  }
+  /* While the strip scrolls by itself (no JS, reduced motion) the plate ends at its padding edge
+     (12px offset - 6px padding), as the old box-shadow was clipped there; a plate reaching past
+     it would give the strip a vertical scroll range. */
+  .hall:not(.js-rally) .track > :global(.plated) :global(.plate) {
+    bottom: 6px;
+  }
   /* A single photo fills the column instead of running past it. */
-  figure:only-child {
+  .track > :global(figure:only-child) {
     flex: 1 1 auto;
     min-width: 0;
   }
-  figure:only-child img {
+  .track > :global(figure:only-child) :global(img) {
     width: 100%;
     height: auto;
-    max-height: clamp(200px, 38vh, 340px);
+    max-height: clamp(200px, 38vh, calc(340px + var(--lift) * 0.15));
     object-fit: cover;
-  }
-  figure:nth-child(3) {
-    margin-right: 12px;
-  }
-  figure:nth-child(3) img {
-    box-shadow: 12px 12px 0 var(--red);
   }
   @media (max-width: 860px) {
     .hall-head {

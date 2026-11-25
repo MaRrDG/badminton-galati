@@ -1,0 +1,59 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import TrialForm from '../../components/contact/TrialForm.astro';
+import Place from '../../components/contact/Place.astro';
+import { getContactPage } from '../../lib/content';
+import { CLUB_EMAIL } from '../../lib/club';
+
+const page = await getContactPage();
+const description = 'Cere un antrenament de probă, pentru copil sau pentru tine, ori scrie-ne. Sala Siderurgistul, Bd. Cloșca, Galați.';
+---
+
+<Base title="Contact | CS Siderurgistul Galați" description={description}>
+  <PageHead title="Contact" tone="blue">
+    <p class="lead">
+      Pentru un antrenament de probă, completează formularul. Pentru orice altă întrebare, scrie-ne la <a href={`mailto:${CLUB_EMAIL}`}
+        >{CLUB_EMAIL}</a
+      >.
+    </p>
+  </PageHead>
+
+  <section class="contact" aria-label="Formular și adresă">
+    <div class="wrap contact-grid">
+      <TrialForm replyDays={page.contact.replyDays} />
+      <Place contact={page.contact} photo={page.hallPhoto} />
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  initPageMotion('poster-reveal');
+</script>
+
+<style>
+  /* The lede carries a link, so it sits in PageHead's slot (which already spaces it below the title). */
+  .lead {
+    max-width: 60ch;
+    font-size: clamp(1.02rem, 1.3vw, 1.14rem);
+  }
+
+  /* The form is the page; the place sits beside it as one panel, below it on a phone. */
+  .contact {
+    padding: clamp(36px, 5vw, 72px) 0 clamp(52px, 7vw, 100px);
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 48px clamp(36px, 6vw, 96px);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .contact-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import RallyScene from '../components/notfound/RallyScene.astro';
+import { getAthletesPage } from '../lib/content';
 import { makeLayout } from '../lib/rally/court';
 
 // The page's strip of floor has to meet the one inside each drawing, so it takes their measures.
@@ -11,12 +12,15 @@ const measures = (['wide', 'tall'] as const)
   })
   .join(';');
 
-// The section pages of the menu arrive with plan 2; until then these lead to the homepage sections.
+// The section pages of the menu. The athletes page only when its wall shows an athlete (the
+// wall holds consented athletes only); an empty wall is no way out.
+const { tiles } = await getAthletesPage();
 const ways = [
-  { label: 'Program', href: '/#program' },
-  { label: 'Calendar', href: '/#calendar' },
-  { label: 'Noutăți', href: '/#noutati' },
-  { label: 'Contact', href: '/#contact' },
+  ...(tiles.length > 0 ? [{ label: 'Sportivi', href: '/sportivi/' }] : []),
+  { label: 'Program', href: '/program/' },
+  { label: 'Calendar', href: '/calendar/' },
+  { label: 'Noutăți', href: '/noutati/' },
+  { label: 'Contact', href: '/contact/' },
 ];
 ---
 
@@ -50,10 +54,19 @@ const ways = [
 </script>
 
 <style>
+  /* As the last section of <main> the scene takes whatever height the window has left
+     (base.css): the free space opens up as sky between the text and the court, so the floor
+     line stays on the footer. The drawing itself keeps its own coordinates. */
   .nf {
     background: var(--blue);
     color: var(--white);
     padding-top: clamp(28px, 4.5vh, 52px);
+    display: flex;
+    flex-direction: column;
+  }
+  .nf-text {
+    width: 100%;
+    margin-bottom: auto;
   }
   .nf-text {
     display: grid;
@@ -129,6 +142,14 @@ const ways = [
   }
   .nf-frame :global(.tall) {
     display: none;
+  }
+  /* Large screens: the page is one screen, footer included, so the drawing takes the height
+     left by the header, the text and the footer (the text and footer grow with --lift), up to
+     a cap that grows with the column. */
+  @media (min-width: 1441px) {
+    .nf-court {
+      --frame: min(100vw, 1500px + var(--lift) * 0.4, max(820px, (100vh - 590px - var(--lift) * 0.06) * var(--w) / var(--h)));
+    }
   }
 
   @media (max-width: 860px) {

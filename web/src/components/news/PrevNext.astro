@@ -1,0 +1,84 @@
+---
+import { formatDateRo } from '../../lib/dates';
+import type { Post } from '../../lib/types';
+
+interface Props {
+  older?: Post;
+  newer?: Post;
+}
+
+const { older, newer } = Astro.props;
+const pair = [
+  older && { post: older, label: `Mai vechi, ${formatDateRo(older.date)}`, side: 'older' },
+  newer && { post: newer, label: `Mai nou, ${formatDateRo(newer.date)}`, side: 'newer' },
+].filter(x => !!x);
+---
+
+{/* The article before and after this one in the news list, then the whole list. */}
+<nav class="pn wrap" aria-label="Alte articole">
+  {
+    pair.length > 0 && (
+      <div class="pair">
+        {pair.map(({ post, label, side }) => (
+          <a class={side} href={`/noutati/${post.slug}/`}>
+            <small>{label}</small>
+            <b>{post.title}</b>
+          </a>
+        ))}
+      </div>
+    )
+  }
+  <a class="textlink all" href="/noutati/">Toate articolele</a>
+</nav>
+
+<style>
+  .pn {
+    padding-top: clamp(40px, 5vw, 72px);
+    padding-bottom: clamp(48px, 6vw, 88px);
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px clamp(32px, 6vw, 96px);
+  }
+  .pair a {
+    display: block;
+    text-decoration: none;
+  }
+  .newer {
+    grid-column: 2;
+    text-align: right;
+  }
+  small {
+    display: block;
+    font-weight: 600;
+    color: var(--red-ink);
+    font-size: 0.95rem;
+  }
+  b {
+    display: block;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 2.6vw, 2.3rem);
+    line-height: 1.02;
+    margin-top: 6px;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+  .pair a:hover b {
+    color: var(--blue);
+  }
+  .all {
+    display: inline-block;
+    margin-top: clamp(24px, 3vw, 36px);
+  }
+  @media (max-width: 860px) {
+    .pair {
+      grid-template-columns: 1fr;
+    }
+    .newer {
+      grid-column: 1;
+      text-align: left;
+    }
+  }
+</style>

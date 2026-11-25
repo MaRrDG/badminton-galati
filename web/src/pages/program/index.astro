@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import ClosingCta from '../../components/ui/ClosingCta.astro';
+import Planner from '../../components/program/Planner.astro';
+import GroupGuide from '../../components/program/GroupGuide.astro';
+import { getProgramPage } from '../../lib/content';
+
+const page = await getProgramPage();
+const lede =
+  'Când se antrenează fiecare grupă și cine o antrenează. Toate antrenamentele sunt în Sala Siderurgistul, pe Bulevardul Cloșca.';
+---
+
+<Base title="Program și grupe | CS Siderurgistul Galați" description={lede}>
+  <PageHead title="Program și grupe" lede={lede} tone="blue" />
+  <Planner planner={page.planner} filters={page.filters} note={page.note} provisional={page.provisional} />
+  <GroupGuide tracks={page.tracks} missingCoach={page.missingCoach} />
+  <ClosingCta
+    text="Spune-ne cine vine și un număr de telefon, iar clubul te contactează ca să stabiliți împreună ziua probei."
+    display
+    label="Cere un antrenament de probă"
+    href="/contact/#formular"
+    email
+  />
+</Base>
+
+<script>
+  import { initFilterStatus } from '../../scripts/filter-status';
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  initFilterStatus();
+  initPageMotion('sessions-settle');
+</script>

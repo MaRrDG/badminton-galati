@@ -3,17 +3,22 @@
 // The page is complete without this file; every moment no-ops when its targets are absent.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { digitBands } from './roll';
 
 /** Breakpoint shared with the components' CSS (`max-width: 860px`). */
 const WIDE = '(min-width: 861px)';
 const NARROW = '(max-width: 860px)';
 
-export function initMotion(): void {
+/**
+ * `intro: false` (the motion code arrived late, `lib/motion-budget.ts`) leaves the hero as
+ * rendered; the scroll-driven moments are set up either way.
+ */
+export function initMotion({ intro = true }: { intro?: boolean } = {}): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.registerPlugin(ScrollTrigger);
 
   // The intro plays once per visit, outside matchMedia, so crossing 860px does not replay it.
-  heroLoad();
+  if (intro) heroLoad();
   const mm = gsap.matchMedia();
   mm.add({ wide: WIDE, narrow: NARROW }, (ctx) => {
     const wide = Boolean(ctx.conditions?.wide);
@@ -82,26 +87,12 @@ function heroScrub(wide: boolean): void {
 function rosterRoll(): () => void {
   const els = gsap.utils.toArray<HTMLElement>('[data-roll]');
   els.forEach((el) => {
-    const digits = el.dataset.roll ?? '';
-    el.textContent = '';
-    [...digits].forEach((digit, i) => {
-      // One full turn of 0–9, then on to the digit.
-      const n = 10 + Number(digit) + 1;
-      const cell = document.createElement('i');
-      const band = document.createElement('span');
-      band.style.display = 'block';
-      for (let k = 0; k < n; k++) {
-        const u = document.createElement('u');
-        u.textContent = String(k % 10);
-        band.append(u);
-      }
-      cell.append(band);
-      el.append(cell);
+    digitBands(el).forEach(({ band, end }, i) => {
       gsap.fromTo(
         band,
         { yPercent: 0 },
         {
-          yPercent: (-100 * (n - 1)) / n,
+          yPercent: end,
           ease: 'power2.out',
           scrollTrigger: { trigger: el, start: 'top 95%', end: `top ${52 - i * 8}%`, scrub: 0.6 },
         },

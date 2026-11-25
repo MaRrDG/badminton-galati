@@ -1,0 +1,64 @@
+---
+import { initialsOf, type Tone } from '../../lib/tiles';
+
+interface Props {
+  name: string;
+  tone: Tone;
+  /** tile: the athletes wall; poster: an athlete's profile; coach: the parents' page. */
+  size: 'tile' | 'poster' | 'coach';
+}
+
+const { name, tone, size } = Astro.props;
+---
+
+<div class:list={['initial', `c-${tone}`, `as-${size}`]}><span class="ini" aria-hidden="true">{initialsOf(name)}</span></div>
+
+<style>
+  /* Stands in for a missing photo: a coloured field with the initials, never a placeholder image. */
+  .initial {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    color: var(--white);
+  }
+  .c-blue {
+    background: var(--blue);
+  }
+  .c-deep {
+    background: var(--blue-deep);
+  }
+  .c-red {
+    background: var(--red-field);
+  }
+  .as-tile .ini,
+  .as-poster .ini {
+    font-family: var(--display);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .as-tile .ini {
+    font-size: clamp(4rem, 8vw, 7rem);
+  }
+  .as-poster .ini {
+    font-size: clamp(6rem, 13vw, 11rem);
+  }
+  .as-coach .ini {
+    font-weight: 700;
+    font-size: clamp(1.8rem, 2.6vw, 2.3rem);
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 860px) {
+    .as-coach {
+      aspect-ratio: 1;
+    }
+    .as-coach .ini {
+      font-size: 1.5rem;
+    }
+  }
+  @media (max-width: 560px) {
+    .as-tile .ini {
+      font-size: 4.2rem;
+    }
+  }
+</style>

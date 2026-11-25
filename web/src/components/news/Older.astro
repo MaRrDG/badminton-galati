@@ -1,0 +1,82 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import { formatDateRo } from '../../lib/dates';
+import { postKindLabel } from '../../lib/home';
+import type { Post } from '../../lib/types';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<section class="older" aria-labelledby="older-h">
+  <div class="wrap">
+    <SectionHeading id="older-h">Mai vechi</SectionHeading>
+    <ol>
+      {
+        posts.map(post => (
+          <li data-f={post.kind}>
+            <p class="meta">{postKindLabel(post.kind)}, <time datetime={post.date}>{formatDateRo(post.date)}</time></p>
+            <h3><a href={`/noutati/${post.slug}/`}>{post.title}</a></h3>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* Older articles: a quiet band of titles, no photos. */
+  .older {
+    background: var(--mist);
+    padding: clamp(36px, 4.4vw, 60px) 0 clamp(44px, 5vw, 72px);
+  }
+  ol {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px clamp(20px, 3vw, 40px);
+  }
+  li {
+    position: relative;
+  }
+  .meta {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--red-ink);
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.4rem;
+    line-height: 1.05;
+    margin-top: 4px;
+    overflow-wrap: break-word;
+  }
+  a {
+    text-decoration: none;
+  }
+  /* The whole item is the link; its name stays the title. */
+  a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  li:hover a {
+    color: var(--blue);
+  }
+  @media (max-width: 1000px) {
+    ol {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    ol {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

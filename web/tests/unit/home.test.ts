@@ -86,11 +86,11 @@ describe('rosterOrder', () => {
 });
 
 const comps = [
-  { id: 'a', title: 'CN U9 & CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false },
-  { id: 'b', title: 'CN U15 & CN Seniori', city: 'Blejoi/Bacău', start: '2026-11-20', end: '2026-11-22', home: false },
-  { id: 'c', title: 'CN U11 & CN U19', city: 'Galați', start: '2026-10-23', end: '2026-10-25', home: true },
-  { id: 'd', title: 'CN U13 & CN U23', city: 'Blejoi/Bacău', start: '2026-09-25', end: '2026-09-27', home: false },
-  { id: 'e', title: 'CN Echipe U15', city: 'Galați', start: '2026-09-18', end: '2026-09-20', home: true },
+  { id: 'a', title: 'CN U9 & CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false, categories: [] },
+  { id: 'b', title: 'CN U15 & CN Seniori', city: 'Blejoi/Bacău', start: '2026-11-20', end: '2026-11-22', home: false, categories: [] },
+  { id: 'c', title: 'CN U11 & CN U19', city: 'Galați', start: '2026-10-23', end: '2026-10-25', home: true, categories: [] },
+  { id: 'd', title: 'CN U13 & CN U23', city: 'Blejoi/Bacău', start: '2026-09-25', end: '2026-09-27', home: false, categories: [] },
+  { id: 'e', title: 'CN Echipe U15', city: 'Galați', start: '2026-09-18', end: '2026-09-20', home: true, categories: [] },
 ] satisfies Competition[];
 const cnU17 = comps[0];
 
@@ -180,7 +180,7 @@ describe('pointsUnit', () => {
 });
 
 describe('groupsHeading', () => {
-  const group = (i: number, track: Group['track']): Group => ({ name: `G${i}`, audience: 'Toți', track });
+  const group = (i: number, track: Group['track']): Group => ({ id: `g${i}`, slug: `g${i}`, name: `G${i}`, audience: 'Toți', track, sessions: [] });
   const groups = (perf: number, amatori: number): Group[] => [
     ...Array.from({ length: perf }, (_, i) => group(i, 'performanta')),
     ...Array.from({ length: amatori }, (_, i) => group(perf + i, 'amatori')),

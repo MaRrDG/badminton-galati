@@ -1,0 +1,210 @@
+---
+import { filterBarCss, type FilterOption } from '../../lib/filter';
+
+interface Props {
+  legend: string;
+  /** Show the legend (calendar, news, programme); otherwise only screen readers hear it. */
+  legendVisible?: boolean;
+  /** The radios' name; unique on the page. */
+  name: string;
+  /** A selector for the element that holds this bar and the filtered items (`data-f`). */
+  scope: string;
+  /** The first option is "all" and starts checked; the others filter. */
+  options: FilterOption[];
+  effect: 'hide' | 'dim';
+  container?: string;
+  /** A media query that limits hiding the empty `container` (e.g. phones only). */
+  containerMedia?: string;
+  /** chips: filled buttons (athletes); links: underlined words (calendar, news); swatches: outlined, with a colour square (programme). */
+  variant: 'chips' | 'links' | 'swatches';
+  /** A count line under the bar, announced to screen readers when the choice changes (filter-status.ts). */
+  status?: boolean;
+}
+
+const { legend, legendVisible = false, name, scope, options, effect, container, containerMedia, variant, status = false } = Astro.props;
+const css = filterBarCss(scope, name, options, { effect, container, containerMedia, status });
+// A count is a <sup> right after its word; the radio is named with a comma between them, so
+// screen readers say "Toate, 15", not "Toate15".
+const nameOf = (o: FilterOption) => (o.count !== undefined ? `${o.label}, ${o.count}` : undefined);
+---
+
+<div class:list={['filterbar', variant]}>
+  <fieldset class="filter">
+    <legend class:list={{ 'visually-hidden': !legendVisible }}>{legend}</legend>
+    <div class="opts">
+      {
+        options.map((o, i) => (
+          <>
+            <input type="radio" name={name} id={`${name}-${o.value}`} value={o.value} checked={i === 0} data-count-label={o.countLabel} aria-label={nameOf(o)} />
+            <label for={`${name}-${o.value}`}>
+              {o.swatch && <i class="sw" style={`--sw:${o.swatch}`} aria-hidden="true" />}
+              {o.label}
+              {o.count !== undefined && <sup>{o.count}</sup>}
+            </label>
+          </>
+        ))
+      }
+    </div>
+  </fieldset>
+  {
+    status && (
+      <p class="status" data-filter-status>
+        {options.map(o => <span data-count-for={o.value}>{o.countLabel}</span>)}
+        <span class="visually-hidden" aria-live="polite" />
+      </p>
+    )
+  }
+</div>
+<style is:inline set:html={css}></style>
+
+<style>
+  .filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 32px;
+  }
+  .filter {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .opts {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  /* Visually hidden radios; the label carries the look and the focus ring. */
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+  }
+  label {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  input:focus-visible + label {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  sup {
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 3px;
+    vertical-align: 0.45em;
+    line-height: 0;
+  }
+  .status {
+    font-weight: 600;
+  }
+
+  /* chips: the athletes wall (on mist) */
+  .chips .opts {
+    gap: 6px;
+  }
+  .chips label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    background: var(--white);
+    color: var(--ink);
+  }
+  .chips label:hover,
+  .chips input:checked + label {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  /* links: plain words, the chosen one underlined in red like the menu */
+  .links .filter {
+    position: relative; /* the radios' containing block, since .opts has no box here */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px clamp(16px, 2vw, 28px);
+  }
+  /* A floated legend is laid out as an ordinary flex item, beside the options. */
+  .links legend:not(.visually-hidden) {
+    float: left;
+    padding: 0;
+    margin-right: 4px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  /* The words flow on after the legend as one line of text that wraps, not as a block under it. */
+  .links .opts {
+    display: contents;
+  }
+  .links label {
+    font-size: 1.02rem;
+    padding: 4px 0;
+    border-bottom: 4px solid transparent;
+  }
+  .links label:hover {
+    border-bottom-color: var(--ink-muted);
+  }
+  .links input:checked + label {
+    border-bottom-color: var(--red);
+  }
+
+  /* swatches: the programme, each group with its colour */
+  .swatches legend:not(.visually-hidden) {
+    padding: 0;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .swatches .opts {
+    gap: 8px;
+  }
+  .swatches label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 10px 16px;
+    border: 2px solid var(--ink-muted);
+    background: var(--white);
+    user-select: none;
+  }
+  .swatches label:hover,
+  .swatches input:checked + label {
+    border-color: var(--ink);
+  }
+  .swatches input:checked + label {
+    outline: 2px solid var(--ink);
+    outline-offset: -4px;
+  }
+  .swatches input:checked:focus-visible + label {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .sw {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    background: var(--sw);
+    border: 2px solid var(--sw);
+  }
+
+  @media (max-width: 560px) {
+    .chips .opts {
+      gap: 4px;
+    }
+    .chips label {
+      padding: 0 11px;
+    }
+  }
+  @media (max-width: 860px) {
+    .swatches .opts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

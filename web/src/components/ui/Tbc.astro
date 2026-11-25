@@ -1,0 +1,12 @@
+---
+interface Props {
+  /** What the club still has to confirm, e.g. "taxa lunară la fiecare grupă." */
+  what: string;
+  as?: 'p' | 'span' | 'dd';
+}
+
+const { what, as: Tag = 'p' } = Astro.props;
+---
+
+{/* Unknown data is never filled with invented copy; .tbc lives in base.css. */}
+<Tag class="tbc"><b>De confirmat de club:</b> {what}</Tag>

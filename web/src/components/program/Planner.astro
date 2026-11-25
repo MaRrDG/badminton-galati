@@ -1,0 +1,332 @@
+---
+import FilterBar from '../ui/FilterBar.astro';
+import Sample from '../ui/Sample.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Tbc from '../ui/Tbc.astro';
+import type { FilterOption } from '../../lib/filter';
+import { HALL_MAP_URL } from '../../lib/club';
+import { plannerRows, type Planner } from '../../lib/program';
+
+interface Props {
+  planner?: Planner;
+  filters: FilterOption[];
+  note?: string;
+  /** Something on the page is an example the club has not confirmed: say what the hatching means. */
+  provisional: boolean;
+}
+
+const { planner, filters, note, provisional } = Astro.props;
+// The picker's swatches take their fill from the option; the light ones also need an edge.
+// Values are slugs (filterBarCss rejects anything else), so they are safe in a selector.
+const EDGE: Record<string, string> = { 'var(--white)': 'var(--blue)', 'var(--mist)': 'var(--blue-tint)' };
+const edges = filters
+  .filter(f => f.swatch && EDGE[f.swatch])
+  .map(f => `.week label[for="grupa-${f.value}"] .sw{border-color:${EDGE[f.swatch!]}}`)
+  .join('\n');
+const gridStyle = planner ? `--days:${planner.days.length};grid-template-rows:${plannerRows(planner)}` : '';
+---
+
+<section class="week" id="saptamana" aria-labelledby="wk-h">
+  <div class="wrap">
+    <div class="week-top">
+      <SectionHeading id="wk-h">Săptămâna în sală</SectionHeading>
+      {
+        provisional && (
+          <p class="sample-note" role="note">
+            <span class="hatch" aria-hidden="true" />
+            <b>Orele sunt exemple, clubul le confirmă.</b> Zilele, orele și antrenorii de pe această pagină arată doar cum va
+            arăta programul; tot ce e hașurat portocaliu nu e încă real.
+          </p>
+        )
+      }
+    </div>
+    {
+      planner ? (
+        <>
+          {filters.length > 0 && (
+            <div class="pick">
+              <FilterBar
+                legend="Alege grupa copilului"
+                legendVisible
+                name="grupa"
+                scope=".week"
+                options={filters}
+                effect="hide"
+                container=".daycol"
+                containerMedia="(max-width: 860px)"
+                variant="swatches"
+                status
+              />
+            </div>
+          )}
+          <div class="planner" role="list" aria-label="Antrenamentele pe zile" style={gridStyle}>
+            {planner.marks.map(m => (
+              <span class="hr" style={`--r:${m.row}`} aria-hidden="true">
+                <i>{m.label}</i>
+              </span>
+            ))}
+            {planner.gapRows.map(r => (
+              <span class="gapband" style={`--r:${r}`} aria-hidden="true" />
+            ))}
+            {planner.days.map(d => (
+              <div class="daycol" role="listitem">
+                <h3 class="dname" style={`--c:${d.col}`}>{d.name}</h3>
+                <ul role="list">
+                  {planner.blocks
+                    .filter(b => b.day === d.day)
+                    .map(b => (
+                      <li
+                        class:list={['blk', `t-${b.tone}`, { short: b.r2 - b.r1 <= 2 }]}
+                        data-f={b.group.slug}
+                        style={`--c:${b.col};--r1:${b.r1};--r2:${b.r2};--lane:${b.lane};--lanes:${b.lanes}`}
+                      >
+                        <b>{b.group.name}</b>
+                        <span class="time">
+                          {b.provisional ? <Sample note="oră dată ca exemplu">{b.label}</Sample> : b.label}
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          {note && <p class="club-note">{note}</p>}
+        </>
+      ) : (
+        <Tbc what="zilele și orele fiecărei grupe." />
+      )
+    }
+    <p class="where">
+      Sala Siderurgistul, Bd. Cloșca, Galați · patru terenuri · <a class="textlink" href={HALL_MAP_URL}>sala pe hartă</a>{' · '}<a
+        class="textlink"
+        href="/contact/#drum">cum ajungi</a
+      >
+    </p>
+  </div>
+  {edges && <style is:inline set:html={edges} />}
+</section>
+
+<style>
+  .week {
+    padding: clamp(32px, 4.4vw, 60px) 0 clamp(44px, 6vw, 80px);
+  }
+  .week-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: 10px clamp(24px, 5vw, 72px);
+    align-items: start;
+    margin-bottom: clamp(18px, 2.4vw, 28px);
+  }
+  .sample-note {
+    font-size: 0.98rem;
+    max-width: 62ch;
+  }
+  .sample-note b {
+    font-weight: 700;
+  }
+  .hatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: -1px;
+    margin-right: 8px;
+    border: 1px solid var(--court);
+    background-image: repeating-linear-gradient(-45deg, var(--court-hatch-strong) 0 2px, transparent 2px 5px);
+  }
+  .pick {
+    margin-bottom: clamp(18px, 2.4vw, 28px);
+  }
+  /* The count is for screen readers only: the blocks that stay already show the choice. */
+  .pick :global(.status) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Group colours: the performance road in solid club colours, the play road light. */
+  .t-red {
+    --g: var(--red-field);
+    --gt: var(--white);
+  }
+  .t-blue {
+    --g: var(--blue);
+    --gt: var(--white);
+  }
+  .t-deep {
+    --g: var(--blue-deep);
+    --gt: var(--white);
+  }
+  .t-outline {
+    --g: var(--white);
+    --gt: var(--blue);
+    --gb: var(--blue);
+  }
+  .t-mist {
+    --g: var(--mist);
+    --gt: var(--ink);
+  }
+
+  .planner,
+  .planner ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .dname {
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .blk {
+    background: var(--g);
+    color: var(--gt);
+    border: 2px solid var(--gb, var(--g));
+  }
+  .blk b {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.15;
+  }
+  .time {
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .club-note {
+    margin-top: clamp(14px, 1.8vw, 20px);
+    max-width: 62ch;
+    font-size: 0.98rem;
+  }
+  .where {
+    margin-top: clamp(18px, 2.4vw, 26px);
+    font-size: 0.98rem;
+  }
+  .where .textlink {
+    text-underline-offset: 4px;
+  }
+  .week :global(.tbc) {
+    margin-bottom: 4px;
+  }
+
+  /* Wide: the days are columns on one time axis; the empty middle of the day is one mist band. */
+  @media (min-width: 861px) {
+    .planner {
+      --slot: 25px;
+      --gap-row: 34px;
+      display: grid;
+      grid-template-columns: 3.4rem repeat(var(--days), minmax(0, 1fr));
+      column-gap: 6px;
+    }
+    /* The picker hides only blocks here (its empty-day rule is for phones); every day keeps its name. */
+    .daycol,
+    .daycol ul {
+      display: contents;
+    }
+    .dname {
+      grid-column: var(--c);
+      grid-row: 1;
+      padding: 0 2px 10px;
+    }
+    .hr {
+      grid-column: 1 / -1;
+      grid-row: var(--r);
+      border-top: 1px solid var(--blue-tint);
+      position: relative;
+    }
+    .hr i {
+      position: absolute;
+      left: 0;
+      top: -0.7em;
+      background: var(--white);
+      padding-right: 6px;
+      font-style: normal;
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink-soft);
+    }
+    .gapband {
+      grid-column: 2 / -1;
+      grid-row: var(--r);
+      background: var(--mist);
+    }
+    /* Sessions that overlap share the day's column in lanes, side by side. */
+    .blk {
+      --lane-gap: 4px;
+      grid-column: var(--c);
+      grid-row: var(--r1) / var(--r2);
+      width: calc((100% + var(--lane-gap)) / var(--lanes) - var(--lane-gap));
+      margin: 2px 0 1px calc(var(--lane) * (100% + var(--lane-gap)) / var(--lanes));
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+    /* An hour or less: name and time on one line that fits a single half-hour row; the name
+       gives way (ellipsis), the time always shows. */
+    .blk.short {
+      flex-flow: row nowrap;
+      align-items: center;
+      gap: 6px;
+      padding: 1px 6px;
+      line-height: 1.1;
+    }
+    .blk.short b {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.8rem;
+      line-height: 1.1;
+    }
+    .blk.short .time {
+      flex: none;
+      font-size: 0.78rem;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+  }
+
+  /* Two picker columns on a phone: a tighter label keeps "Amatori adulți" on one line. */
+  @media (max-width: 560px) {
+    .pick :global(.swatches label) {
+      padding: 10px 12px;
+    }
+  }
+
+  /* Narrow: the days stacked, each with its sessions as full-width bars. */
+  @media (max-width: 860px) {
+    .week-top {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hr,
+    .gapband {
+      display: none;
+    }
+    .daycol {
+      padding: 10px 0 12px;
+    }
+    .dname {
+      margin-bottom: 6px;
+    }
+    .daycol ul {
+      display: grid;
+      gap: 6px;
+    }
+    .blk {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      min-height: 48px;
+    }
+  }
+</style>

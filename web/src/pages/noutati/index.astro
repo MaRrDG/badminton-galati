@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import FilterBar from '../../components/ui/FilterBar.astro';
+import Front from '../../components/news/Front.astro';
+import Older from '../../components/news/Older.astro';
+import { getNewsPage } from '../../lib/content';
+
+const { front, filters } = await getNewsPage();
+const lede = 'Articolele clubului, de la competiții, din viața clubului și despre proiecte.';
+const empty = front.feat === undefined;
+---
+
+<Base title="Noutăți | CS Siderurgistul Galați" description={lede}>
+  <div class="nl">
+    {
+      filters.length > 0 ? (
+        <PageHead title="Noutăți" lede={lede} tone="white">
+          <FilterBar legend="Tipul" legendVisible name="tip" scope=".nl" options={filters} effect="dim" variant="links" />
+        </PageHead>
+      ) : (
+        <PageHead title="Noutăți" lede={lede} tone="white" />
+      )
+    }
+    {
+      empty ? (
+        <div class="wrap">
+          <p class="quiet">Încă nu sunt articole.</p>
+        </div>
+      ) : (
+        <Front front={front} />
+      )
+    }
+    {front.older.length > 0 && <Older posts={front.older} />}
+  </div>
+</Base>
+
+<script>
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  initPageMotion('feature-reveal');
+</script>
+
+<style>
+  .nl {
+    overflow-x: clip;
+  }
+  /* No article yet: one plain line, quieter than any front. */
+  .quiet {
+    padding-bottom: clamp(56px, 7vw, 96px);
+  }
+</style>

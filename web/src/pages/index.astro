@@ -31,7 +31,15 @@ const hasRoster = home.athletes.length > 0;
 </Base>
 
 <script>
-  import { initMotion } from '../scripts/motion';
+  import { introOnTime } from '../lib/motion-budget';
 
-  initMotion();
+  // GSAP and the motion layer are fetched only when motion runs; reduced motion shows the page as
+  // rendered. When the chunk arrives late, the hero intro is skipped (the page has painted already).
+  const startedAt = performance.now();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    void import('../scripts/motion').then(m => {
+      // Measured from the first contentful paint when the browser reports it: that is when the final state shows.
+      const fcp = performance.getEntriesByName('first-contentful-paint')[0]?.startTime;
+      m.initMotion({ intro: introOnTime(fcp ?? startedAt, performance.now()) });
+    });
 </script>

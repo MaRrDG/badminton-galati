@@ -179,6 +179,148 @@ test('heading drift follows the new width after a resize', async ({ page }) => {
   expect(x).toBeCloseTo(1000 * 0.07, 0);
 });
 
+test.describe('the hero on a large screen (2560×1300)', () => {
+  /** The visible hero (under the header), its content block and the space above and below it. */
+  const heroLayout = (page: Page) => page.evaluate(() => {
+    const hero = document.querySelector('.hero')!.getBoundingClientRect();
+    const parts = [document.querySelector('.hero .wrap > div')!, document.querySelector('.hero .poster')!].map(e => e.getBoundingClientRect());
+    const top = Math.min(...parts.map(r => r.top)), bottom = Math.max(...parts.map(r => r.bottom));
+    return { height: hero.height, above: top - hero.top, below: innerHeight - bottom, innerHeight };
+  });
+
+  test('the first screen is one composition and the scrub ends into the next section', async ({ page }) => {
+    await page.setViewportSize({ width: 2560, height: 1300 }); await page.goto('/', { waitUntil: 'networkidle' });
+    const first = await heroLayout(page);
+    expect(first.above).toBeGreaterThan(0);
+    expect(first.below, JSON.stringify(first)).toBeLessThanOrEqual(first.above * 1.6);
+    // The hero is the window under the header plus the pin distance (70% of the window), no more.
+    expect(first.height).toBeLessThanOrEqual(first.innerHeight * 1.7 + 1);
+    // At the end of the pin the lines have moved their full distance and the next section's
+    // content has not come into view yet.
+    const end = await page.evaluate(() => document.querySelector('.hero')!.getBoundingClientRect().top + scrollY + innerHeight * 0.7);
+    await page.evaluate(y => scrollTo(0, y), end); await page.waitForTimeout(1500);
+    const x = (sel: string) => page.evaluate(s => new DOMMatrix(getComputedStyle(document.querySelector(s)!).transform).m41, sel);
+    expect(await x('.hero .l2')).toBeCloseTo(2560 * 0.15, 0);
+    expect(await x('.hero .l1')).toBeCloseTo(2560 * -0.05, 0);
+    expect(await page.evaluate(() => document.querySelector('#why-h')!.getBoundingClientRect().top)).toBeGreaterThan(1300);
+  });
+
+  for (const mode of ['reduced motion', 'no JavaScript'] as const)
+    test(`with ${mode} the hero is one balanced screen, not a pin's height`, async ({ browser }) => {
+      const ctx = await browser.newContext({ viewport: { width: 2560, height: 1300 },
+        ...(mode === 'reduced motion' ? { reducedMotion: 'reduce' as const } : { javaScriptEnabled: false }) });
+      const page = await ctx.newPage();
+      await page.goto('/');
+      const l = await heroLayout(page);
+      await expect(page.locator('.pin-spacer')).toHaveCount(0);
+      expect(l.height).toBeLessThanOrEqual(l.innerHeight);
+      expect(l.below, JSON.stringify(l)).toBeLessThanOrEqual(l.above * 1.6);
+      await ctx.close();
+    });
+});
+
+test.describe('motion code that arrives late', () => {
+  /**
+   * Records the lowest opacity the hero headline lines reach once the page has painted: on every
+   * frame and on every style change of a line.
+   */
+  const watchHeadline = (page: Page) => page.addInitScript(() => {
+    const w = window as unknown as { minOpacity: number };
+    w.minOpacity = 1;
+    const lines = () => document.querySelectorAll<HTMLElement>('.hero .l1, .hero .l2, .hero .l3');
+    const sample = () => lines().forEach(l => { w.minOpacity = Math.min(w.minOpacity, parseFloat(getComputedStyle(l).opacity)); });
+    const frame = () => { sample(); requestAnimationFrame(frame); };
+    document.addEventListener('DOMContentLoaded', () => {
+      new MutationObserver(sample).observe(document.querySelector('.hero')!, { attributes: true, attributeFilter: ['style'], subtree: true });
+      requestAnimationFrame(frame);
+    });
+  });
+  const minOpacity = (page: Page) => page.evaluate(() => (window as unknown as { minOpacity: number }).minOpacity);
+
+  test('on time, the hero intro plays (the probe sees the lines come in)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await watchHeadline(page);
+    await page.goto('/');
+    await expect.poll(() => minOpacity(page)).toBeLessThan(0.5);
+  });
+
+  test('1.5 s late, the headline never fades out after the first paint; the scrub is still set up', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await watchHeadline(page);
+    let arrived = false;
+    await page.route(/\/_astro\/motion\.[^/]*\.js$/, async route => {
+      await new Promise(r => setTimeout(r, 1500));
+      await route.continue();
+      arrived = true;
+    });
+    await page.goto('/');
+    await expect.poll(() => arrived, { timeout: 5000 }).toBe(true);
+    // The scroll moments run: the hero column is pinned (a pin spacer wraps it).
+    await expect(page.locator('.hero .pin-spacer')).toHaveCount(1);
+    await page.waitForTimeout(1200);
+    expect(await minOpacity(page)).toBe(1);
+  });
+});
+
+test.describe('inner-page moment code that arrives late', () => {
+  /**
+   * Records, on every frame, whether the first wall tile's digit band was ever back near its start
+   * (within a tenth of its height of the cell's top; a frame after the roll starts it has moved a
+   * few percent) and whether the contact poster was ever clipped or its plate shrunk.
+   */
+  const watchMoments = (page: Page) => page.addInitScript(() => {
+    const w = window as unknown as { bandAtStart: boolean; posterHidden: boolean };
+    w.bandAtStart = false;
+    w.posterHidden = false;
+    const frame = () => {
+      const band = document.querySelector<HTMLElement>('.wall [data-roll] i span');
+      if (band) {
+        const r = band.getBoundingClientRect();
+        if (r.top - band.parentElement!.getBoundingClientRect().top > -0.1 * r.height) w.bandAtStart = true;
+      }
+      const shot = document.querySelector<HTMLElement>('.plated.reveal .shot');
+      const plate = document.querySelector<HTMLElement>('.plated.reveal .plate');
+      if (shot && /inset\((?!0px 0px 0px 0px|0%)/.test(shot.style.clipPath)) w.posterHidden = true;
+      if (plate && plate.style.transform && new DOMMatrix(getComputedStyle(plate).transform).d < 0.99) w.posterHidden = true;
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  });
+  const seen = (page: Page) =>
+    page.evaluate(() => { const w = window as unknown as { bandAtStart: boolean; posterHidden: boolean }; return { band: w.bandAtStart, poster: w.posterHidden }; });
+
+  /** Delays the inner pages' moment chunk by `ms`; resolves `arrived` once it is served. */
+  const delayMoments = async (page: Page, ms: number) => {
+    const state = { arrived: false };
+    await page.route(/\/_astro\/page-moments\.[^/]*\.js$/, async route => {
+      await new Promise(r => setTimeout(r, ms));
+      await route.continue();
+      state.arrived = true;
+    });
+    return state;
+  };
+
+  for (const [path, key] of [['/sportivi/', 'band'], ['/contact/', 'poster']] as const) {
+    test(`on time, ${path} plays its moment (the probe sees it start)`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await watchMoments(page);
+      await page.goto(path);
+      await expect.poll(async () => (await seen(page))[key]).toBe(true);
+    });
+
+    test(`1.5 s late, ${path} keeps what it painted`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await watchMoments(page);
+      const state = await delayMoments(page, 1500);
+      await page.goto(path);
+      await expect.poll(() => state.arrived, { timeout: 5000 }).toBe(true);
+      if (key === 'band') await expect(page.locator('.wall [data-roll] i').first()).toHaveCount(1); // the moment ran
+      await page.waitForTimeout(1200);
+      expect((await seen(page))[key]).toBe(false);
+    });
+  }
+});
+
 test('reduced motion shows final states', async ({ browser }) => {
   const ctx = await browser.newContext({ reducedMotion: 'reduce' }); const page = await ctx.newPage();
   await pinClock(page);
@@ -206,4 +348,22 @@ test('motion is bundled, not loaded from another site', async ({ page, baseURL }
   expect(foreign).toEqual([]);
   // And the motion layer did run: it marks the hall whose strip it moves.
   await expect(page.locator('.hall.js-rally')).toHaveCount(1);
+});
+
+// GSAP is fetched only when motion will run: under reduced motion the homepage and an inner
+// page request no script holding it; with motion they do (so the marker is a real one). A fresh
+// context per visit, so nothing comes from the cache.
+test('GSAP is loaded only when motion runs', async ({ browser, baseURL }) => {
+  const MARK = 'GreenSockGlobals';
+  for (const reducedMotion of ['reduce', 'no-preference'] as const)
+    for (const path of ['/', '/noutati/']) {
+      const ctx = await browser.newContext({ baseURL, reducedMotion });
+      const page = await ctx.newPage();
+      const bodies: Promise<string>[] = [];
+      page.on('response', r => { if (r.request().resourceType() === 'script' && r.status() === 200) bodies.push(r.text()); });
+      await page.goto(path, { waitUntil: 'networkidle' });
+      const withGsap = (await Promise.all(bodies)).some(b => b.includes(MARK));
+      expect(withGsap, `${path}, ${reducedMotion}`).toBe(reducedMotion === 'no-preference');
+      await ctx.close();
+    }
 });

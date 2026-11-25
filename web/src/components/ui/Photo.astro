@@ -1,0 +1,32 @@
+---
+import type { Img } from '../../lib/types';
+
+interface Props {
+  img: Img;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  /** With `loading="eager"`: the browser fetches this image first (the page's main photo). */
+  priority?: boolean;
+  class?: string;
+  /** The image only repeats what the text next to it says: empty alt, marked `data-decorative`. */
+  decorative?: boolean;
+}
+
+const { img, sizes, loading = 'lazy', priority = false, class: className, decorative = false } = Astro.props;
+const lazy = loading === 'lazy';
+---
+
+<img
+  class={className}
+  src={img.url}
+  width={img.width}
+  height={img.height}
+  alt={decorative ? '' : img.alt}
+  data-decorative={decorative ? '' : undefined}
+  srcset={img.srcset}
+  sizes={img.srcset ? sizes : undefined}
+  style={img.position ? `object-position:${img.position}` : undefined}
+  loading={loading}
+  decoding={lazy ? 'async' : undefined}
+  fetchpriority={!lazy && priority ? 'high' : undefined}
+/>

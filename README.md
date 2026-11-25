@@ -13,8 +13,25 @@ The visible site is in Romanian; this repository (code, docs, commits) is in Eng
   (`mockups/varianta-d.html`), reads its content from fixtures or Sanity, and has the scroll
   motion. The Studio is live. Deploy scaffolding for a private test address exists; no deploy
   has been run from this repo yet.
-- **Plan 2, pending:** inner pages (athletes, schedule, calendar, news, about, contact, ...) and
-  the forms. Until then the menu links lead to "not found".
+- **Plan 2a, done:** the inner pages, each laid out for its content from the approved mockups
+  in `mockups/pagini/`:
+
+  | Address | Page |
+  |---|---|
+  | `/sportivi/` | Athletes wall (only athletes whose parents gave consent), filter by age category |
+  | `/sportivi/{slug}/` | Athlete profile: FRB place, group, articles, medals |
+  | `/calendar/` | The season as twelve month grids, home events marked, filter by category |
+  | `/noutati/` | News front led by photos, filter by kind |
+  | `/noutati/{slug}/` | Article: text, linked competition, tagged athletes, gallery, share links |
+  | `/program/` | Weekly timetable and a guide to the groups |
+  | `/pentru-parinti/` | What parents ask before the first training |
+  | `/contact/` | Trial-training form and the hall's address |
+
+  Until the club confirms them, unknown facts show as "de confirmat" and example hours are
+  hatched. The copy we wrote is listed for the club in `docs/ai/copy-to-confirm.md`. The trial
+  form opens a pre-filled e-mail to the club until its endpoint exists.
+- **Plan 2b, pending:** the Studio fields for what the inner pages read, all articles from
+  Sanity, Sanity image sizing, the trial form's endpoint, a daily rebuild.
 - **Plan 3, pending:** moving the 15 old articles, redirects from the old addresses, SEO.
 - **Plan 4, pending:** weekly sync of the FRB rankings (needs the federation's agreement).
 - **Plan 5, pending:** launch on badmintongalati.ro.
@@ -47,8 +64,8 @@ pnpm install
 | `pnpm test:changed` | Unit tests affected by the diff against `dev` | at most the full unit run |
 | `pnpm e2e:changed` | E2E specs affected by the diff against `dev` | up to ~24 s |
 | `pnpm e2e -- shell.spec.ts` | One spec (builds only the content variant it needs) | 4–5 s |
-| `pnpm test` | All unit tests (web 77, studio 14) | ~3 s |
-| `pnpm e2e` | All e2e tests (50, on four content variants) | ~23 s |
+| `pnpm test` | All unit tests (web 325, studio 14) | ~3 s |
+| `pnpm e2e` | All e2e tests (189, on four content variants) | ~37 s cold |
 | `pnpm -C web check` | Astro and TypeScript check | |
 
 During work run only the affected tests; run the full suite once before merging or pushing.
@@ -75,6 +92,7 @@ Settings (template `web/.env.example`; `web/.env` is git-ignored):
 | `SANITY_READ_TOKEN` | Read-only ("Viewer") token from sanity.io/manage; required with `sanity`; used only by the build, never reaches the browser. Never commit it |
 | `HOME_FIXTURE` | Fixture file for `fixtures`, default `home.json` |
 | `BUILD_TODAY` | `YYYY-MM-DD`, pins "today" (for tests); leave unset otherwise |
+| `TRIAL_ENDPOINT` | The trial form's endpoint (plan 2b, e.g. `/api/proba`). Empty: the form opens a pre-filled e-mail to the club and sends nothing over the network (every build until plan 2b, and the tests) |
 
 `pnpm build` reads `web/.env`; `pnpm dev` does not, so export the variables in the shell to run
 the dev server against Sanity.
@@ -88,7 +106,10 @@ received yet, so a Sanity-backed build currently shows no athletes.
 Hosted Studio: https://siderurgistul-galati.sanity.studio/ (sign in with a Sanity account that
 is a member of the project; the coaches have not been invited yet). The editor is in Romanian:
 "Pagina principală" (homepage texts and photos), "Articole", "Calendar competițional",
-"Sportivi", "Grupe". Changes reach the site on the next build. Running, deploying and seeding
+"Sportivi", "Grupe". Changes reach the site on the next build. The Studio does not yet have the
+fields the inner pages add (birth years, training hours, coaches, competition categories, the
+club's answers for parents and contact); those come in plan 2b, and until then a Sanity-backed
+build shows those parts as "de confirmat" and only the three newest articles. Running, deploying and seeding
 the Studio: `studio/README.md`. The content model: `docs/ai/content-model.md`.
 
 ## Deploy (private test address)
@@ -114,17 +135,19 @@ Do not deploy from Sanity before image sizing for Sanity photos is done (`docs/a
 
 ```
 web/                 Astro site
-  src/lib/           content layer (content.ts, sanity.ts) and pure logic (home.ts, dates.ts)
-  src/components/    shell and homepage sections (home/)
-  src/scripts/       motion.ts (GSAP)
+  src/lib/           content layer (content.ts, sanity.ts) and one logic module per page
+  src/pages/         the routes
+  src/components/    shell, shared pieces (ui/), homepage sections (home/), one folder per page
+  src/scripts/       motion.ts and page-motion.ts (GSAP), browser helpers (calendar, form, ...)
   src/styles/        tokens.css, base.css
   src/fixtures/      local content variants
   tests/unit, tests/e2e, scripts/   tests and test runners
 studio/              Sanity Studio: schemaTypes/, seed/, tests/
 deploy/              docker-compose.yml, nginx.conf for the test server
 scripts/deploy.sh    test deployment (pnpm deploy:test)
-mockups/             approved mockup D and the club photos it uses
-docs/superpowers/    design spec and plan 1
-docs/ai/             architecture, content model, design system, testing, decisions, roadmap
+mockups/             approved mockup D, the inner-page mockups (pagini/) and the club photos
+docs/superpowers/    design spec and the plans
+docs/ai/             architecture, content model, design system, testing, decisions, roadmap,
+                     copy to confirm with the club
 CLAUDE.md            rules for AI coding agents working in this repo
 ```

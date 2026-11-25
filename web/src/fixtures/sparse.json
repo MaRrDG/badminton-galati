@@ -21,104 +21,7 @@
     "from": "2026-11-09",
     "to": "2026-11-15"
   },
-  "competitions": [
-    {
-      "id": "competition-2026-03-13-cr-u9-cr-seniori",
-      "title": "CR U9 și CR Seniori",
-      "city": "București",
-      "start": "2026-03-13",
-      "end": "2026-03-15",
-      "home": false
-    },
-    {
-      "id": "competition-2026-03-27-cr-u15-cr-u23",
-      "title": "CR U15 și CR U23",
-      "city": "București",
-      "start": "2026-03-27",
-      "end": "2026-03-29",
-      "home": false
-    },
-    {
-      "id": "competition-2026-04-03-cr-u11-cr-u17",
-      "title": "CR U11 și CR U17",
-      "city": "Galați",
-      "start": "2026-04-03",
-      "end": "2026-04-05",
-      "home": true
-    },
-    {
-      "id": "competition-2026-04-24-cr-u13-cr-u19",
-      "title": "CR U13 și CR U19",
-      "city": "Galați",
-      "start": "2026-04-24",
-      "end": "2026-04-26",
-      "home": true
-    },
-    {
-      "id": "competition-2026-05-08-cr-echipe-seniori-si-cupa-u15",
-      "title": "CR Echipe Seniori și Cupa U15",
-      "city": "București",
-      "start": "2026-05-08",
-      "end": "2026-05-10",
-      "home": false
-    },
-    {
-      "id": "competition-2026-09-04-cn-echipe-seniori",
-      "title": "CN Echipe Seniori",
-      "city": "de confirmat",
-      "start": "2026-09-04",
-      "end": "2026-09-06",
-      "home": false
-    },
-    {
-      "id": "competition-2026-09-11-cn-echipe-u19",
-      "title": "CN Echipe U19",
-      "city": "Galați",
-      "start": "2026-09-11",
-      "end": "2026-09-13",
-      "home": true
-    },
-    {
-      "id": "competition-2026-09-18-cn-echipe-u15",
-      "title": "CN Echipe U15",
-      "city": "Galați",
-      "start": "2026-09-18",
-      "end": "2026-09-20",
-      "home": true
-    },
-    {
-      "id": "competition-2026-09-25-cn-u13-cn-u23",
-      "title": "CN U13 și CN U23",
-      "city": "Blejoi/Bacău",
-      "start": "2026-09-25",
-      "end": "2026-09-27",
-      "home": false
-    },
-    {
-      "id": "competition-2026-10-23-cn-u11-cn-u19",
-      "title": "CN U11 și CN U19",
-      "city": "Galați",
-      "start": "2026-10-23",
-      "end": "2026-10-25",
-      "home": true
-    },
-    {
-      "id": "competition-2026-11-20-cn-u15-cn-seniori",
-      "title": "CN U15 și CN Seniori",
-      "city": "Blejoi/Bacău",
-      "start": "2026-11-20",
-      "end": "2026-11-22",
-      "home": false
-    },
-    {
-      "id": "competition-2026-11-27-cn-u9-cn-u17",
-      "title": "CN U9 și CN U17",
-      "city": "București",
-      "start": "2026-11-27",
-      "end": "2026-11-29",
-      "home": false
-    }
-  ],
+  "competitions": [],
   "groups": [
     {
       "name": "Inițiere",
@@ -151,13 +54,7 @@
       "title": "Novi Sad – 2026",
       "slug": "novi-sad-2026",
       "kind": "competitie",
-      "date": "2026-06-30",
-      "cover": {
-        "url": "/img/echipa-u15.jpg",
-        "height": 854,
-        "width": 1280,
-        "alt": "Echipa clubului în treninguri roșii, la un turneu"
-      }
+      "date": "2026-06-30"
     },
     {
       "title": "București, Memorialul Rotaru U15 – 2026",

@@ -46,7 +46,7 @@ const year = (next?.start ?? today).slice(0, 4);
           <ul class="played">
             {played.map((c) => (
               <li>
-                <b>{c.title}</b>
+                <b>{c.postSlug ? <a class="post" href={`/noutati/${c.postSlug}/`}>{c.title}</a> : c.title}</b>
                 <span class="wh">
                   {c.city}, {formatRangeRo(c.start, c.end, { year: false })}
                   {c.home && <span class="home">acasă</span>}
@@ -63,20 +63,19 @@ const year = (next?.start ?? today).slice(0, 4);
 </section>
 
 <script>
-  // The page is built once a day, so the build-time label can go stale: recompute it from the
-  // visitor's clock with the same rules. Without JavaScript the build-time label stays.
-  import { todayInBucharest } from '../../lib/dates';
-  import { countdownLabel } from '../../lib/home';
+  import { initCountdowns } from '../../scripts/countdown';
 
-  for (const el of document.querySelectorAll<HTMLElement>('[data-countdown]')) {
-    const { start, end } = el.dataset;
-    const label = start && end ? countdownLabel({ start, end }, todayInBucharest()) : undefined;
-    el.textContent = label ?? '';
-    el.hidden = !label;
-  }
+  initCountdowns();
 </script>
 
 <style>
+  /* A played competition with an article leads to it; underlined only under the pointer. */
+  .post {
+    text-decoration: none;
+  }
+  .post:hover {
+    text-decoration: underline;
+  }
   .cal {
     background: var(--red-field);
     color: var(--white);

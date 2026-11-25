@@ -1,0 +1,150 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import { cityLabel } from '../../lib/calendar';
+import { splitRangeRo } from '../../lib/dates';
+import type { TaggedRow } from '../../lib/article';
+import type { Competition } from '../../lib/types';
+
+interface Props {
+  competition?: Competition;
+  /** The competition has a block on the calendar page (it starts in the year shown there). */
+  inCalendar: boolean;
+  tagged: TaggedRow[];
+}
+
+const { competition, inCalendar, tagged } = Astro.props;
+const when = competition ? splitRangeRo(competition.start, competition.end) : undefined;
+---
+
+{/* Beside the text: the competition the article is about (red), then the athletes in it. */}
+<aside class="side" aria-label="Legături">
+  {
+    competition && when && (
+      <section class="comp" aria-labelledby="comp-h">
+        <h2 id="comp-h">Competiția din articol</h2>
+        <p class="when">
+          <time datetime={competition.start}>{when.days}</time>
+          <small>{when.rest}</small>
+        </p>
+        <h3>{competition.title}</h3>
+        <p class="city">{cityLabel(competition)}</p>
+        {(inCalendar || competition.resultsUrl) && (
+          <p class="links">
+            {inCalendar && <a class="textlink" href={`/calendar/#ev-${competition.id}`}>În calendar</a>}
+            {competition.resultsUrl && <a class="textlink" href={competition.resultsUrl}>Rezultatele pe badminton.ro</a>}
+          </p>
+        )}
+      </section>
+    )
+  }
+  {
+    tagged.length > 0 && (
+      <section class="tagged" aria-labelledby="tag-h">
+        <SectionHeading id="tag-h">Sportivi în articol</SectionHeading>
+        <ul>
+          {tagged.map(row => (
+            <li>
+              <a href={`/sportivi/${row.athlete.slug}/`}>{row.athlete.name}</a>
+              {row.line && <span class="line">{row.line}</span>}
+              <span class="res">
+                {row.results.map((r, i) => (
+                  <span>
+                    {r.result}
+                    {r.discipline && `, ${r.discipline}`}
+                    {i < row.results.length - 1 && ';'}
+                  </span>
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</aside>
+
+<style>
+  .side > * + * {
+    margin-top: clamp(30px, 3.4vw, 44px);
+  }
+  .comp {
+    background: var(--red-field);
+    color: var(--white);
+    padding: clamp(18px, 2vw, 24px);
+  }
+  .comp h2 {
+    font-weight: 600;
+    font-size: 0.98rem;
+  }
+  .when {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(3rem, 4.6vw, 4rem);
+    line-height: 0.86;
+    margin-top: 12px;
+  }
+  .when small {
+    display: block;
+    font-size: 0.3em;
+    font-weight: 800;
+    margin-top: 0.25em;
+    line-height: 1.1;
+  }
+  /* The title as in the calendar panel: display face, not uppercase (big uppercase is the page title's). */
+  .comp h3 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+    line-height: 1.02;
+    margin-top: 14px;
+  }
+  .city {
+    margin-top: 2px;
+  }
+  .links {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    font-size: 0.98rem;
+  }
+  .comp a:focus-visible {
+    outline-color: var(--white);
+  }
+
+  .tagged ul {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+  }
+  .tagged li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 16px;
+    align-items: baseline;
+    padding: 10px 0;
+  }
+  .tagged li a {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1.02;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    overflow-wrap: break-word;
+  }
+  .line {
+    grid-column: 1;
+    font-size: 0.95rem;
+  }
+  .res {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    display: grid;
+    justify-items: end;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--red-ink);
+  }
+</style>

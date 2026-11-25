@@ -1,0 +1,138 @@
+---
+import Base from '../../layouts/Base.astro';
+import FilterBar from '../../components/ui/FilterBar.astro';
+import Month from '../../components/calendar/Month.astro';
+import Panel from '../../components/calendar/Panel.astro';
+import SeasonList from '../../components/calendar/SeasonList.astro';
+import { getCalendarPage } from '../../lib/content';
+
+const page = await getCalendarPage();
+const { year, today, months, nextView, countdown, intro, filters, spring, autumn, todayLabel, legend, events } = page;
+// For calendar-today.ts; "<" is escaped so the JSON can never close its script element.
+const eventsJson = JSON.stringify(events).replace(/</g, '\\u003c');
+---
+
+<Base title="Calendar | CS Siderurgistul Galați" description={intro}>
+  <div class="cal" data-today={today}>
+    <div class="wrap">
+      <div class="layout">
+        <div class="head">
+          <h1 class="display">Calendar competițional {year}</h1>
+          <p>{intro}</p>
+        </div>
+
+        <aside class="side" aria-label="Detaliile competiției">
+          <Panel next={nextView} countdown={countdown} todayLabel={todayLabel} legend={legend} />
+        </aside>
+
+        {
+          filters.length > 0 && (
+            <div class="filters">
+              <FilterBar legend="Categoria" legendVisible name="cat" scope=".cal" options={filters} effect="dim" variant="links" />
+            </div>
+          )
+        }
+
+        {
+          months.length > 0 && (
+            <section class="months" aria-labelledby="months-h">
+              <h2 class="visually-hidden" id="months-h">Lunile anului {year}</h2>
+              {months.map(m => <Month month={m} year={year} />)}
+            </section>
+          )
+        }
+      </div>
+
+      {spring.length + autumn.length > 0 && <SeasonList spring={spring} autumn={autumn} />}
+    </div>
+    <script type="application/json" id="calendar-events" set:html={eventsJson} />
+  </div>
+</Base>
+
+<script>
+  import { initCalendarPanel } from '../../scripts/calendar-panel';
+  import { initCalendarToday } from '../../scripts/calendar-today';
+  import { initCountdowns } from '../../scripts/countdown';
+  import { initPageMotion } from '../../scripts/page-motion';
+
+  // In this order: today's statuses and next event, then its countdown, then the panel, which
+  // keeps a copy of what the first two left in it.
+  // A fault in the date logic must not stop the panel and the motion below: the page as built
+  // stays readable, only its statuses may be a few days old.
+  try {
+    initCalendarToday();
+  } catch (error) {
+    console.error('calendar today:', error);
+  }
+  initCountdowns();
+  initCalendarPanel();
+  initPageMotion('season-fill');
+</script>
+
+<style>
+  .cal {
+    padding: clamp(28px, 4vw, 56px) 0 clamp(56px, 7vw, 96px);
+    overflow-x: clip;
+  }
+  /* Title, filter and the year on the left; the details panel on the right. */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas: 'head side' 'filter side' 'months side';
+    gap: 0 clamp(32px, 4vw, 56px);
+    align-items: start;
+  }
+  .head {
+    grid-area: head;
+  }
+  .head h1 {
+    font-size: clamp(2.6rem, 5vw, 4.6rem);
+    max-width: 13ch;
+  }
+  .head p {
+    margin-top: 14px;
+    max-width: 58ch;
+  }
+  .side {
+    grid-area: side;
+    position: sticky;
+    top: 16px;
+  }
+  .filters {
+    grid-area: filter;
+    padding: 22px 0 26px;
+  }
+  .months {
+    grid-area: months;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px clamp(20px, 2.4vw, 32px);
+  }
+  /* Without a filter the months keep the same distance from the intro. */
+  .head + .side + .months {
+    margin-top: 26px;
+  }
+
+  @media (max-width: 1100px) {
+    .months {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'head' 'side' 'filter' 'months';
+    }
+    .side {
+      position: static;
+      margin-top: 24px;
+    }
+    .filters {
+      padding: 24px 0 22px;
+    }
+    .months {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+  }
+</style>

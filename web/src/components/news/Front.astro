@@ -1,0 +1,34 @@
+---
+import FrontItem from './FrontItem.astro';
+import type { NewsFront } from '../../lib/news';
+
+interface Props {
+  front: NewsFront;
+}
+
+const { feat, shape, side, rows } = Astro.props.front;
+---
+
+<div class="wrap fw">
+  <ol class="front">
+    {feat && <FrontItem item={feat} place="feat" shape={shape} />}
+    {side.map(item => <FrontItem item={item} place="side" shape={shape} />)}
+    {rows.flat().map(item => <FrontItem item={item} place="row" />)}
+  </ol>
+</div>
+
+<style>
+  /* Space before the older band or the footer. */
+  .fw {
+    padding-bottom: clamp(56px, 7vw, 96px);
+  }
+  /* One composed 12-column grid; each item says its own width (FrontItem). */
+  .front {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(32px, 3.4vw, 48px) clamp(18px, 2.2vw, 30px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

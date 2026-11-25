@@ -35,6 +35,7 @@ function buildEnv(name: ServerName): NodeJS.ProcessEnv {
     HOME_FIXTURE: SERVERS[name].fixture,
     BUILD_TODAY,
     SANITY_READ_TOKEN: DUMMY_READ_TOKEN,
+    TRIAL_ENDPOINT: '', // the trial form without an endpoint, as built until plan 2b
   };
 }
 

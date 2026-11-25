@@ -1,0 +1,116 @@
+---
+import PlatePhoto from '../ui/PlatePhoto.astro';
+import Tbc from '../ui/Tbc.astro';
+import { CLUB_EMAIL, HALL_MAP_URL } from '../../lib/club';
+import { formatPhoneRo, normalizePhoneRo } from '../../lib/trial';
+import type { ContactPage } from '../../lib/content';
+
+interface Props {
+  contact: ContactPage['contact'];
+  photo?: ContactPage['hallPhoto'];
+}
+
+const { contact, photo } = Astro.props;
+const phone = contact.phone ? { href: `tel:${normalizePhoneRo(contact.phone)}`, text: formatPhoneRo(contact.phone) } : undefined;
+---
+
+{/* Where the hall is and how to reach the club, in one blue panel beside the form. */}
+<aside class="place" aria-labelledby="sala-h">
+  {photo && <PlatePhoto img={photo} offset={14} sizes="(max-width: 860px) 100vw, 480px" class="reveal" />}
+  <div class="place-body">
+    <h2 id="sala-h">Sala Siderurgistul</h2>
+    <p>Bd. Cloșca, Galați<br />Patru terenuri de badminton; aici se antrenează toate grupele.</p>
+    <a class="maplink" href={HALL_MAP_URL}>Deschide harta</a>
+    <dl>
+      <div id="drum">
+        <dt>Cum ajungi</dt>
+        {
+          contact.directions ? (
+            <dd>{contact.directions}</dd>
+          ) : (
+            <Tbc as="dd" what="cu ce autobuz sau tramvai se ajunge, unde se poate parca și pe ce intrare se intră în sală." />
+          )
+        }
+      </div>
+      <div>
+        <dt>E-mail</dt>
+        <dd><a href={`mailto:${CLUB_EMAIL}`}>{CLUB_EMAIL}</a></dd>
+      </div>
+      <div>
+        <dt>Telefon</dt>
+        {
+          phone ? (
+            <dd><a href={phone.href}>{phone.text}</a></dd>
+          ) : (
+            <Tbc as="dd" what="un număr al clubului, dacă vreți să apară aici. Numerele personale ale antrenorilor nu se publică." />
+          )
+        }
+      </div>
+    </dl>
+  </div>
+</aside>
+
+<style>
+  .place {
+    background: var(--blue);
+    color: var(--white);
+    padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.4vw, 28px) clamp(22px, 2.8vw, 32px);
+  }
+  .place-body {
+    margin-top: clamp(16px, 2vw, 22px);
+  }
+  .place h2 {
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 1.4rem;
+    line-height: 1.2;
+  }
+  .place-body > p {
+    margin-top: 4px;
+  }
+  .maplink {
+    display: inline-flex;
+    align-items: center;
+    min-height: 50px;
+    margin-top: 16px;
+    padding: 12px 20px;
+    background: var(--white);
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .maplink:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .maplink:focus-visible {
+    outline-color: var(--white);
+  }
+  dl {
+    margin: 22px 0 0;
+  }
+  dl > div {
+    padding: 12px 0;
+    border-top: 1px solid var(--blue-tint);
+    scroll-margin-top: 16px;
+  }
+  dt {
+    font-weight: 700;
+  }
+  /* :global so the Tbc component's <dd> loses the browser's indent too. */
+  dl :global(dd) {
+    margin: 2px 0 0;
+  }
+  dd a {
+    display: inline-block;
+    padding: 4px 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    text-underline-offset: 3px;
+  }
+  /* "De confirmat" on blue: white text, the hatched square kept. */
+  .place :global(.tbc),
+  .place :global(.tbc b) {
+    color: var(--white);
+  }
+</style>

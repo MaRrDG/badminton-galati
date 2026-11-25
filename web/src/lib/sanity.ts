@@ -1,31 +1,46 @@
 import { createClient } from '@sanity/client';
 import { HOME_POSTS, visibleAthletes } from './home';
-import type { Athlete, Competition, Discipline, Group, HomeData, Img, Post, PostKind, Ranking } from './types';
+import type { Athlete, Competition, Discipline, Group, Img, Post, PostKind, Ranking, SiteData } from './types';
 
 const API_VERSION = '2025-02-19';
+
+/**
+ * The Studio's slug rule (`studio/schemaTypes/shared.ts`): diacritics stripped, lowercase,
+ * every run of other characters as one `-`. "Amatori adulți" -> "amatori-adulti".
+ */
+export function slugifyRo(input: string): string {
+  return input
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // combining accents left by NFD
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 96);
+}
 
 /** Projects an image field to the fields of `Img`, with the pixel size from the asset metadata. */
 const IMAGE = `{ alt, "url": asset->url, "width": asset->metadata.dimensions.width, "height": asset->metadata.dimensions.height }`;
 
 /**
- * Everything the homepage needs, in one request. Athletes without parental consent are
- * filtered here already, so their data never leaves Sanity; `toHomeData` filters again.
+ * Everything the homepage needs, in one request; until plan 2b this is all the Sanity source
+ * serves (three posts; of the inner-page fields only the venue and parents' photos, whose
+ * Studio fields come in plan 2b). Athletes without parental consent are filtered here already, so their data never
+ * leaves Sanity; `toHomeData` filters again.
  */
 export const HOME_QUERY = `{
   "settings": *[_id == "siteSettings"][0]{
     heroLines, heroText, "heroPhoto": heroPhoto${IMAGE},
     whyIntro, "whyPhoto": whyPhoto${IMAGE}, whyPoints[]{ title, text },
     hallText, "hallPhotos": hallPhotos[]${IMAGE},
-    groupsIntro, trialText, rankingWeek{ week, from, to }
+    groupsIntro, trialText, rankingWeek{ week, from, to },
+    "venuePhoto": venuePhoto${IMAGE}, "parentsPhoto": parentsPhoto${IMAGE}
   },
   "athletes": *[_type == "athlete" && consent == true] | order(name asc){
     _id, name, "slug": slug.current, consent, frbUrl, "photo": photo${IMAGE},
     rankings[]{ category, discipline, place, points }
   },
-  "groups": *[_type == "group"] | order(order asc){ name, audience, track, schedule },
-  "competitions": *[_type == "competition"] | order(start asc){
-    _id, title, city, start, end, home, "postSlug": post->slug.current
-  },
+  "groups": *[_type == "group"] | order(order asc){ _id, name, audience, track, coachProvisional },
+  "competitions": *[_type == "competition"] | order(start asc){ _id, title, city, start, end, home },
   "posts": *[_type == "post"] | order(date desc)[0...${HOME_POSTS}]{ title, "slug": slug.current, kind, date, "cover": cover${IMAGE} }
 }`;
 
@@ -52,13 +67,14 @@ type RawRanking = Raw<{ category: string; discipline: Discipline; place: number;
 type RawAthlete = Raw<{
   _id: string; name: string; slug: string; consent: boolean; frbUrl: string; photo: RawImg; rankings: RawRanking[];
 }>;
-type RawGroup = Raw<Group>;
-type RawCompetition = Raw<{ _id: string; title: string; city: string; start: string; end: string; home: boolean; postSlug: string }>;
+type RawGroup = Raw<{ _id: string; name: string; audience: string; track: Group['track']; coachProvisional: boolean }>;
+type RawCompetition = Raw<{ _id: string; title: string; city: string; start: string; end: string; home: boolean }>;
 type RawPost = Raw<{ title: string; slug: string; kind: PostKind; date: string; cover: RawImg }>;
 type RawSettings = Raw<{
   heroLines: string[]; heroText: string; heroPhoto: RawImg; whyIntro: string; whyPhoto: RawImg;
   whyPoints: Raw<{ title: string; text: string }>[]; hallText: string; hallPhotos: (RawImg | null)[];
   groupsIntro: string; trialText: string; rankingWeek: Raw<{ week: number; from: string; to: string }>;
+  venuePhoto: RawImg; parentsPhoto: RawImg; // no Studio fields until plan 2b; null until then
 }>;
 type RawHome = Raw<{
   settings: RawSettings; athletes: RawAthlete[]; groups: RawGroup[]; competitions: RawCompetition[]; posts: RawPost[];
@@ -100,8 +116,17 @@ function toAthlete(raw: RawAthlete): Athlete {
   };
 }
 
+/** Sanity groups have no slug field until plan 2b: the slug comes from the name, by the Studio's rule. */
 function toGroup(raw: RawGroup): Group {
-  return { name: raw.name as string, audience: raw.audience as string, track: raw.track as Group['track'], ...optional('schedule', raw.schedule) };
+  return {
+    id: raw._id as string,
+    slug: slugifyRo(raw.name ?? ''),
+    name: raw.name as string,
+    audience: raw.audience as string,
+    track: raw.track as Group['track'],
+    sessions: [],
+    ...optional('coachProvisional', raw.coachProvisional),
+  };
 }
 
 function toCompetition(raw: RawCompetition): Competition {
@@ -112,20 +137,25 @@ function toCompetition(raw: RawCompetition): Competition {
     start: raw.start as string,
     end: raw.end as string,
     home: raw.home === true,
-    ...optional('postSlug', raw.postSlug),
+    categories: [],
   };
 }
 
 function toPost(raw: RawPost): Post {
-  return { title: raw.title as string, slug: raw.slug as string, kind: raw.kind as PostKind, date: raw.date as string, ...optional('cover', toImg(raw.cover)) };
+  return {
+    title: raw.title as string, slug: raw.slug as string, kind: raw.kind as PostKind, date: raw.date as string,
+    ...optional('cover', toImg(raw.cover)),
+    body: [], gallery: [], results: [],
+  };
 }
 
 /**
- * Maps the result of `HOME_QUERY` to `HomeData`: drops athletes without consent and broken
- * images, turns missing lists into empty ones. Required texts pass through as they are;
- * `parseHomeData` in content.ts checks them.
+ * Maps the result of `HOME_QUERY` to `SiteData`: drops athletes without consent and broken
+ * images, turns missing lists into empty ones. Fields the query does not read yet (sessions,
+ * categories, bodies, coaches, club answers) take their empty defaults until plan 2b.
+ * Required texts pass through as they are; `parseSiteData` in content.ts checks them.
  */
-export function toHomeData(raw: unknown): HomeData {
+export function toHomeData(raw: unknown): SiteData {
   const home = (raw ?? {}) as RawHome;
   const s = home.settings;
   if (!s) throw new Error('Sanity: no published siteSettings document ("Pagina principală") was found.');
@@ -146,5 +176,10 @@ export function toHomeData(raw: unknown): HomeData {
     hallText: s.hallText as string,
     groupsIntro: s.groupsIntro as string,
     trialText: s.trialText as string,
+    coaches: [],
+    info: {
+      parents: {}, contact: {},
+      ...optional('venuePhoto', toImg(s.venuePhoto)), ...optional('parentsPhoto', toImg(s.parentsPhoto)),
+    },
   };
 }

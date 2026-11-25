@@ -277,8 +277,8 @@ test('the address comes from X-Real-IP', async () => { /* 6 posts with x-real-ip
 - Test: `web/tests/e2e/contact.spec.ts`
 
 **Interfaces:**
-- `/contact/trimis/`: `noindex`; `PageHead` blue "Cererea a ajuns la club"; "Clubul vă contactează la numărul lăsat în formular ca să stabiliți ziua probei."; "Vă sunăm în cel mult {replyDays} zile." or the `Tbc` of plan 2a; link "ce e bine să știți înainte de primul antrenament" → `/pentru-parinti/`; link "Înapoi la contact" → `/contact/`.
-- `/contact/netrimis/`: `noindex`; `PageHead` blue "Cererea nu a plecat"; "Verificați datele din formular și trimiteți din nou, sau scrieți-ne la siderurgistul@badmintongalati.ro."; link "Înapoi la formular" → `/contact/#formular`.
+- `/contact/trimis/`: `noindex`; `PageHead` blue "Cererea a ajuns la club"; "Clubul te contactează la numărul lăsat în formular ca să stabiliți împreună ziua probei."; "Te sunăm în cel mult {replyDays} zile." or the `Tbc` of plan 2a; link "ce e bine să știi înainte de primul antrenament" (all site copy is "tu" since 2026-11-26) → `/pentru-parinti/`; link "Înapoi la contact" → `/contact/`.
+- `/contact/netrimis/`: `noindex`; `PageHead` blue "Cererea nu a plecat"; "Verifică datele din formular și trimite din nou, sau scrie-ne la siderurgistul@badmintongalati.ro."; link "Înapoi la formular" → `/contact/#formular`.
 - Copy of both pages: Appendix A.
 
 - [ ] **Step 1: Write failing e2e tests** (`contact.spec.ts`, on `home`):
@@ -427,7 +427,7 @@ test('the token reaches the build env but no log line', async () => { /* capture
 
 | Where | Text |
 |---|---|
-| `/contact/trimis/` | "Cererea a ajuns la club" / "Clubul vă contactează la numărul lăsat în formular ca să stabiliți ziua probei." / "Înapoi la contact" |
-| `/contact/netrimis/` | "Cererea nu a plecat" / "Verificați datele din formular și trimiteți din nou, sau scrieți-ne la siderurgistul@badmintongalati.ro." / "Înapoi la formular" |
+| `/contact/trimis/` | "Cererea a ajuns la club" / "Clubul te contactează la numărul lăsat în formular ca să stabiliți împreună ziua probei." / "Înapoi la contact" |
+| `/contact/netrimis/` | "Cererea nu a plecat" / "Verifică datele din formular și trimite din nou, sau scrie-ne la siderurgistul@badmintongalati.ro." / "Înapoi la formular" |
 | Email to the club | Subject "Cerere antrenament de probă: {nume}", body lines as the e-mail fallback of plan 2a |
 | Studio | All new titles and descriptions of Task 1 (coaches and the club's answers are typed by the coaches; the Studio texts tell them what each field is for) |
