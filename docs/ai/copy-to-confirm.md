@@ -28,6 +28,7 @@ the line. Placeholders in braces are filled from data.
 | "Pe listă apar doar sportivii pentru care părinții și-au dat acordul." | Footnote under the wall | Mockup |
 | Age category from the birth year: U-n while the athlete is younger than n in the build year; U23 for 19–22; Seniori from 23; the best place's category wins | Tile line, filter, profile, article tags | 2a: rule to confirm with the coaches (calendar year or FRB season?) |
 | "3 sportivi", "1 sportiv la U17" | Count line under the filter | 2a |
+| "Lista sportivilor" (heading, screen readers only), "Categoria de vârstă" (filter legend), "{N} în țară" (place on a tile), "Locul în țară: Clasamentul FRB, săptămâna {N}, {interval}." (source line under the wall) | Wall | Mockup / 2a |
 
 ## Fișa sportivului (`/sportivi/{slug}/`)
 
@@ -38,6 +39,7 @@ the line. Placeholders in braces are filled from data.
 | Medal rows, one per year: "2026: aur, simplu fete – {titlul articolului}"; several in a year joined with "; "; without a discipline "aur – {titlu}" | Medals (not drawn in the mockup) | 2a |
 | "{Nume}, CS Siderurgistul Galați. Locul 2 în țară la U17, simplu băieți, cu 168 de puncte." when ranked, else "{Nume}, CS Siderurgistul Galați." | Meta description | 2a |
 | "Apare în articolele clubului", "Toți sportivii", "Profilul FRB" | Profile | Mockup |
+| "Categoria", "Proba", "Grupa" (fact labels) and "de confirmat" (a group not yet known) | Profile facts | Mockup |
 
 ## Calendar (`/calendar/`)
 
@@ -48,6 +50,8 @@ the line. Placeholders in braces are filled from data.
 | "Tot în aceste zile:" | Panel, when competitions share days | 2a |
 | "Apasă pe o competiție din calendar ca să vezi detaliile.", "roșu: acasă, la Galați", "urmează", "s-a jucat", "Arată următoarea competiție", "Articolul clubului", "Rezultatele pe badminton.ro", "Toate competițiile, pe rând" | Panel, legend, list | Mockup |
 | "Nicio competiție programată deocamdată." | Panel without a next competition (also the homepage band) | Plan 1 |
+| "Calendar competițional {an}" (page title), "Lunile anului {an}" (heading, screen readers only), "{Lună} fără competiții" (an empty month) | Page | Mockup / 2a |
+| "Următoarea competiție" (panel heading), "peste {N} zile" (countdown; also "începe mâine", "începe azi", "în desfășurare", as on the homepage), "loc de confirmat" (an unknown venue) | Panel and list | Mockup / 2a |
 
 ## Noutăți (`/noutati/`) and articles (`/noutati/{slug}/`)
 
@@ -55,6 +59,7 @@ the line. Placeholders in braces are filled from data.
 |---|---|---|
 | "Articolele clubului, de la competiții, din viața clubului și despre proiecte." | Lede and meta description | Mockup |
 | "Încă nu sunt articole." | Empty state | 2a |
+| "Tipul" | Legend of the kind filter (shown only with two kinds or more) | Mockup |
 | "Competiție, 30 iunie 2026: {titlu}." | Article meta description when the article has no plain first paragraph | 2a |
 | "Distribuie articolul", "Copiază linkul", "Link copiat" | Share row | Mockup / 2a |
 | "{N} fotografii. Apasă pe una ca s-o vezi mare." | Gallery | Mockup |
@@ -71,13 +76,14 @@ the line. Placeholders in braces are filled from data.
 | "Spuneți-ne cine vine și un număr de telefon, iar clubul vă contactează ca să stabiliți ziua." | Closing section (fits a child or an adult; the mockup asked for the child's age) | 2a |
 | "Sala Siderurgistul, Bd. Cloșca, Galați · patru terenuri ·", "Ce grupă i se potrivește", "Întrebări de părinte: vârstă, echipament, cost", "Alegeți grupa copilului", "Toate grupele", "Pentru cine vrea performanță", "Pentru cine vrea doar să joace" | Timetable and guide | Mockup |
 | "15 antrenamente pe săptămână", "3 antrenamente pe săptămână la Inițiere" | Count line (screen readers only) | 2a |
+| The "De confirmat de club" lines "zilele și orele fiecărei grupe." (no session yet) and "antrenorul fiecărei grupe." (a group without a coach) | Timetable and group guide | 2a |
 
 ## Pentru părinți (`/pentru-parinti/`)
 
 | Text | Where | Source |
 |---|---|---|
 | "Ce e bine să știți înainte de primul antrenament, în ordinea în care vă vin întrebările." | Lede and meta description | Mockup |
-| „Asigurăm un climat prietenos pentru toate categoriile de vârstă.” and "Așa își descrie clubul antrenamentele, din 7 martie 2002 încoace. Mai jos găsiți răspunsurile la întrebările pe care și le pune orice părinte înainte să-și aducă copilul în sală." | Opening quote | Mockup |
+| **Presented as the club's own words, so the club must confirm it says this:** „Asigurăm un climat prietenos pentru toate categoriile de vârstă.” Then: "Așa își descrie clubul antrenamentele, din 7 martie 2002 încoace. Mai jos găsiți răspunsurile la întrebările pe care și le pune orice părinte înainte să-și aducă copilul în sală." | Opening quote | Mockup |
 | The seven questions: "De la ce vârstă poate începe copilul?", "Ce îi trebuie la primul antrenament?", "Cât costă?", "Cum arată primele săptămâni?", "Ce urmează după?", "Cine sunt antrenorii?", "Unde e sala?" | Headings and the question list | Mockup |
 | "Copiii încep la grupa de {Inițiere}. Dacă vrea doar să joace, fără competiții, există grupa {Amatori copii}." | Age answer | Mockup |
 | "De la club primește asistență calificată, instructaj și echipamentul minim necesar." | Equipment answer | Mockup |
@@ -107,5 +113,6 @@ the line. Placeholders in braces are filled from data.
 | E-mail subject "Cerere antrenament de probă"; lines "Numele părintelui: …", "Vine la antrenament: chiar eu", "Nume: …", "Vârsta copilului: {N} ani", "Mesaj: …" (cut with "…") | Pre-filled e-mail | 2a |
 | "Fără JavaScript, „Trimite cererea” deschide un e-mail către {e-mail} cu datele completate; cererea ajunge la club după ce trimiteți e-mailul." | `noscript` line (plan 2b replaces it) | 2a |
 | "Patru terenuri de badminton; aici se antrenează toate grupele." | Hall panel | Mockup |
+| "Deschide harta" (map link), "Cum ajungeți" (heading of the directions; also a link on the parents' page) | Hall panel | Mockup |
 | "cu ce autobuz sau tramvai se ajunge, unde se poate parca și pe ce intrare se intră în sală." / "un număr al clubului, dacă vreți să apară aici. Numerele personale ale antrenorilor nu se publică." | "De confirmat de club" lines in the panel | Mockup |
 | "Nu completați acest câmp" | Hidden spam-trap label (never seen) | 2a |
