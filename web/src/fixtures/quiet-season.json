@@ -23,6 +23,22 @@
       "consent": true,
       "frbUrl": "https://badminton.ro/jucator/709/u13-xd-dublu-mixt/",
       "rankings": []
+    },
+    {
+      "id": "athlete-zet-exemplu-ana",
+      "name": "Zet Exemplu-Ana",
+      "slug": "zet-exemplu-ana",
+      "consent": true,
+      "birthYear": 2015,
+      "groupId": "group-initiere",
+      "photo": {
+        "url": "/img/smash.jpg",
+        "width": 800,
+        "height": 1200,
+        "alt": "Zet Exemplu-Ana la un smash",
+        "position": "50% 18%"
+      },
+      "rankings": []
     }
   ],
   "competitions": [

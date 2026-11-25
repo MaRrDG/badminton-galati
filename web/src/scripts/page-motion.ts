@@ -3,6 +3,7 @@
 // show the final state, which is the page as rendered.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { digitBands } from './roll';
 
 export type PageMoment =
   | 'tile-roll' // /sportivi/: place digits roll when a tile enters (once)
@@ -17,6 +18,9 @@ export function initPageMotion(moment: PageMoment): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.registerPlugin(ScrollTrigger);
   switch (moment) {
+    case 'tile-roll':
+      tileRoll();
+      break;
     case 'poster-reveal':
       posterReveal();
       break;
@@ -37,4 +41,32 @@ function posterReveal(): void {
     .timeline({ defaults: { ease: 'power4.out' }, scrollTrigger: { trigger: poster, start: 'top 85%', once: true } })
     .from(plate, { scaleY: 0, duration: 0.6 })
     .from(shot, { clipPath: 'inset(100% 0 0 0)', duration: 0.85 }, '-=.35');
+}
+
+/**
+ * The place on each athlete tile (`.wall [data-roll]`) rolls through the digits to the number
+ * once, when the tile comes into view. The bands start on the final digits, so a tile that
+ * never scrolls into view still reads right. Screen readers hear the place from a hidden copy
+ * of the digits, not the band.
+ */
+function tileRoll(): void {
+  gsap.utils.toArray<HTMLElement>('.wall [data-roll]').forEach(el => {
+    const place = el.dataset.roll ?? '';
+    const bands = digitBands(el);
+    for (const cell of el.children) cell.setAttribute('aria-hidden', 'true');
+    const spoken = document.createElement('span');
+    spoken.className = 'visually-hidden';
+    spoken.textContent = place;
+    el.append(spoken);
+    for (const { band, end } of bands) gsap.set(band, { yPercent: end });
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 92%',
+      once: true,
+      onEnter: () =>
+        bands.forEach(({ band, end }, i) =>
+          gsap.fromTo(band, { yPercent: 0 }, { yPercent: end, duration: 1 + i * 0.25, ease: 'power3.out' }),
+        ),
+    });
+  });
 }

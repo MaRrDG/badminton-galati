@@ -1,0 +1,129 @@
+---
+import InitialTile from '../ui/InitialTile.astro';
+import Photo from '../ui/Photo.astro';
+import type { WallTile } from '../../lib/athletes';
+
+interface Props {
+  tile: WallTile;
+  /** Tiles in the first rows load with the page; the rest when scrolled near. */
+  loading?: 'lazy' | 'eager';
+}
+
+const { tile, loading = 'lazy' } = Astro.props;
+const { athlete, best, caption, tone, filter } = tile;
+---
+
+<li class="tile" data-f={filter}>
+  <div class="pic">
+    {
+      athlete.photo ? (
+        <Photo img={athlete.photo} loading={loading} sizes="(max-width: 860px) 50vw, (max-width: 1099px) 33vw, 300px" />
+      ) : (
+        <InitialTile name={athlete.name} tone={tone} size="tile" />
+      )
+    }
+    {/* The place rolls in (page-motion.ts, tile-roll); the digits stay as text for no-JS and reduced motion. */}
+    {best && <p class="mark"><b data-roll={best.place}>{best.place}</b> în țară</p>}
+  </div>
+  <div class="cap">
+    <h3><a href={`/sportivi/${athlete.slug}/`}>{athlete.name}</a></h3>
+    {caption && <p>{caption}</p>}
+  </div>
+</li>
+
+<style>
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+  }
+  .pic {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--blue);
+  }
+  .pic :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mark {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 7px 12px 6px;
+    background: var(--red-field);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+  .mark b {
+    display: inline-flex;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.9rem;
+    line-height: 1;
+  }
+  /* Digit cells the motion layer builds inside [data-roll]. */
+  .mark :global(i) {
+    display: block;
+    height: 1em;
+    overflow: hidden;
+    font-style: normal;
+  }
+  .mark :global(i u) {
+    display: block;
+    height: 1em;
+    text-decoration: none;
+  }
+
+  .cap {
+    padding: 12px 14px 16px;
+  }
+  .cap h3 {
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .cap a {
+    text-decoration: none;
+  }
+  /* The whole tile is the link. */
+  .cap a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .tile:hover a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .cap p {
+    margin-top: 4px;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 560px) {
+    .cap {
+      padding: 10px 10px 14px;
+    }
+    .cap h3 {
+      font-size: 1.06rem;
+    }
+    .mark {
+      padding: 6px 9px 5px;
+      font-size: 0.88rem;
+    }
+    .mark b {
+      font-size: 1.6rem;
+    }
+  }
+</style>

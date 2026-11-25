@@ -1,0 +1,90 @@
+---
+import FilterBar from '../ui/FilterBar.astro';
+import Tile from './Tile.astro';
+import { formatRangeRo } from '../../lib/dates';
+import type { AthletesPage } from '../../lib/athletes';
+
+type Props = AthletesPage;
+
+const { tiles, filters, rankingWeek } = Astro.props;
+/** Tiles in the first row (four columns at most) load with the page. */
+const FIRST_ROW = 4;
+// The source of the places, only when a tile shows one.
+const source =
+  rankingWeek && tiles.some(t => t.best)
+    ? `Locul în țară: Clasamentul FRB, săptămâna ${rankingWeek.week}, ${formatRangeRo(rankingWeek.from, rankingWeek.to)}. `
+    : '';
+---
+
+<section class:list={['roster', { empty: tiles.length === 0 }]} aria-labelledby="wall-h">
+  <div class="wrap">
+    <h2 class="visually-hidden" id="wall-h">Lista sportivilor</h2>
+    {
+      tiles.length === 0 ? (
+        <p class="quiet">Sportivii apar aici după ce părinții își dau acordul.</p>
+      ) : (
+        <>
+          {filters.length > 0 && (
+            <div class="bar">
+              <FilterBar legend="Categoria de vârstă" name="cat" scope=".roster" options={filters} effect="hide" variant="chips" status />
+            </div>
+          )}
+          <ul class="wall">
+            {tiles.map((tile, i) => <Tile tile={tile} loading={i < FIRST_ROW ? 'eager' : 'lazy'} />)}
+          </ul>
+          <div class="foot">
+            <p>{source}Pe listă apar doar sportivii pentru care părinții și-au dat acordul.</p>
+            <a class="textlink" href="https://badminton.ro/clasamente/">Clasamentele pe badminton.ro</a>
+          </div>
+        </>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .roster {
+    background: var(--mist);
+    padding: clamp(22px, 3vw, 36px) 0 clamp(52px, 7vw, 96px);
+  }
+  .bar {
+    margin-bottom: clamp(18px, 2.4vw, 28px);
+  }
+  .wall {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 1.8vw, 24px);
+  }
+  .foot {
+    margin-top: clamp(20px, 2.6vw, 30px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 32px;
+    font-size: 0.96rem;
+  }
+  .foot p {
+    max-width: 60ch;
+  }
+  /* Nobody may be shown yet: one plain line in an even band, quieter than any wall. */
+  .empty {
+    padding: clamp(28px, 3.6vw, 44px) 0;
+  }
+  .quiet {
+    max-width: 60ch;
+  }
+
+  @media (max-width: 1099px) {
+    .wall {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 860px) {
+    .wall {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

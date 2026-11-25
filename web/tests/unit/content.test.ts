@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { buildToday, getHomeData, getSiteData, parseHomeData, parseSiteData } from '../../src/lib/content';
+import { buildToday, getAthletesPage, getHomeData, getSiteData, parseHomeData, parseSiteData } from '../../src/lib/content';
 import { todayInBucharest } from '../../src/lib/dates';
 import { HOME_QUERY, toHomeData } from '../../src/lib/sanity';
 import fixture from '../../src/fixtures/home.json';
@@ -178,6 +178,18 @@ describe('site data', () => {
     expect(site.info).toEqual({ parents: {}, contact: {} });
     expect(site.competitions.find(c => c.title === 'CR Echipe Seniori și Cupa U15')!.categories).toEqual(['U15', 'Seniori', 'Echipe']);
     expect((await getHomeData()).posts).toHaveLength(3);
+  });
+
+  test('the athletes page: a birth year gives a category, unknown categories come last', async () => {
+    process.env.CONTENT_SOURCE = 'fixtures'; process.env.HOME_FIXTURE = 'quiet-season.json'; process.env.BUILD_TODAY = '2026-11-25';
+    const page = await getAthletesPage();
+    expect(page.tiles.map(t => [t.athlete.name, t.caption])).toEqual([
+      ['Zet Exemplu-Ana', 'U13'], ['Bordeianu Nectarie-Ioan', undefined], ['Nistor Cristian-Ionuț', undefined], ['Pazargic Ligia-Beatrice', undefined],
+    ]);
+    expect(page.filters).toEqual([]);
+    expect(page.rankingWeek).toBeUndefined();
+    // The shared site data keeps its own order.
+    expect((await getSiteData()).athletes.map(a => a.name)[0]).toBe('Nistor Cristian-Ionuț');
   });
 
   test('new list fields default to empty lists', async () => {

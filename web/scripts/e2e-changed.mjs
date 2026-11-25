@@ -16,10 +16,11 @@
 //   src/pages/404.astro, src/components/notfound/**, src/lib/rally/**, src/scripts/rally.ts
 //                                      not-found, build-output (the 404 page and its rally)
 //   src/components/ui/**               every spec (shared by the homepage and every inner page)
-//   src/scripts/**                     motion, scroll-scan, home, build-output
+//   src/pages/sportivi/**, src/components/athletes/**   athletes, build-output
+//   src/scripts/**                     motion, scroll-scan, home, athletes, build-output
 //   src/components/home/**             home, motion, scroll-scan, build-output
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
-//   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan
+//   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan, athletes
 //   tests/e2e/<name>.spec.ts           that spec
 //   tests/unit/**, vitest.config.ts, .env.example, *.md   no e2e spec
 //   everything else (src/lib, Site*.astro, layouts, pages, styles, public, src/fixtures/home.json,
@@ -34,6 +35,7 @@ const ALL = 'all';
 const NONE = [];
 const SHELL = 'shell.spec.ts', HOME = 'home.spec.ts', MOTION = 'motion.spec.ts';
 const SCAN = 'scroll-scan.spec.ts', BUILD = 'build-output.spec.ts', NOT_FOUND = 'not-found.spec.ts';
+const ATHLETES = 'athletes.spec.ts';
 
 /** Outside web/, relative to the repository root. First match wins; no match runs every spec. */
 const ROOT_RULES = [
@@ -47,10 +49,11 @@ const ROOT_RULES = [
 const WEB_RULES = [
   [/^src\/(pages\/404\.astro|components\/notfound\/|lib\/rally\/|scripts\/rally\.ts)/, [NOT_FOUND, BUILD]],
   [/^src\/components\/ui\//, ALL],
-  [/^src\/scripts\//, [MOTION, SCAN, HOME, BUILD]],
+  [/^src\/(pages\/sportivi|components\/athletes)\//, [ATHLETES, BUILD]],
+  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, BUILD]],
   [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
   [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],
-  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN]],
+  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES]],
   [/^tests\/e2e\/([^/]+\.spec\.ts)$/, m => [m[1]]],
   [/^tests\/unit\//, NONE],
   [/^(vitest\.config\.ts|\.env\.example|[^/]+\.md)$/, NONE],
