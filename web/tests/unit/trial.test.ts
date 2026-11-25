@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { AGE_MAX, AGE_MIN, errorIntro, formatPhoneRo, isSpam, normalizePhoneRo, trialMailto, validateTrial } from '../../src/lib/trial';
+import { AGE_MAX, AGE_MIN, MAILTO_MAX, errorIntro, formatPhoneRo, isSpam, normalizePhoneRo, trialDelivered, trialMailto, validateTrial } from '../../src/lib/trial';
 
-const good = { nume: 'Ana Ionescu', telefon: '0745 123 456', varsta: '8', mesaj: '', acord: 'on' };
+const good = { cine: 'copil', nume: 'Ana Ionescu', telefon: '0745 123 456', varsta: '8', mesaj: '', acord: 'on' };
 const fields = (input: Parameters<typeof validateTrial>[0]) => {
   const r = validateTrial(input);
   return r.ok ? [] : r.errors.map(e => e.field);
@@ -13,15 +13,15 @@ const summaries = (input: Parameters<typeof validateTrial>[0]) => {
 
 describe('validateTrial', () => {
   test('a complete request comes back clean, the phone as 10 digits', () => {
-    expect(validateTrial(good)).toEqual({ ok: true, value: { name: 'Ana Ionescu', phone: '0745123456', age: 8 } });
+    expect(validateTrial(good)).toEqual({ ok: true, value: { who: 'copil', name: 'Ana Ionescu', phone: '0745123456', age: 8 } });
     expect(validateTrial({ ...good, nume: '  Ana Ionescu ', mesaj: '  Marțea ne convine.  ', acord: true })).toEqual({
       ok: true,
-      value: { name: 'Ana Ionescu', phone: '0745123456', age: 8, message: 'Marțea ne convine.' },
+      value: { who: 'copil', name: 'Ana Ionescu', phone: '0745123456', age: 8, message: 'Marțea ne convine.' },
     });
   });
 
   test('Romanian phone formats are accepted', () => {
-    for (const telefon of ['+40 745-123-456', '0040 745 123 456', '0745.123.456', '(0745) 123 456', '0745123456', '+40745123456', '0236 123 456']) {
+    for (const telefon of ['+40 745-123-456', '0040 745 123 456', '0745.123.456', '(0745) 123 456', '0745123456', '+40745123456', '0236 123 456', '+40 (0)745 123 456', '0040 (0) 745-123-456']) {
       expect(validateTrial({ ...good, telefon })).toMatchObject({ ok: true });
     }
     expect(validateTrial({ ...good, telefon: '+40 745-123-456' })).toMatchObject({ ok: true, value: { phone: '0745123456' } });
@@ -38,9 +38,19 @@ describe('validateTrial', () => {
   });
 
   test('an empty form lists every required field', () => {
-    expect(fields({})).toEqual(['nume', 'telefon', 'varsta', 'acord']);
-    expect(summaries({})).toEqual(['Lipsește numele părintelui', 'Lipsește telefonul', 'Lipsește vârsta copilului', 'Lipsește acordul pentru date']);
-    expect(fields({ nume: '   ', telefon: ' ', varsta: ' ', acord: 'off' })).toEqual(['nume', 'telefon', 'varsta', 'acord']);
+    expect(fields({ cine: 'copil' })).toEqual(['nume', 'telefon', 'varsta', 'acord']);
+    expect(summaries({ cine: 'copil' })).toEqual(['Lipsește numele părintelui', 'Lipsește telefonul', 'Lipsește vârsta copilului', 'Lipsește acordul pentru date']);
+    expect(fields({ cine: 'copil', nume: '   ', telefon: ' ', varsta: ' ', acord: 'off' })).toEqual(['nume', 'telefon', 'varsta', 'acord']);
+    // Without the first answer the age is still asked for, as on the child path.
+    expect(fields({})).toEqual(['cine', 'nume', 'telefon', 'varsta', 'acord']);
+    expect(summaries({ ...good, cine: 'altcineva' })).toEqual(['Lipsește cine vine la antrenament']);
+  });
+
+  test('an adult asking for themself gives no age', () => {
+    const self = { cine: 'eu', nume: 'Dan Popa', telefon: '0745 123 456', acord: 'on' };
+    expect(validateTrial(self)).toEqual({ ok: true, value: { who: 'eu', name: 'Dan Popa', phone: '0745123456' } });
+    expect(validateTrial({ ...self, varsta: '45' })).toEqual({ ok: true, value: { who: 'eu', name: 'Dan Popa', phone: '0745123456' } });
+    expect(summaries({ cine: 'eu' })).toEqual(['Lipsește numele', 'Lipsește telefonul', 'Lipsește acordul pentru date']);
   });
 
   test('a phone that is not a Romanian number is wrong, not short', () => {
@@ -69,7 +79,7 @@ describe('validateTrial', () => {
   });
 
   test('values that are not text are treated as missing', () => {
-    expect(fields({ nume: 42, telefon: {}, varsta: null, acord: 'on' })).toEqual(['nume', 'telefon', 'varsta']);
+    expect(fields({ cine: 'copil', nume: 42, telefon: {}, varsta: null, acord: 'on' })).toEqual(['nume', 'telefon', 'varsta']);
   });
 });
 
@@ -83,6 +93,7 @@ test('isSpam: the hidden field is filled only by robots', () => {
 test('phones are normalised and written the Romanian way', () => {
   expect(normalizePhoneRo('+40 745-123-456')).toBe('0745123456');
   expect(normalizePhoneRo('0700 000 000')).toBe('0700000000');
+  expect(normalizePhoneRo('+40 (0)745 123 456')).toBe('0745123456');
   expect(formatPhoneRo('0745123456')).toBe('0745 123 456');
   expect(formatPhoneRo('0700 000 000')).toBe('0700 000 000');
   expect(formatPhoneRo('112')).toBe('112');
@@ -96,20 +107,47 @@ test('errorIntro counts the things to check in words', () => {
   expect(errorIntro(5)).toBe('Verificați cinci lucruri:');
 });
 
+test('trialDelivered: only a 2xx answer with { ok: true } means the club has the request', () => {
+  expect(trialDelivered(200, { ok: true })).toBe(true);
+  expect(trialDelivered(201, { ok: true })).toBe(true);
+  expect(trialDelivered(200, { ok: false })).toBe(false);
+  expect(trialDelivered(200, {})).toBe(false);
+  expect(trialDelivered(200, undefined)).toBe(false);
+  expect(trialDelivered(200, 'ok')).toBe(false);
+  expect(trialDelivered(500, { ok: true })).toBe(false);
+});
+
 describe('trialMailto', () => {
   test('a pre-filled e-mail to the club', () => {
-    expect(trialMailto({ name: 'Ana', phone: '0745123456', age: 8 }, 'siderurgistul@badmintongalati.ro')).toBe(
+    expect(trialMailto({ who: 'copil', name: 'Ana', phone: '0745123456', age: 8 }, 'siderurgistul@badmintongalati.ro')).toBe(
       'mailto:siderurgistul@badmintongalati.ro?subject=' +
         encodeURIComponent('Cerere antrenament de probă') +
         '&body=' +
-        encodeURIComponent('Numele părintelui: Ana\nTelefon: 0745 123 456\nVârsta copilului: 8 ani'),
+        encodeURIComponent('Numele părintelui: Ana') + '%0D%0A' + encodeURIComponent('Telefon: 0745 123 456') + '%0D%0A' +
+        encodeURIComponent('Vârsta copilului: 8 ani'),
     );
+    const self = trialMailto({ who: 'eu', name: 'Dan', phone: '0745123456' }, 'club@example.ro');
+    expect(decodeURIComponent(self.split('&body=')[1]!)).toBe('Vine la antrenament: chiar eu\r\nNume: Dan\r\nTelefon: 0745 123 456');
   });
 
   test('the message is added when there is one, and nothing breaks out of the body', () => {
-    const url = trialMailto({ name: 'Ana & Dan', phone: '0745123456', age: 8, message: 'Joi?\nSau vineri' }, 'club@example.ro');
+    const url = trialMailto({ who: 'copil', name: 'Ana & Dan', phone: '0745123456', age: 8, message: 'Joi?\nSau vineri' }, 'club@example.ro');
     const body = decodeURIComponent(url.split('&body=')[1]!);
-    expect(body).toBe('Numele părintelui: Ana & Dan\nTelefon: 0745 123 456\nVârsta copilului: 8 ani\nMesaj: Joi?\nSau vineri');
+    expect(body).toBe('Numele părintelui: Ana & Dan\r\nTelefon: 0745 123 456\r\nVârsta copilului: 8 ani\r\nMesaj: Joi?\nSau vineri');
     expect(url.split('&')).toHaveLength(2);
+  });
+
+  test('a long message is cut at a word so the address stays short enough for mail apps', () => {
+    const long = 'Fetița ține să încerce, își dorește mult, și-a cumpărat rachetă și învață repede. '.repeat(13).slice(0, 1000);
+    const url = trialMailto({ who: 'copil', name: 'Ana Ionescu', phone: '0745123456', age: 8, message: long }, 'siderurgistul@badmintongalati.ro');
+    expect(url.length).toBeLessThanOrEqual(MAILTO_MAX);
+    const message = decodeURIComponent(url.split('&body=')[1]!).split('\r\nMesaj: ')[1]!;
+    expect(message.endsWith('…')).toBe(true);
+    expect(message.length).toBeLessThanOrEqual(600);
+    expect(long.startsWith(message.slice(0, -1))).toBe(true);
+    expect(message.slice(0, -1)).toMatch(/\S$/);
+    expect(long[message.length - 1]).toMatch(/[\s,.]/); // the cut falls between words
+    // A short message is never cut.
+    expect(decodeURIComponent(trialMailto({ who: 'eu', name: 'Dan', phone: '0745123456', message: 'Marțea.' }, 'a@b.ro'))).toContain('Mesaj: Marțea.');
   });
 });
