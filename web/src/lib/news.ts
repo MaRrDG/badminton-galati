@@ -7,8 +7,13 @@ import { POST_KINDS, type Post, type SiteData } from './types';
 export type FrontTone = 'red' | 'blue' | 'mist';
 /** One article on the front: its width in the 12-column grid, a photo or a colour tile. */
 export type FrontItem = { post: Post; span: number; kind: 'photo' | 'tile'; tone?: FrontTone; big?: boolean };
+/**
+ * How the featured article meets the side column: `solo` alone across the grid, `pair` sharing one
+ * row with the single side item, `full` two rows tall beside the two side items.
+ */
+export type FrontShape = 'solo' | 'pair' | 'full';
 /** The featured article, the two beside it, rows of up to three, then the older ones as a plain list. */
-export type NewsFront = { feat?: FrontItem; side: FrontItem[]; rows: FrontItem[][]; older: Post[] };
+export type NewsFront = { feat?: FrontItem; shape?: FrontShape; side: FrontItem[]; rows: FrontItem[][]; older: Post[] };
 export type NewsPage = { front: NewsFront; filters: FilterOption[] };
 
 const COLUMNS = 12;
@@ -25,7 +30,8 @@ const BIG_SPAN = 5;
 
 /**
  * The front of the news page, from the posts newest first (the list itself is not changed):
- * the first is featured (its photo, or a blue tile); the next two sit beside it; the next eight
+ * the first is featured (its photo, or a blue tile); the next two sit beside it (`shape` says how
+ * many there are, so no grid cell is left empty); the next eight
  * fill rows of the widths in `ROW_PATTERNS`, and a last row with fewer posts shares the twelve
  * columns evenly; everything after is `older`. A post without a cover is a colour tile: the
  * tiles take red, blue, mist in turn, in reading order, going on from the featured tile's blue
@@ -65,7 +71,8 @@ export function frontLayout(posts: Post[]): NewsFront {
     at += pattern.length;
   }
 
-  return { feat, side, rows, older: rest.slice(SIDE + IN_ROWS) };
+  const shape: FrontShape = side.length === 0 ? 'solo' : side.length < SIDE ? 'pair' : 'full';
+  return { feat, shape, side, rows, older: rest.slice(SIDE + IN_ROWS) };
 }
 
 /** "Toate" with the total, then each kind that has posts, with its count; nothing without posts. */

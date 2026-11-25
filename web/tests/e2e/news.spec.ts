@@ -1,9 +1,13 @@
 import { test, expect, type Page } from '@playwright/test';
 import { on } from './servers';
+import { DIM_OPACITY } from '../../src/lib/filter';
 
-/** "Toate 3": a label's word and its count (a <sup> right after the word). */
-const filterLabels = (p: Page) =>
-  p.locator('.filter label').evaluateAll(ls => ls.map(l => [...l.childNodes].map(n => n.textContent!.trim()).filter(Boolean).join(' ')));
+/** The radios of the kind filter must be named exactly these ("Toate, 3": the word, then its count). */
+async function expectFilterNames(p: Page, names: string[]) {
+  const radios = p.getByRole('radio');
+  await expect(radios).toHaveCount(names.length);
+  for (const [i, name] of names.entries()) await expect(radios.nth(i)).toHaveAccessibleName(name);
+}
 const opacity = (p: Page, sel: string) => p.locator(sel).evaluateAll(els => els.map(e => Number(getComputedStyle(e).opacity)));
 
 test('the featured article leads the front in big uppercase type', async ({ page }) => {
@@ -17,7 +21,12 @@ test('the featured article leads the front in big uppercase type', async ({ page
   await expect(feat.getByRole('link', { name: 'Novi Sad – 2026', exact: true })).toHaveAttribute('href', '/noutati/novi-sad-2026/');
   await expect(feat.locator('.plated img')).toHaveAttribute('loading', 'eager');
   await expect(page.locator('.front .side')).toHaveCount(2);
-  expect(await filterLabels(page)).toEqual(['Toate 3', 'Competiție 3']);
+  await expectFilterNames(page, ['Toate, 3', 'Competiție, 3']);
+  await expect(page.locator('.filter label sup')).toHaveText(['3', '3']);
+  // Every article title is an h2 under the page's h1; only the featured one is set big.
+  await expect(page.locator('.front h2')).toHaveCount(3);
+  await expect(page.locator('.front h3')).toHaveCount(0);
+  await expect(page.locator('.front .side h2').first()).toHaveCSS('text-transform', 'none');
   await expect(page.getByText('Mai vechi')).toHaveCount(0);
 });
 
@@ -52,7 +61,7 @@ test.describe('a full front', on('quiet-season'), () => {
     await expect(page.locator('.front .tile')).toHaveCount(8);
     await expect(page.locator('.front .tile img')).toHaveCount(0);
     await expect(page.locator('.front .ph img')).toHaveCount(3);
-    expect(await filterLabels(page)).toEqual(['Toate 15', 'Competiție 11', 'Viața clubului 3', 'Proiecte 1']);
+    await expectFilterNames(page, ['Toate, 15', 'Competiție, 11', 'Viața clubului, 3', 'Proiecte, 1']);
     await expect(page.locator('.filter label sup')).toHaveText(['15', '11', '3', '1']);
   });
 
@@ -62,8 +71,11 @@ test.describe('a full front', on('quiet-season'), () => {
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('ArrowRight');
     await expect(page.getByRole('radio', { name: /^Viața clubului/ })).toBeChecked();
-    for (const o of await opacity(page, '[data-f="competitie"]')) expect(o).toBeLessThan(1);
+    // Dimmed, still readable (tokens.test.ts proves 3:1 at this opacity), and grey.
+    for (const o of await opacity(page, '[data-f="competitie"]')) expect(o).toBeCloseTo(DIM_OPACITY, 5);
+    await expect(page.locator('[data-f="competitie"]').first()).toHaveCSS('filter', 'grayscale(1)');
     expect(await opacity(page, '[data-f="viata-clubului"]')).toEqual([1, 1, 1]);
+    await expect(page.locator('[data-f="viata-clubului"]').first()).toHaveCSS('filter', 'none');
     // Dimmed, never hidden: the layout keeps its places.
     await expect(page.locator('.front > li:visible')).toHaveCount(11);
   });
@@ -74,7 +86,7 @@ test.describe('a full front', on('quiet-season'), () => {
     await page.goto('/noutati/');
     await page.locator('.filter label', { hasText: 'Proiecte' }).click();
     expect(await opacity(page, '[data-f="proiecte"]')).toEqual([1]);
-    for (const o of await opacity(page, '[data-f="competitie"], [data-f="viata-clubului"]')) expect(o).toBeLessThan(1);
+    for (const o of await opacity(page, '[data-f="competitie"], [data-f="viata-clubului"]')) expect(o).toBeCloseTo(DIM_OPACITY, 5);
     await ctx.close();
   });
 });

@@ -4,6 +4,13 @@
 
 export type FilterOption = { value: string; label: string; count?: number; countLabel?: string; swatch?: string };
 
+/**
+ * How far `dim` fades the other items. Faded text must keep at least 3:1 on every surface it sits
+ * on (owner's ruling: dimmed items stay readable; tokens.test.ts computes it from the tokens), so
+ * the fade is mild and grayscale is the cue that does not rely on contrast.
+ */
+export const DIM_OPACITY = 0.8;
+
 /** Values go into CSS selectors, so only plain slugs are allowed. */
 const SAFE = /^[a-z0-9-]+$/;
 
@@ -16,7 +23,8 @@ function assertSlugs(values: string[]): void {
 /**
  * The rules for one filter. `scope` contains the radios (named `name`), the items and the
  * counts; `values` are the filtering values, without the "all" option. `hide` takes other
- * items out of the layout; `dim` fades them where the layout must not reflow. `container`
+ * items out of the layout; `dim` fades them and takes their colour (`DIM_OPACITY`, grayscale) where
+ * the layout must not reflow. `container`
  * names a wrapper that is hidden when none of its items match. Browsers without :has() get
  * no filter at all, and every item stays visible.
  * `name` and every value must be lowercase slugs (`/^[a-z0-9-]+$/`): pages that take values from
@@ -29,7 +37,7 @@ export function filterCss(
   opts: { effect: 'hide' | 'dim'; container?: string },
 ): string {
   assertSlugs([name, ...values]);
-  const effect = opts.effect === 'hide' ? 'display:none' : 'opacity:.25';
+  const effect = opts.effect === 'hide' ? 'display:none' : `opacity:${DIM_OPACITY};filter:grayscale(1)`;
   const rules = values.flatMap(v => {
     const on = `${scope}:has(input[name="${name}"][value="${v}"]:checked)`;
     return [

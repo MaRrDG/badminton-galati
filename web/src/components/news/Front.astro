@@ -6,13 +6,13 @@ interface Props {
   front: NewsFront;
 }
 
-const { feat, side, rows } = Astro.props.front;
+const { feat, shape, side, rows } = Astro.props.front;
 ---
 
 <div class="wrap fw">
   <ol class="front">
-    {feat && <FrontItem item={feat} place="feat" />}
-    {side.map(item => <FrontItem item={item} place="side" />)}
+    {feat && <FrontItem item={feat} place="feat" shape={shape} />}
+    {side.map(item => <FrontItem item={item} place="side" shape={shape} />)}
     {rows.flat().map(item => <FrontItem item={item} place="row" />)}
   </ol>
 </div>

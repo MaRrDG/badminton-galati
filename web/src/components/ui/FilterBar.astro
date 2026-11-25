@@ -21,6 +21,9 @@ interface Props {
 
 const { legend, legendVisible = false, name, scope, options, effect, container, variant, status = false } = Astro.props;
 const css = filterBarCss(scope, name, options, { effect, container, status });
+// A count is a <sup> right after its word; the radio is named with a comma between them, so
+// screen readers say "Toate, 15", not "Toate15".
+const nameOf = (o: FilterOption) => (o.count !== undefined ? `${o.label}, ${o.count}` : undefined);
 ---
 
 <div class:list={['filterbar', variant]}>
@@ -30,7 +33,7 @@ const css = filterBarCss(scope, name, options, { effect, container, status });
       {
         options.map((o, i) => (
           <>
-            <input type="radio" name={name} id={`${name}-${o.value}`} value={o.value} checked={i === 0} data-count-label={o.countLabel} />
+            <input type="radio" name={name} id={`${name}-${o.value}`} value={o.value} checked={i === 0} data-count-label={o.countLabel} aria-label={nameOf(o)} />
             <label for={`${name}-${o.value}`}>
               {o.swatch && <i class="sw" style={`--sw:${o.swatch}`} aria-hidden="true" />}
               {o.label}

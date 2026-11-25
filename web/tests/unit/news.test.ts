@@ -53,8 +53,21 @@ describe('the news front', () => {
     }
   });
 
+  test('the featured article meets the side column without leaving an empty cell', () => {
+    const shape = (n: number) => {
+      const f = frontLayout(fifteen.slice(0, n));
+      return [f.shape, f.feat!.span, ...f.side.map(i => i.span)];
+    };
+    expect(shape(1)).toEqual(['solo', 12]);
+    // Two posts: one row of 8 + 4, not a two-row featured item beside one side item.
+    expect(shape(2)).toEqual(['pair', 8, 4]);
+    expect(shape(3)).toEqual(['full', 8, 4, 4]);
+    expect(shape(15)).toEqual(['full', 8, 4, 4]);
+  });
+
   test('few posts: no rows up to three, then a partial row splits twelve columns evenly', () => {
     expect(frontLayout([])).toEqual({ side: [], rows: [], older: [] });
+    expect(frontLayout([]).shape).toBeUndefined();
     expect(frontLayout(fifteen.slice(0, 1)).side).toEqual([]);
     expect(frontLayout(fifteen.slice(0, 2)).side).toHaveLength(1);
     expect(frontLayout(fifteen.slice(0, 3)).rows).toEqual([]);

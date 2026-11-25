@@ -17,7 +17,7 @@ describe('filterCss', () => {
 
   test('dims instead of hiding, so the layout does not reflow', () => {
     const css = filterCss('.cal', 'cat', ['u9'], { effect: 'dim' });
-    expect(css).toMatch(/\[data-f\]:not\(\[data-f~="u9"\]\)\s*\{\s*opacity:\.25/);
+    expect(css).toMatch(/\[data-f\]:not\(\[data-f~="u9"\]\)\s*\{\s*opacity:0\.8;filter:grayscale\(1\)/);
     expect(css).not.toMatch(/\[data-f~="u9"\]\)\s*\{\s*display:none/);
   });
 
