@@ -1,0 +1,105 @@
+---
+import type { Img } from '../../lib/types';
+
+interface Props {
+  intro: string;
+  photo?: Img;
+  points: { title: string; text: string }[];
+}
+
+const { intro, photo, points } = Astro.props;
+---
+
+<section class="why" id="de-ce" aria-labelledby="why-h">
+  <div class="wrap">
+    <div class="why-head">
+      <h2 class="display" id="why-h">De ce badminton</h2>
+      <p>{intro}</p>
+    </div>
+    <div class:list={['why-body', { solo: !photo }]}>
+      {
+        photo && (
+          <figure>
+            <img src={photo.url} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
+          </figure>
+        )
+      }
+      <ul>
+        {
+          points.map((point) => (
+            <li>
+              <b>{point.title}</b>
+              <span>{point.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .why {
+    background: var(--white);
+    color: var(--ink);
+    padding: clamp(52px, 7vw, 104px) 0;
+  }
+  .why-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px clamp(24px, 5vw, 72px);
+    align-items: end;
+    margin-bottom: clamp(24px, 3.4vw, 44px);
+  }
+  .why-head h2 {
+    color: var(--blue);
+  }
+  .why-head p {
+    max-width: 46ch;
+  }
+  .why-body {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 28px clamp(28px, 5vw, 72px);
+    align-items: start;
+  }
+  .why-body.solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  figure {
+    margin: 0 14px 14px 0;
+    box-shadow: 14px 14px 0 var(--red);
+  }
+  img {
+    width: 100%;
+    height: auto;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 4px solid var(--blue);
+  }
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 4px 24px;
+    align-items: baseline;
+    padding: 15px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+  }
+  b {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    line-height: 1.05;
+    color: var(--blue);
+  }
+  @media (max-width: 860px) {
+    .why-head,
+    .why-body,
+    li {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

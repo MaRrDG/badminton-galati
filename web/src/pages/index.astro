@@ -1,10 +1,29 @@
 ---
 import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import Why from '../components/home/Why.astro';
+import Groups from '../components/home/Groups.astro';
+import CalendarBand from '../components/home/CalendarBand.astro';
+import Roster from '../components/home/Roster.astro';
+import Hall from '../components/home/Hall.astro';
+import News from '../components/home/News.astro';
+import TrialCta from '../components/home/TrialCta.astro';
+import { buildToday, getHomeData } from '../lib/content';
+
+const home = await getHomeData();
+const today = buildToday();
 ---
 
 <Base
   title="CS Siderurgistul Galați"
   description="Club de badminton din Galați, afiliat la Federația Română de Badminton."
 >
-  <h1 class="visually-hidden">CS Siderurgistul Galați</h1>
+  <Hero lines={home.heroLines} text={home.heroText} photo={home.heroPhoto} />
+  <Why intro={home.whyIntro} photo={home.whyPhoto} points={home.whyPoints} />
+  <Groups intro={home.groupsIntro} groups={home.groups} />
+  <CalendarBand competitions={home.competitions} today={today} />
+  <Roster athletes={home.athletes} rankingWeek={home.rankingWeek} />
+  <Hall text={home.hallText} photos={home.hallPhotos} />
+  <News posts={home.posts} />
+  <TrialCta text={home.trialText} />
 </Base>

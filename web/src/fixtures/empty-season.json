@@ -1,0 +1,292 @@
+{
+  "athletes": [
+    {
+      "id": "athlete-nistor-cristian-ionut",
+      "name": "Nistor Cristian-Ionuț",
+      "slug": "nistor-cristian-ionut",
+      "consent": true,
+      "frbUrl": "https://badminton.ro/jucator/236/u17-sb-simplu-baieti/",
+      "rankings": [
+        {
+          "category": "U17",
+          "discipline": "SB",
+          "place": 2,
+          "points": 168
+        }
+      ]
+    },
+    {
+      "id": "athlete-pazargic-ligia-beatrice",
+      "name": "Pazargic Ligia-Beatrice",
+      "slug": "pazargic-ligia-beatrice",
+      "consent": true,
+      "frbUrl": "https://badminton.ro/jucator/434/u15-sf-simplu-fete/",
+      "rankings": [
+        {
+          "category": "U15",
+          "discipline": "SF",
+          "place": 3
+        }
+      ]
+    },
+    {
+      "id": "athlete-bordeianu-nectarie-ioan",
+      "name": "Bordeianu Nectarie-Ioan",
+      "slug": "bordeianu-nectarie-ioan",
+      "consent": true,
+      "frbUrl": "https://badminton.ro/jucator/709/u13-xd-dublu-mixt/",
+      "rankings": [
+        {
+          "category": "U13",
+          "discipline": "DX",
+          "place": 58
+        }
+      ]
+    }
+  ],
+  "rankingWeek": {
+    "week": 46,
+    "from": "2026-11-09",
+    "to": "2026-11-15"
+  },
+  "competitions": [
+    {
+      "id": "competition-2026-03-13-cr-u9-cr-seniori",
+      "title": "CR U9 și CR Seniori",
+      "city": "București",
+      "start": "2026-03-13",
+      "end": "2026-03-15",
+      "home": false
+    },
+    {
+      "id": "competition-2026-03-27-cr-u15-cr-u23",
+      "title": "CR U15 și CR U23",
+      "city": "București",
+      "start": "2026-03-27",
+      "end": "2026-03-29",
+      "home": false
+    },
+    {
+      "id": "competition-2026-04-03-cr-u11-cr-u17",
+      "title": "CR U11 și CR U17",
+      "city": "Galați",
+      "start": "2026-04-03",
+      "end": "2026-04-05",
+      "home": true
+    },
+    {
+      "id": "competition-2026-04-24-cr-u13-cr-u19",
+      "title": "CR U13 și CR U19",
+      "city": "Galați",
+      "start": "2026-04-24",
+      "end": "2026-04-26",
+      "home": true
+    },
+    {
+      "id": "competition-2026-05-08-cr-echipe-seniori-si-cupa-u15",
+      "title": "CR Echipe Seniori și Cupa U15",
+      "city": "București",
+      "start": "2026-05-08",
+      "end": "2026-05-10",
+      "home": false
+    },
+    {
+      "id": "competition-2026-09-04-cn-echipe-seniori",
+      "title": "CN Echipe Seniori",
+      "city": "de confirmat",
+      "start": "2026-09-04",
+      "end": "2026-09-06",
+      "home": false
+    },
+    {
+      "id": "competition-2026-09-11-cn-echipe-u19",
+      "title": "CN Echipe U19",
+      "city": "Galați",
+      "start": "2026-09-11",
+      "end": "2026-09-13",
+      "home": true
+    },
+    {
+      "id": "competition-2026-09-18-cn-echipe-u15",
+      "title": "CN Echipe U15",
+      "city": "Galați",
+      "start": "2026-09-18",
+      "end": "2026-09-20",
+      "home": true
+    },
+    {
+      "id": "competition-2026-09-25-cn-u13-cn-u23",
+      "title": "CN U13 și CN U23",
+      "city": "Blejoi/Bacău",
+      "start": "2026-09-25",
+      "end": "2026-09-27",
+      "home": false
+    },
+    {
+      "id": "competition-2026-10-23-cn-u11-cn-u19",
+      "title": "CN U11 și CN U19",
+      "city": "Galați",
+      "start": "2026-10-23",
+      "end": "2026-10-25",
+      "home": true
+    },
+    {
+      "id": "competition-2026-11-20-cn-u15-cn-seniori",
+      "title": "CN U15 și CN Seniori",
+      "city": "Blejoi/Bacău",
+      "start": "2026-11-20",
+      "end": "2026-11-22",
+      "home": false
+    },
+    {
+      "id": "competition-2026-11-27-cn-u9-cn-u17",
+      "title": "CN U9 și CN U17",
+      "city": "București",
+      "start": "2026-11-27",
+      "end": "2026-11-29",
+      "home": false
+    }
+  ],
+  "groups": [
+    {
+      "name": "Inițiere",
+      "audience": "Copii care țin prima dată racheta în mână",
+      "track": "performanta"
+    },
+    {
+      "name": "Performanță",
+      "audience": "Sportivi legitimați care merg la competiții",
+      "track": "performanta"
+    },
+    {
+      "name": "Elite",
+      "audience": "Sportivii din lotul de vârf al clubului",
+      "track": "performanta"
+    },
+    {
+      "name": "Amatori copii",
+      "audience": "Copii care joacă de plăcere",
+      "track": "amatori"
+    },
+    {
+      "name": "Amatori adulți",
+      "audience": "Adulți, indiferent de nivel",
+      "track": "amatori"
+    }
+  ],
+  "posts": [
+    {
+      "title": "Novi Sad – 2026",
+      "slug": "novi-sad-2026",
+      "kind": "competitie",
+      "date": "2026-06-30",
+      "cover": {
+        "url": "/img/echipa-u15.jpg",
+        "height": 1067,
+        "width": 1600,
+        "alt": "Echipa clubului în treninguri roșii, la un turneu"
+      }
+    },
+    {
+      "title": "București, Memorialul Rotaru U15 – 2026",
+      "slug": "bucuresti-memorialul-rotaru-u15-2026",
+      "kind": "competitie",
+      "date": "2026-05-13"
+    },
+    {
+      "title": "București, Cupa României U15 – 2026",
+      "slug": "bucuresti-cupa-romaniei-u15-2026",
+      "kind": "competitie",
+      "date": "2026-04-01"
+    }
+  ],
+  "hallPhotos": [
+    {
+      "url": "/img/meci-dublu.jpg",
+      "height": 1080,
+      "width": 1920,
+      "alt": "Meci de dublu în sala Siderurgistul"
+    },
+    {
+      "url": "/img/sala-turneu-1.jpg",
+      "height": 1080,
+      "width": 1920,
+      "alt": "Sala Siderurgistul în timpul unui turneu"
+    },
+    {
+      "url": "/img/echipa-rosu.jpg",
+      "height": 1281,
+      "width": 1920,
+      "alt": "Sportivi și antrenori în echipamentul roșu al clubului"
+    },
+    {
+      "url": "/img/festivitate.jpg",
+      "height": 1080,
+      "width": 1920,
+      "alt": "Sportivi aliniați la o festivitate în sală"
+    },
+    {
+      "url": "/img/cantonament.jpg",
+      "height": 1440,
+      "width": 1920,
+      "alt": "Grupul din cantonament, în tricouri verzi"
+    },
+    {
+      "url": "/img/medalii.jpg",
+      "height": 868,
+      "width": 1920,
+      "alt": "Sportivi cu medalii după o competiție"
+    },
+    {
+      "url": "/img/sala-turneu-2.jpg",
+      "height": 1080,
+      "width": 1920,
+      "alt": "Meciuri pe terenurile sălii"
+    }
+  ],
+  "heroLines": [
+    "Ai reușit?",
+    "Continuă!",
+    "N-ai reușit?",
+    "Continuă!"
+  ],
+  "heroText": "CS Siderurgistul Galați crește jucători de badminton din 7 martie 2002, în sala cu patru terenuri de pe Bulevardul Cloșca.",
+  "heroPhoto": {
+    "url": "/img/smash.jpg",
+    "height": 1200,
+    "width": 800,
+    "alt": "Sportiv al clubului în săritură, cu racheta ridicată spre fluturaș"
+  },
+  "whyIntro": "Se joacă cu rachete, fluturași și fileu, în doi sau în patru, și poate fi practicat la orice vârstă. La noi găsești un climat prietenos pentru toate categoriile de vârstă.",
+  "whyPhoto": {
+    "url": "/img/echipa-u15.jpg",
+    "height": 1067,
+    "width": 1600,
+    "alt": "Sportivi și antrenori ai clubului la o competiție"
+  },
+  "whyPoints": [
+    {
+      "title": "Te ține în formă, cap și corp",
+      "text": "Îmbunătățește starea fizică și mentală, concentrarea și atenția."
+    },
+    {
+      "title": "Înveți să decizi repede",
+      "text": "Jocul îți dezvoltă capacitatea de a lua decizii rapid, sub presiune."
+    },
+    {
+      "title": "Prinzi încredere",
+      "text": "Socializezi, iar încrederea în tine crește cu fiecare antrenament."
+    },
+    {
+      "title": "Nu ești singur pe teren",
+      "text": "La dublu ai un partener care te sprijină și pe care îl sprijini."
+    },
+    {
+      "title": "Dormi mai bine",
+      "text": "Reduce stresul și scurtează recuperarea."
+    }
+  ],
+  "hallText": "Clubul s-a înființat pe 7 martie 2002. În aceeași sală s-a jucat Balcaniada din 2002 și cea din 2023, iar aici se antrenează toate grupele.",
+  "groupsIntro": "Fiecare grupă lucrează cu antrenor calificat, iar la început primești de la club echipamentul minim necesar. Zilele și orele urmează să fie confirmate de club.",
+  "trialText": "Adu doar pantofi de sală. Rachetă și fluturași găsești la noi, iar după o oră știi dacă îți place."
+}

@@ -1,3 +1,4 @@
+import { isIsoDate, todayInBucharest } from './dates';
 import { visibleAthletes } from './home';
 import { fetchHomeQuery, toHomeData } from './sanity';
 import type { HomeData } from './types';
@@ -18,6 +19,17 @@ function contentSource(): Source {
   if (!value) return process.env.SANITY_PROJECT_ID ? 'sanity' : 'fixtures';
   if (value === 'fixtures' || value === 'sanity') return value;
   throw new Error(`CONTENT_SOURCE must be "fixtures" or "sanity", got "${value}".`);
+}
+
+/**
+ * The date the homepage is built for: today in Bucharest, or `BUILD_TODAY` (YYYY-MM-DD)
+ * when set, so tests and rebuilds of a past day give the same page.
+ */
+export function buildToday(): string {
+  const pinned = process.env.BUILD_TODAY;
+  if (!pinned) return todayInBucharest();
+  if (!isIsoDate(pinned)) throw new Error(`BUILD_TODAY must be a date written YYYY-MM-DD, got "${pinned}".`);
+  return pinned;
 }
 
 /** All homepage content, from Sanity or from `src/fixtures/${HOME_FIXTURE ?? 'home.json'}`. */

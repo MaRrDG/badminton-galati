@@ -90,3 +90,8 @@ h2.display {
     scroll-behavior: auto !important;
   }
 }
+
+/* Sections never cause sideways scroll, whatever moves inside them. */
+main > section {
+  overflow-x: clip;
+}

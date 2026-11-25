@@ -3,6 +3,7 @@ import {
   bestRanking,
   countdownLabel,
   disciplineLabel,
+  pointsUnit,
   postKindLabel,
   rosterOrder,
   splitCalendar,
@@ -65,6 +66,14 @@ describe('rosterOrder', () => {
       ({ id, name, slug: id, consent: true, rankings: [] });
     const order = rosterOrder([unranked('t', 'Tudor Ana'), unranked('ș', 'Ștefan Ioana'), unranked('s', 'Sandu Maria')]);
     expect(order.map(a => a.name)).toEqual(['Sandu Maria', 'Ștefan Ioana', 'Tudor Ana']);
+  });
+
+  test('Romanian collation, not root: Szabo comes before Ștefan', () => {
+    // Root collation treats Ș as a variant of S and would put Ștefan (s-t) before Szabo (s-z).
+    const unranked = (id: string, name: string): Athlete =>
+      ({ id, name, slug: id, consent: true, rankings: [] });
+    const order = rosterOrder([unranked('ș', 'Ștefan Ioana'), unranked('sz', 'Szabo Erika')]);
+    expect(order.map(a => a.name)).toEqual(['Szabo Erika', 'Ștefan Ioana']);
   });
 });
 
@@ -140,5 +149,19 @@ describe('postKindLabel', () => {
     expect(postKindLabel('competitie')).toBe('Competiție');
     expect(postKindLabel('viata-clubului')).toBe('Viața clubului');
     expect(postKindLabel('proiecte')).toBe('Proiecte');
+  });
+});
+
+describe('pointsUnit', () => {
+  test('one point is singular', () => {
+    expect(pointsUnit(1)).toBe('punct');
+  });
+
+  test('Romanian adds "de" from 20 on, and after 00', () => {
+    expect(pointsUnit(19)).toBe('puncte');
+    expect(pointsUnit(20)).toBe('de puncte');
+    expect(pointsUnit(168)).toBe('de puncte');
+    expect(pointsUnit(101)).toBe('puncte');
+    expect(pointsUnit(200)).toBe('de puncte');
   });
 });

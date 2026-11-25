@@ -1,2 +1,3 @@
 # The root .gitignore drops every .env* file; keep the empty template.
 !.env.example
+dist-e2e/

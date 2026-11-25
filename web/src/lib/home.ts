@@ -48,12 +48,23 @@ export function splitCalendar(c: Competition[], today: string): { next?: Competi
 }
 
 /** Romanian takes "de" when the last two digits are 00 or 20–99: "19 zile", "20 de zile". */
-function daysRo(n: number): string {
+function takesDe(n: number): boolean {
   const lastTwo = n % 100;
-  return lastTwo === 0 || lastTwo >= 20 ? `${n} de zile` : `${n} zile`;
+  return lastTwo === 0 || lastTwo >= 20;
 }
 
-export function countdownLabel(next: Competition, today: string): string | undefined {
+function daysRo(n: number): string {
+  return takesDe(n) ? `${n} de zile` : `${n} zile`;
+}
+
+/** The words after a points total: 1 punct, 19 puncte, 168 de puncte. */
+export function pointsUnit(n: number): string {
+  if (n === 1) return 'punct';
+  return takesDe(n) ? 'de puncte' : 'puncte';
+}
+
+/** Only the dates matter, so the browser can recompute the label from data attributes. */
+export function countdownLabel(next: Pick<Competition, 'start' | 'end'>, today: string): string | undefined {
   const untilStart = daysBetween(today, next.start);
   if (untilStart > COUNTDOWN_MAX_DAYS) return undefined;
   if (untilStart > 1) return `peste ${daysRo(untilStart)}`;

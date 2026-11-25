@@ -1,10 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { getHomeData, parseHomeData } from '../../src/lib/content';
+import { buildToday, getHomeData, parseHomeData } from '../../src/lib/content';
+import { todayInBucharest } from '../../src/lib/dates';
 import { toHomeData } from '../../src/lib/sanity';
 import fixture from '../../src/fixtures/home.json';
 
-const ENV_KEYS = ['CONTENT_SOURCE', 'SANITY_PROJECT_ID', 'SANITY_DATASET', 'HOME_FIXTURE'] as const;
+const ENV_KEYS = ['CONTENT_SOURCE', 'SANITY_PROJECT_ID', 'SANITY_DATASET', 'HOME_FIXTURE', 'BUILD_TODAY'] as const;
 let savedEnv: Record<string, string | undefined>;
 beforeEach(() => {
   savedEnv = Object.fromEntries(ENV_KEYS.map(k => [k, process.env[k]]));
@@ -203,3 +204,21 @@ function jpegSize(b: Buffer): { width: number; height: number } {
   }
   throw new Error('no JPEG frame header');
 }
+
+describe('buildToday', () => {
+  test('is today in Bucharest when BUILD_TODAY is not set', () => {
+    expect(buildToday()).toBe(todayInBucharest());
+  });
+
+  test('BUILD_TODAY pins the date, so builds are repeatable', () => {
+    process.env.BUILD_TODAY = '2026-12-05';
+    expect(buildToday()).toBe('2026-12-05');
+  });
+
+  test('a malformed BUILD_TODAY fails the build', () => {
+    process.env.BUILD_TODAY = '5 decembrie';
+    expect(() => buildToday()).toThrow(/BUILD_TODAY/);
+    process.env.BUILD_TODAY = '2026-13-05';
+    expect(() => buildToday()).toThrow(/BUILD_TODAY/);
+  });
+});
