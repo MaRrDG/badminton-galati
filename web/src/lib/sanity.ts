@@ -1,6 +1,5 @@
 import { createClient } from '@sanity/client';
-import { visibleAthletes } from './home';
-import { HOME_POSTS } from './home';
+import { HOME_POSTS, visibleAthletes } from './home';
 import type { Athlete, Competition, Discipline, Group, HomeData, Img, Post, PostKind, Ranking } from './types';
 
 const API_VERSION = '2025-02-19';
@@ -40,7 +39,7 @@ export function fetchHomeQuery(config: { projectId: string; dataset: string; tok
     dataset: config.dataset,
     token: config.token,
     apiVersion: API_VERSION,
-    useCdn: false, // builds want the version just published, and the CDN does not serve token requests
+    useCdn: false, // builds want fresh data: the live API has what was just published, the CDN may lag
     perspective: 'published',
   });
   return client.fetch(HOME_QUERY);
