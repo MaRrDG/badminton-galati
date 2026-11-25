@@ -2,15 +2,18 @@
 
 Sanity project `4p2ry2u9` ("Siderurgistul Galati", organisation "CS Siderurgistul Galati"),
 dataset `production`. Schemas in `studio/schemaTypes/`, registered in `index.ts`; Studio
-structure and Romanian UI locale (`@sanity/locale-ro-ro`) in `studio/sanity.config.ts`.
+config and Romanian UI locale (`@sanity/locale-ro-ro`) in `studio/sanity.config.ts`, navigation
+in `studio/structure.ts`, start screen in `studio/start/`, publish action in `studio/actions.ts`.
 Field titles, descriptions and validation messages are Romanian (they are for the coaches).
+Titles, descriptions, tabs, ordering, visibility and initial values are editorial and may change;
+field NAMES and types may not, because `web/src/lib/sanity.ts` reads them.
 
 Only the homepage exists so far; "Used by" names what `HOME_QUERY` (`web/src/lib/sanity.ts`)
 reads. Everything else is stored for plan 2 pages.
 
 ## Document types
 
-### `siteSettings` ("Pagina principală", singleton, id `siteSettings`)
+### `siteSettings` ("Textele site-ului", singleton, id `siteSettings`)
 | Field | Type | Meaning | Used by |
 |---|---|---|---|
 | `heroLines` | string[] | Motto, one line per entry; 2–4 required, warning above 20 chars | Hero headline |
@@ -26,7 +29,7 @@ reads. Everything else is stored for plan 2 pages.
 | Field | Meaning | Used by |
 |---|---|---|
 | `name` | As in the FRB ranking | Roster |
-| `slug` | From the name via `slugifyRo` (strips diacritics) | Roster (future athlete page) |
+| `slug` | From the name via `slugifyRo` (strips diacritics), written by the publish action | Roster (future athlete page) |
 | `consent` | "Acord părinte"; `initialValue: false` | Consent filter everywhere |
 | `frbUrl` | Profile on badminton.ro | Roster "Profilul FRB" link |
 | `photo` | image + `alt` | Mapped, not rendered on the homepage yet |
@@ -40,19 +43,65 @@ days and hours; empty until the club supplies it), `order` (integer from 1). Use
 
 ### `competition` ("Competiție")
 `title` (uses "și", never "&"), `city` (may be "de confirmat"), `start`, `end` (not before
-`start`), `home` (played in Galați), `post` (optional reference to the results article). Used by
+`start`), `home` (played in Galați; set by the publish action from `city`, read-only), `post` (optional reference to the results article). Used by
 CalendarBand (next with countdown, three played). `post` is mapped to `postSlug` but not
 rendered yet.
 
 ### `post` ("Articol")
 `title`, `kind` (`competitie`, `viata-clubului`, `proiecte`), `date`, `cover`, `body` (Portable
-Text: normal, h2, h3, blockquote, lists, strong, em, links), `gallery[]`, `slug`, and in the
-collapsed "Legături" fieldset `competition` (reference) and `results[]` (`resultRow`: `athlete`
+Text: normal, h2, h3, blockquote, lists, strong, em, links), `gallery[]`, `slug` (written by
+the publish action from the title), `competition` (reference) and `results[]` (`resultRow`: `athlete`
 reference filtered to `consent == true`, `discipline`, `result` text such as "aur" or "locul 5").
 The homepage reads `title`, `slug`, `kind`, `date`, `cover` of the 3 newest posts.
 
 Shared (`shared.ts`): `altField` (required alt text, validation error), `imageOptions`
-(`hotspot: true`), `disciplines` (SB, SF, DB, DF, DX), `slugifyRo`.
+(`hotspot: true`), `disciplines` (SB, SF, DB, DF, DX), `slugifyRo`, `formGroups` (the form
+tabs), `isGalati`, `todayInBucharest` and the Romanian date formatting of list previews.
+
+## How the Studio is organised (for the coaches)
+
+Problem the owner reported: "I did not know where to start" and "there are too many fields".
+
+- **Start screen** (first tool, default on opening): „Scrie un articol” and „Adaugă o
+  competiție în calendar” open a new document (intent links); „Sportivi”, „Program și grupe”
+  and „Textele de pe prima pagină” open the navigation item. Below: „Cum postez după un turneu”
+  in five steps.
+- **Navigation**: Articole (newest first), Calendar („Urmează” by start ascending, then „Au
+  trecut” by start descending; split on `end` against today in Bucharest), Sportivi (two lists:
+  `consent == true` and `consent != true`), Grupe și program (by `order`), Textele site-ului.
+  The global „create” menu offers only `post`, `competition`, `athlete`.
+- **Previews**: articles show cover, title, Romanian date and kind; competitions show the days,
+  the city or „Acasă, la Galați”; athletes show photo, name, ranking category, group and
+  „Fără acord părinte, nu apare pe site” while consent is not ticked.
+- **Form tabs**: every form opens on a tab with only the common task; everything else is in „Mai
+  multe”. The „all fields” tab is hidden, so every field must name a tab.
+
+| Type | First tab | „Mai multe” |
+|---|---|---|
+| `post` | `title`, `cover`, `body`, `gallery` | `kind` (initial „Competiție”), `date` (initial today), `competition`, `results`, `slug` |
+| `athlete` | `name`, `photo`, `group`, `consent` | `frbUrl`, `slug`, `rankings` (hidden while empty, read-only) |
+| `competition` | `title`, `start`, `end`, `city` | `home` (read-only, derived), `post` |
+| `siteSettings` | Prima pagină: `heroLines`, `heroText`, `heroPhoto` | tabs De ce badminton, Sala, Antrenament de probă, Mai multe (`groupsIntro`, `rankingWeek`), each with a one-line hint |
+
+`group` keeps a single form (five short fields).
+
+**Rule: a new field goes into „Mai multe” unless a coach needs it every week.**
+
+### Slugs and the publish action
+
+Coaches never type a slug. `studio/actions.ts` wraps the built-in publish action of `post`,
+`athlete` and `competition`: before publishing it patches the draft with what is missing, then
+runs the normal publish. Sanity's publish operation commits pending patches and waits for the
+server to have them, so the published document includes the patch.
+
+- `slug`: only when the document has none, `slugifyRo(title or name)`; if another document of
+  the type (drafts included) already uses it, `-2`, `-3`… An existing slug is never changed,
+  so URLs stay stable. The field is read-only, hidden until it exists, and has no `required`
+  rule (it would block the publish button before the action can fill it).
+- `home`: `true` exactly when `slugifyRo(city) === "galati"`.
+- „Duplicate” is removed for these three types: a copy would carry the original's slug.
+- Releases, scheduled publishing and scheduled drafts are disabled, so no publish path skips
+  the action. Documents written through the API or the seed must carry their own slugs.
 
 ## Consent, end to end
 
