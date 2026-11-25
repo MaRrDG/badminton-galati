@@ -181,14 +181,20 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
   .for-eu {
     display: none;
   }
-  .trial:has(#f-cine-eu:checked) .for-eu,
+  /* Two separate rule sets: a browser without :has() drops any rule whose selector list holds
+     one, so the data-who rules (set by the script) must never share a list with :has(). */
   .trial[data-who='eu'] .for-eu {
     display: inline;
   }
-  .trial:has(#f-cine-eu:checked) .for-copil,
   .trial[data-who='eu'] .for-copil,
-  .trial:has(#f-cine-eu:checked) [data-field='varsta'],
   .trial[data-who='eu'] [data-field='varsta'] {
+    display: none;
+  }
+  .trial:has(#f-cine-eu:checked) .for-eu {
+    display: inline;
+  }
+  .trial:has(#f-cine-eu:checked) .for-copil,
+  .trial:has(#f-cine-eu:checked) [data-field='varsta'] {
     display: none;
   }
   .field label {
@@ -336,7 +342,7 @@ const consent = 'Sunt de acord ca CS Siderurgistul Galați să folosească numel
     border-color: var(--red-ink);
     border-width: 3px;
   }
-.who.bad .choices label {
+  .who.bad .choices label {
     border-color: var(--red-ink);
     border-width: 3px;
   }

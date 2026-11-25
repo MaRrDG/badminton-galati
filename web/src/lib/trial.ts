@@ -137,12 +137,16 @@ export function errorIntro(n: number): string {
   return `Verificați ${COUNT_WORDS[n] ?? `${n} lucruri`}:`;
 }
 
-/** Cuts `s` to at most `max` characters at a word boundary, ending with "…". */
+/**
+ * Cuts `s` to at most `max` characters (code points, so an emoji is never split into a lone
+ * surrogate that `encodeURIComponent` rejects) at a word boundary, ending with "…".
+ */
 function cutAtWord(s: string, max: number): string {
-  if (s.length <= max) return s;
-  const head = s.slice(0, max - 1);
+  const chars = Array.from(s);
+  if (chars.length <= max) return s;
+  const head = chars.slice(0, max - 1).join('');
   const space = head.lastIndexOf(' ');
-  return `${(space > max / 2 ? head.slice(0, space) : head).trimEnd()}…`;
+  return `${(space > head.length / 2 ? head.slice(0, space) : head).trimEnd()}…`;
 }
 
 /**

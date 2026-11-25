@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { AGE_MAX, AGE_MIN, MAILTO_MAX, errorIntro, formatPhoneRo, isSpam, normalizePhoneRo, trialDelivered, trialMailto, validateTrial } from '../../src/lib/trial';
 
@@ -147,7 +148,24 @@ describe('trialMailto', () => {
     expect(long.startsWith(message.slice(0, -1))).toBe(true);
     expect(message.slice(0, -1)).toMatch(/\S$/);
     expect(long[message.length - 1]).toMatch(/[\s,.]/); // the cut falls between words
+    // An emoji run past the cap is cut between code points, never into a lone surrogate.
+    const emoji = trialMailto({ who: 'eu', name: 'Dan', phone: '0745123456', message: '🏸'.repeat(900) }, 'siderurgistul@badmintongalati.ro');
+    expect(emoji.length).toBeLessThanOrEqual(MAILTO_MAX);
+    const cut = decodeURIComponent(emoji.split('&body=')[1]!).split('\r\nMesaj: ')[1]!;
+    expect(cut).toMatch(/^(🏸)+…$/u);
     // A short message is never cut.
     expect(decodeURIComponent(trialMailto({ who: 'eu', name: 'Dan', phone: '0745123456', message: 'Marțea.' }, 'a@b.ro'))).toContain('Mesaj: Marțea.');
   });
+});
+
+test('the self-path CSS never mixes :has() with the data-who fallback in one selector list', () => {
+  // A browser without :has() drops a whole rule when one selector in its list is unknown.
+  const source = readFileSync(new URL('../../src/components/contact/TrialForm.astro', import.meta.url), 'utf8');
+  const css = source.slice(source.indexOf('<style>')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const selectorLists = [...css.matchAll(/([^{}]+)\{/g)].map(m => m[1]!.trim());
+  const who = selectorLists.filter(sel => sel.includes('[data-who'));
+  const has = selectorLists.filter(sel => sel.includes(':has('));
+  expect(who.length).toBeGreaterThanOrEqual(2);
+  expect(has.length).toBeGreaterThanOrEqual(2);
+  for (const sel of who) expect(sel).not.toContain(':has(');
 });

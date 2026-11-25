@@ -160,6 +160,16 @@ test.describe('without an endpoint (every build until plan 2b)', () => {
   });
 });
 
+test('the data-who rules alone switch to the self path (browsers without :has())', async ({ page }) => {
+  await page.goto('/contact/');
+  await expect(page.locator('form[data-trial]')).toHaveAttribute('data-who', 'copil');
+  // "Copilul meu" stays checked, so no :has() rule matches; only the script's data-who can act.
+  await page.locator('form[data-trial]').evaluate(f => f.setAttribute('data-who', 'eu'));
+  await expect(page.getByLabel('Copilul meu')).toBeChecked();
+  await expect(page.locator('#f-nume')).toHaveAccessibleName('Numele dumneavoastră');
+  await expect(page.locator('[data-field="varsta"]')).toBeHidden();
+});
+
 test.describe('with an endpoint (plan 2b)', () => {
   test('the club has the request only when the endpoint says ok', async ({ page }) => {
     await withEndpoint(page, ok);
