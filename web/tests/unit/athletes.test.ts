@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'vitest';
 import {
-  athleteCategory, athleteFilters, athleteProfile, athletesCountLabel, athletesView, athleteWall, medalOf,
+  appearancesLabel, athleteCategory, athleteFilters, athleteProfile, athletesCountLabel, athletesView, athleteWall, medalOf,
 } from '../../src/lib/athletes';
 import { getAthleteProfiles, parseSiteData } from '../../src/lib/content';
 import type { Athlete, Post } from '../../src/lib/types';
@@ -189,6 +189,14 @@ describe('athleteProfile', () => {
       { year: 2026, rows: [{ medal: 'aur', discipline: 'SF', post: { title: 'Articol de test cu galerie', slug: 'articol-de-test-cu-galerie' } }] },
     ]);
     expect(athleteProfile(quietSite, nistorOf(quietSite), '2026-11-25').category).toBeUndefined();
+  });
+
+  test('the section below the identity is named after the blocks it holds; no medals, no Medalii', () => {
+    const nistor = athleteProfile(homeSite, nistorOf(homeSite), '2026-11-25');
+    expect(appearancesLabel(nistor)).toBe('Turnee');
+    const z = athleteProfile(quietSite, zet, '2026-11-25');
+    expect(appearancesLabel(z)).toBe('Articole, turnee și medalii');
+    expect(appearancesLabel({ ...z, medals: [] })).toBe('Articole și turnee');
   });
 
   test('articles newest first; medals by year, newest first, gold before silver before bronze', () => {

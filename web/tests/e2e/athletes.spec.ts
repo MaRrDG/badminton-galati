@@ -124,7 +124,10 @@ test.describe('an athlete profile', () => {
     await expect(page.getByRole('link', { name: 'Profilul FRB' }).first()).toHaveAttribute('href', 'https://badminton.ro/jucator/236/u17-sb-simplu-baieti/');
     await expect(page.getByRole('link', { name: 'Toți sportivii' })).toHaveAttribute('href', '/sportivi/');
     await expect(page.getByText('Apar aici după prima sincronizare cu clasamentul FRB.')).toBeVisible();
-    await expect(page.getByText('Încă nu are medalii trecute în articolele clubului.')).toBeVisible();
+    // No medal yet: no Medalii block at all (an empty one could read as a claim about a child).
+    await expect(page.getByRole('heading', { name: 'Medalii' })).toHaveCount(0);
+    await expect(page.getByText('Încă nu are medalii')).toHaveCount(0);
+    await expect(page.locator('section.more')).toHaveAttribute('aria-label', 'Turnee');
     await expect(page.getByRole('heading', { name: 'Apare în articolele clubului' })).toHaveCount(0);
     // No photo yet: the initials on a coloured field, the same colour as the tile on the wall.
     await expect(page.locator('.ident .ini')).toHaveText('NC');
@@ -189,7 +192,7 @@ test.describe('medals and articles', on('quiet-season'), () => {
     const medals = page.locator('.medals li');
     await expect(medals).toHaveText(['2026: aur, simplu fete – Articol de test cu galerie']);
     await expect(medals.getByRole('link')).toHaveAttribute('href', '/noutati/articol-de-test-cu-galerie/');
-    await expect(page.getByText('Încă nu are medalii')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Medalii' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Apare în articolele clubului' })).toBeVisible();
     const article = page.locator('.arts a');
     await expect(article).toHaveAttribute('href', '/noutati/articol-de-test-cu-galerie/');

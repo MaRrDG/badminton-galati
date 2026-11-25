@@ -34,7 +34,7 @@ the line. Placeholders in braces are filled from data.
 | Text | Where | Source |
 |---|---|---|
 | "Turneele care contează" / "Apar aici după prima sincronizare cu clasamentul FRB. Până atunci le găsești pe Profilul FRB." (second sentence only with an FRB link) | Quiet block | Mockup |
-| "Medalii" / "Încă nu are medalii trecute în articolele clubului." | Quiet block | Mockup |
+| "Medalii" | Heading of the medal rows, only when the athlete has a medal (the empty line "Încă nu are medalii trecute în articolele clubului." is **not shipped**: it could read as a claim about a child) | Mockup / 2a |
 | Medal rows, one per year: "2026: aur, simplu fete – {titlul articolului}"; several in a year joined with "; "; without a discipline "aur – {titlu}" | Medals (not drawn in the mockup) | 2a |
 | "{Nume}, CS Siderurgistul Galați. Locul 2 în țară la U17, simplu băieți, cu 168 de puncte." when ranked, else "{Nume}, CS Siderurgistul Galați." | Meta description | 2a |
 | "Apare în articolele clubului", "Toți sportivii", "Profilul FRB" | Profile | Mockup |

@@ -194,3 +194,13 @@ export function athleteProfile(site: SiteData, athlete: Athlete, today: string):
     tone,
   };
 }
+
+/**
+ * The name of the section below a profile's identity, from the blocks it holds: the articles
+ * (when any), the tournaments line (always) and the medals (only when there are some).
+ */
+export function appearancesLabel({ posts, medals }: Pick<AthleteProfile, 'posts' | 'medals'>): string {
+  const parts = [...(posts.length > 0 ? ['articole'] : []), 'turnee', ...(medals.length > 0 ? ['medalii'] : [])];
+  const list = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} și ${parts.at(-1)}`;
+  return capitalised(list);
+}

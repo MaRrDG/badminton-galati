@@ -3,7 +3,7 @@ import Photo from '../ui/Photo.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { formatDateRo } from '../../lib/dates';
 import { disciplineLabel } from '../../lib/home';
-import type { AthleteProfile } from '../../lib/athletes';
+import { appearancesLabel, type AthleteProfile } from '../../lib/athletes';
 
 interface Props {
   profile: AthleteProfile;
@@ -14,8 +14,9 @@ const { athlete, posts, medals } = profile;
 ---
 
 {/* Below the identity, on white: the articles (real content, first), then the quiet lines
-     for what is not known yet. Nothing empty here is louder than the block above. */}
-<section class="more" aria-label="Articole, turnee și medalii">
+     for what is not known yet. Nothing empty here is louder than the block above. Without a
+     medal there is no Medalii block: an empty one could read as a claim about a child. */}
+<section class="more" aria-label={appearancesLabel(profile)}>
   <div class="wrap">
     {
       posts.length > 0 && (
@@ -51,12 +52,10 @@ const { athlete, posts, medals } = profile;
           }
         </p>
       </div>
-      <div>
-        <SectionHeading id="medalii-h">Medalii</SectionHeading>
-        {
-          medals.length === 0 ? (
-            <p>Încă nu are medalii trecute în articolele clubului.</p>
-          ) : (
+      {
+        medals.length > 0 && (
+          <div>
+            <SectionHeading id="medalii-h">Medalii</SectionHeading>
             <ul class="medals" aria-labelledby="medalii-h">
               {medals.map(({ year, rows }) => (
                 <li>
@@ -71,9 +70,9 @@ const { athlete, posts, medals } = profile;
                 </li>
               ))}
             </ul>
-          )
-        }
-      </div>
+          </div>
+        )
+      }
     </div>
   </div>
 </section>
