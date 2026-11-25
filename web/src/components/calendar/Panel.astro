@@ -220,7 +220,19 @@ const { next, countdown, todayLabel, legend } = Astro.props;
     background: var(--blue-tint);
   }
   .sw.hm {
+    position: relative;
     background: var(--red-tint);
+  }
+  /* The home mark of the month grids (calendar/Month.astro): the corner triangle. */
+  .sw.hm::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 9px;
+    height: 9px;
+    background: var(--red-deep);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
   }
   .sw.td {
     background: var(--ink);

@@ -133,7 +133,7 @@ When you add a spec or a new source folder, update this table in the script's he
 - Inner pages (`inner-pages.spec`): see "The inner-pages sweep" below. Per-page specs
   (`athletes`, `calendar`, `news`, `article`, `program`, `parents`, `contact`) cover each page's
   behaviour: consent (no tile, no profile route for a non-consenting athlete), filters with and
-  without JS, the calendar following the visitor's date, the trial form's paths and states, the
+  without JS, the calendar following the visitor's date and its home mark (home blocks carry the corner triangle in both styles at 1440 and 390, away blocks and the other legend swatches do not), the trial form's paths and states, the
   lightbox and share row, hatched example hours, each page's motion moment and reduced motion.
 - Unit: date formatting and Bucharest "today", Romanian plurals, roster order/layout, calendar
   split, fixture shape and parity with the seed, photo sizes and weight, WCAG token contrast.

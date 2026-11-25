@@ -102,8 +102,24 @@ const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Jo', 'Vi', 'Sâ', 'Du'];
     aspect-ratio: 1;
   }
   .evb.home {
+    position: relative;
     background: var(--red-tint);
     color: var(--red-deep);
+  }
+  /* The second cue for a home event, besides the red: a small triangle folded into the block's
+     top-right corner, in the block's text colour (white on the solid red, deep red on the pale
+     one). The legend's "acasă" swatch carries the same mark. */
+  .evb.home::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    width: 9px;
+    height: 9px;
+    background: currentColor;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    pointer-events: none;
   }
   .evb:is(.next, .upcoming) {
     background: var(--blue);

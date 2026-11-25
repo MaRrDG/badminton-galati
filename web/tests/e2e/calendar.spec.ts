@@ -24,6 +24,57 @@ test('twelve month grids, today marked, the next event in the panel', async ({ p
   await expect(page.locator('#ev-competition-2026-04-03-cr-u11-cr-u17')).toContainText('acasă');
 });
 
+test.describe('home events carry a mark besides the red', () => {
+  /** Each block's home flag and its corner mark: drawn or not, size, colour, and the block's text and background colours. */
+  const marks = (page: import('@playwright/test').Page, sel: string) =>
+    page.locator(sel).evaluateAll(els => els.map(e => {
+      const m = getComputedStyle(e, '::after');
+      const cs = getComputedStyle(e);
+      return {
+        home: e.classList.contains('home'),
+        status: [...e.classList].find(c => c === 'played' || c === 'upcoming' || c === 'next') ?? '',
+        drawn: m.content !== 'none' && m.content !== 'normal',
+        w: parseFloat(m.width),
+        h: parseFloat(m.height),
+        mark: m.backgroundColor,
+        text: cs.color,
+        bg: cs.backgroundColor,
+      };
+    }));
+
+  for (const width of [1440, 390])
+    test(`home blocks have the corner mark, away blocks do not, at ${width}`, async ({ page }) => {
+      // On 1 September the spring home events are played (pale) and the autumn ones still coming (solid).
+      await page.clock.setSystemTime(at('2026-09-01'));
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/calendar/');
+      await expect(page.locator(block('CN U11 și CN U19'))).toHaveClass(/\bupcoming\b/);
+      const all = await marks(page, '.evb');
+      const home = all.filter(b => b.home);
+      const away = all.filter(b => !b.home);
+      expect(home.length).toBeGreaterThan(0);
+      expect(away.length).toBeGreaterThan(0);
+      // Both styles are covered: a played (pale) and a coming (solid) home event.
+      expect(home.some(b => b.status === 'played')).toBe(true);
+      expect(home.some(b => b.status !== 'played')).toBe(true);
+      for (const b of home) {
+        expect(b.drawn).toBe(true);
+        expect([b.w, b.h]).toEqual([9, 9]);
+        expect(b.mark).toBe(b.text);
+        expect(b.mark).not.toBe(b.bg);
+      }
+      for (const b of away) expect(b.drawn).toBe(false);
+    });
+
+  test('the legend shows the mark beside "acasă"', async ({ page }) => {
+    await page.goto('/calendar/');
+    const [sw] = await marks(page, '[data-legend="home"] .sw');
+    expect(sw.drawn).toBe(true);
+    expect(sw.mark).not.toBe(sw.bg);
+    for (const other of await marks(page, '.legend li:not([data-legend="home"]) .sw')) expect(other.drawn).toBe(false);
+  });
+});
+
 test('the plain list holds every competition in date order', async ({ page }) => {
   await page.goto('/calendar/');
   const list = page.locator('.list');
