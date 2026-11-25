@@ -1,7 +1,7 @@
 # Site nou pentru CS Siderurgistul Galați: design
 
 Data: 25 noiembrie 2026
-Stare: de aprobat
+Stare: aprobat de Mario pe 25 noiembrie 2026
 
 ## De ce
 
@@ -235,6 +235,13 @@ Deciziile de mai jos sunt ale mele, de confirmat de Mario:
   formularul să rămână scurt. Palmaresul se construiește din aceste câmpuri.
 - **Antrenorii publică direct**, fără aprobare. Mario poate retrage orice.
 
+## Conturi și termen (hotărât de Mario)
+
+- **Deocamdată un singur cont de administrator**, al lui Mario, cu email și parolă. Conturile
+  antrenorilor și mutarea proprietății pe un email al clubului vin mai târziu, la predare.
+- Parola nu se scrie în cod și nu intră în depozitul git. Mario o alege la crearea contului.
+- **Nu există termen.** Se construiește tot înainte de lansare.
+
 ## Domeniu și email (verificat pe 25 noiembrie 2026)
 
 - Domeniul are serverele de nume la ROMARG (`ns1–ns4.romarg.com`), iar site-ul vechi stă pe
@@ -275,9 +282,6 @@ Mario a vorbit despre rezultat, nu despre unelte, așa că acestea sunt alegeril
 ## Depinde de club
 
 - Acordul pentru proiect și accesul la DNS pentru lansare.
-- Pe numele cui se fac conturile (Sanity, Cloudflare, GitHub, email). De hotărât cu Mario.
-- Dacă există un termen (început de sezon, întâlnire cu sponsori). Fără termen, se
-  construiește tot înainte de lansare.
 - Acordul FRB pentru sincronizare.
 - Programul cu ore, prețurile, lista sportivilor cu acordul părinților.
 - Emblema în format vectorial, poze noi și, ideal, o filmare scurtă pentru hero.
