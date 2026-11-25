@@ -151,7 +151,11 @@ lipsesc. Pozele au dimensiuni declarate, ca distanțele animațiilor să se calc
 
 **Păstrate din site-ul vechi**
 
-- **Acasă.** Structura din schița D: motto, calendar, sportivi, grupe, sală, noutăți,
+- **Acasă.** Tonul e invitația, nu lauda: Mario a observat că site-ul actual al clubului
+  spune „de ce să joci badminton”, nu „uite ce sus suntem”, și vrea să rămână așa. Ordinea:
+  motto, „De ce badminton” (beneficiile din textul clubului, rescrise scurt, cu diacritice),
+  grupe, calendar, sportivi („Unde ajung cei care continuă”, ca dovadă, nu ca titlu de
+  pagină), sală, noutăți, antrenament de probă. Vechea ordine din schiță: calendar, sportivi, grupe, sală, noutăți,
   antrenament de probă.
 - **Despre club.** Istoric, înființare 7 martie 2002, sala cu 4 terenuri de pe Bd. Cloșca,
   Balcaniadele din 2002 și 2023. O singură pagină în locul celor două duplicate.

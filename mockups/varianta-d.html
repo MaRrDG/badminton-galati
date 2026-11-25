@@ -108,6 +108,19 @@ section{overflow-x:clip}
 .pts small{display:block;font:500 .9rem var(--body);margin-top:4px}
 .roster-foot{margin-top:22px;display:flex;gap:12px 32px;flex-wrap:wrap}
 
+/* ---------- why badminton ---------- */
+.why{background:var(--white);color:var(--ink);padding:clamp(52px,7vw,104px) 0}
+.why-head{display:grid;grid-template-columns:1fr 1fr;gap:20px clamp(24px,5vw,72px);align-items:end;margin-bottom:clamp(24px,3.4vw,44px)}
+.why-head h2{color:var(--blue)}
+.why-head p{max-width:46ch}
+.why-body{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:28px clamp(28px,5vw,72px);align-items:start}
+.why-body figure{margin:0 14px 14px 0;box-shadow:14px 14px 0 var(--red)}
+.why-body img{display:block;width:100%;height:auto}
+.why-body ul{list-style:none;margin:0;padding:0;border-top:4px solid var(--blue)}
+.why-body li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:4px 24px;align-items:baseline;padding:15px 0;border-bottom:1px solid rgba(21,73,168,.3)}
+.why-body b{font-family:var(--display);font-weight:800;font-size:clamp(1.35rem,2vw,1.75rem);line-height:1.05;color:var(--blue)}
+@media (max-width:860px){.why-head,.why-body,.why-body li{grid-template-columns:1fr}}
+
 /* ---------- groups on court lines ---------- */
 .groups{background:var(--blue);color:var(--white);padding:clamp(52px,7vw,104px) 0}
 .groups-head{display:grid;grid-template-columns:1fr 1fr;gap:20px clamp(24px,5vw,72px);align-items:end;margin-bottom:clamp(22px,3vw,38px)}
@@ -229,6 +242,50 @@ footer p+p{margin-top:.35em}
   </div>
 </section>
 
+<section class="why" id="de-ce" aria-labelledby="why-h">
+  <div class="wrap">
+    <div class="why-head">
+      <h2 class="display" id="why-h">De ce badminton</h2>
+      <p>Se joacă cu rachete, fluturași și fileu, în doi sau în patru, și poate fi practicat la orice vârstă. La noi găsești un climat prietenos pentru toate categoriile de vârstă.</p>
+    </div>
+    <div class="why-body">
+      <figure><img src="img/echipa-u15.jpg" width="1600" height="1067" alt="Sportivi și antrenori ai clubului la o competiție"></figure>
+      <ul>
+        <li><b>Te ține în formă, cap și corp</b><span>Îmbunătățește starea fizică și mentală, concentrarea și atenția.</span></li>
+        <li><b>Înveți să decizi repede</b><span>Jocul îți dezvoltă capacitatea de a lua decizii rapid, sub presiune.</span></li>
+        <li><b>Prinzi încredere</b><span>Socializezi, iar încrederea în tine crește cu fiecare antrenament.</span></li>
+        <li><b>Nu ești singur pe teren</b><span>La dublu ai un partener care te sprijină și pe care îl sprijini.</span></li>
+        <li><b>Dormi mai bine</b><span>Reduce stresul și scurtează recuperarea.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="groups" id="program" aria-labelledby="gr-h">
+  <div class="wrap">
+    <div class="groups-head">
+      <h2 class="display" id="gr-h">Cinci grupe, pe două drumuri</h2>
+      <p>Fiecare grupă lucrează cu antrenor calificat, iar la început primești de la club echipamentul minim necesar. Zilele și orele urmează să fie confirmate de club.</p>
+    </div>
+    <div class="tracks">
+      <div>
+        <h3>Pentru cine vrea performanță</h3>
+        <ol>
+          <li><b>Inițiere</b><span>Copii care țin prima dată racheta în mână</span></li>
+          <li><b>Performanță</b><span>Sportivi legitimați care merg la competiții</span></li>
+          <li><b>Elite</b><span>Sportivii din lotul de vârf al clubului</span></li>
+        </ol>
+      </div>
+      <div class="play">
+        <h3>Pentru cine vrea doar să joace</h3>
+        <ul>
+          <li><b>Amatori copii</b><span>Copii care joacă de plăcere</span></li>
+          <li><b>Amatori adulți</b><span>Adulți, indiferent de nivel</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="cal" id="calendar" aria-labelledby="cal-h">
   <div class="wrap">
     <div>
@@ -252,11 +309,10 @@ footer p+p{margin-top:.35em}
     </div>
   </div>
 </section>
-
 <section class="roster" id="sportivi" aria-labelledby="ros-h">
   <div class="wrap">
     <div class="roster-head">
-      <h2 class="display" id="ros-h">Sportivii noștri, loc cu loc</h2>
+      <h2 class="display" id="ros-h">Unde ajung cei care continuă</h2>
       <p>Locul fiecărui sportiv legitimat, luat din clasamentul Federației Române de Badminton.</p>
     </div>
     <article class="first">
@@ -289,33 +345,6 @@ footer p+p{margin-top:.35em}
     <p class="roster-foot"><a class="textlink" href="#sportivi">Toți sportivii clubului</a><a class="textlink" href="https://badminton.ro/clasamente/">Clasamentele pe badminton.ro</a></p>
   </div>
 </section>
-
-<section class="groups" id="program" aria-labelledby="gr-h">
-  <div class="wrap">
-    <div class="groups-head">
-      <h2 class="display" id="gr-h">Cinci grupe, pe două drumuri</h2>
-      <p>Fiecare grupă lucrează cu antrenor calificat, iar la început primești de la club echipamentul minim necesar. Zilele și orele urmează să fie confirmate de club.</p>
-    </div>
-    <div class="tracks">
-      <div>
-        <h3>Pentru cine vrea performanță</h3>
-        <ol>
-          <li><b>Inițiere</b><span>Copii care țin prima dată racheta în mână</span></li>
-          <li><b>Performanță</b><span>Sportivi legitimați care merg la competiții</span></li>
-          <li><b>Elite</b><span>Sportivii din lotul de vârf al clubului</span></li>
-        </ol>
-      </div>
-      <div class="play">
-        <h3>Pentru cine vrea doar să joace</h3>
-        <ul>
-          <li><b>Amatori copii</b><span>Copii care joacă de plăcere</span></li>
-          <li><b>Amatori adulți</b><span>Adulți, indiferent de nivel</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="hall" aria-labelledby="hall-h">
   <div class="wrap">
     <div class="hall-head">
@@ -333,7 +362,6 @@ footer p+p{margin-top:.35em}
     </div>
   </div>
 </section>
-
 <section class="news" id="noutati" aria-labelledby="news-h">
   <div class="wrap">
     <h2 class="display" id="news-h">Noutăți</h2>
@@ -350,7 +378,6 @@ footer p+p{margin-top:.35em}
     </div>
   </div>
 </section>
-
 <section class="cta" id="proba" aria-labelledby="cta-h">
   <div class="wrap">
     <div>

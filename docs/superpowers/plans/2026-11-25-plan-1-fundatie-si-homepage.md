@@ -15,6 +15,7 @@ This is plan 1 of 5. Later plans, each written when its turn comes: (2) inner pa
 ## Global Constraints
 
 - All visible copy is Romanian with correct diacritics (ș ț ă î â, comma-below forms). No English labels.
+- Tone: the homepage invites ("de ce să joci badminton"), it does not boast. Rankings appear as proof lower on the page, never in the hero.
 - No invented facts. Unknown club data (training hours, prices, captions) renders as the literal text `de confirmat` or is omitted; never placeholder prose presented as fact.
 - An athlete is rendered anywhere (roster, hero, counts, tags) only if `consent === true`. This filter lives in the content layer, not in components.
 - Colours: blue `#1549A8`, red `#E23A45`, court orange `#F39A1E` (small touches only), white, mist (very light blue) for rest sections, ink (dark navy) for text. Take exact mist/ink/blue-deep values from the mockup's `:root`.
@@ -49,8 +50,8 @@ web/
   src/styles/base.css          reset, typography, .wrap, .display, focus styles
   src/layouts/Base.astro       <head>, header, footer, skip link
   src/components/SiteHeader.astro, SiteFooter.astro
-  src/components/home/Hero.astro, CalendarBand.astro, Roster.astro,
-                      Groups.astro, Hall.astro, News.astro, TrialCta.astro
+  src/components/home/Hero.astro, Why.astro, Groups.astro, CalendarBand.astro,
+                      Roster.astro, Hall.astro, News.astro, TrialCta.astro
   src/lib/types.ts             content types shared by everything
   src/lib/dates.ts             Romanian date formatting
   src/lib/home.ts              pure homepage logic
@@ -132,7 +133,8 @@ export type Post = { title: string; slug: string; kind: PostKind; date: string; 
 export type HomeData = {
   athletes: Athlete[]; rankingWeek?: RankingWeek; competitions: Competition[];
   groups: Group[]; posts: Post[]; hallPhotos: Img[];
-  heroLines: string[]; heroText: string; heroPhoto: Img; hallText: string; groupsIntro: string; trialText: string;
+  heroLines: string[]; heroText: string; heroPhoto: Img;
+  whyIntro: string; whyPhoto: Img; whyPoints: { title: string; text: string }[]; hallText: string; groupsIntro: string; trialText: string;
 };
 ```
 
@@ -215,13 +217,13 @@ test('countdown wording', () => {
   - `group`: `name`, `audience`, `track` (`performanta` | `amatori`), `schedule` (string, optional), `order` (number)
   - `competition`: `title`, `city`, `start` (date), `end` (date), `home` (boolean), `post` (reference to `post`, optional)
   - `post`: `title`, `slug`, `kind` (`competitie` | `viata-clubului` | `proiecte`), `date`, `cover` (image with `alt`), `body` (portable text), `gallery[]` (images), `competition` (reference, optional), `results[]` of `{athlete (reference), discipline, result}` where `result` is `aur` | `argint` | `bronz` | free text place; all of `results` optional
-  - `siteSettings` (singleton): `heroLines[]` (2 to 4 short strings, the motto, one per headline line), `heroText`, `heroPhoto`, `hallText`, `hallPhotos[]`, `groupsIntro`, `trialText`, `rankingWeek` `{week, from, to}`
+  - `siteSettings` (singleton): `heroLines[]` (2 to 4 short strings, the motto, one per headline line), `heroText`, `heroPhoto`, `whyIntro`, `whyPhoto`, `whyPoints[]` of `{title, text}`, `hallText`, `hallPhotos[]`, `groupsIntro`, `trialText`, `rankingWeek` `{week, from, to}`
 - All field titles and descriptions in the Studio are Romanian, written for a coach on a phone ("Poza principală", not "Cover image"). The `post` form lists `title`, `kind`, `date`, `cover`, `body`, `gallery` first; references and results come after, in a collapsed group "Legături".
 
 - [ ] **Step 1: Write the failing test** `schema.test.ts`: import the schema array and assert (a) the five type names exist, (b) `athlete.consent` has `initialValue === false`, (c) `post.kind` options are exactly `competitie`, `viata-clubului`, `proiecte`, (d) every image field declares a required `alt` sub-field.
 - [ ] **Step 2: Run, expect failure.** Run: `pnpm --filter studio test` → FAIL.
 - [ ] **Step 3: Create the Studio package and schemas.**
-- [ ] **Step 4: Write `seed.ndjson`** with the real facts: the three athletes above (all `consent: true` for the seed only, flagged in a comment line in the README as test data pending real consent), the five groups (Inițiere, Performanță, Elite → `performanta`; Amatori copii, Amatori adulți → `amatori`; audiences as in the mockup; no `schedule`), the 12 competitions of the 2026 calendar from the audit (dates, cities, `home: true` for Galați), the three posts (Novi Sad – 2026, 2026-06-30; București, Memorialul Rotaru U15 – 2026, 2026-05-13; București, Cupa României U15 – 2026, 2026-04-01; all `competitie`), `siteSettings` with `heroLines` [`Ai reușit?`, `Continuă!`, `N-ai reușit?`, `Continuă!`] (the club's own motto, from their current site), `heroText` "CS Siderurgistul Galați crește jucători de badminton din 7 martie 2002, în sala cu patru terenuri de pe Bulevardul Cloșca." and `rankingWeek {46, 2026-11-09, 2026-11-15}`.
+- [ ] **Step 4: Write `seed.ndjson`** with the real facts: the three athletes above (all `consent: true` for the seed only, flagged in a comment line in the README as test data pending real consent), the five groups (Inițiere, Performanță, Elite → `performanta`; Amatori copii, Amatori adulți → `amatori`; audiences as in the mockup; no `schedule`), the 12 competitions of the 2026 calendar from the audit (dates, cities, `home: true` for Galați), the three posts (Novi Sad – 2026, 2026-06-30; București, Memorialul Rotaru U15 – 2026, 2026-05-13; București, Cupa României U15 – 2026, 2026-04-01; all `competitie`), `siteSettings` with `heroLines` [`Ai reușit?`, `Continuă!`, `N-ai reușit?`, `Continuă!`] (the club's own motto, from their current site), `whyIntro` and the five `whyPoints` copied from the "De ce badminton" section of `mockups/varianta-d.html` (they are the club's own benefit list from its current homepage, shortened), `heroText` "CS Siderurgistul Galați crește jucători de badminton din 7 martie 2002, în sala cu patru terenuri de pe Bulevardul Cloșca." and `rankingWeek {46, 2026-11-09, 2026-11-15}`.
 - [ ] **Step 5: Run tests and validate.** Run: `pnpm --filter studio test` → pass. Run the Sanity CLI schema validation → no errors. If the project exists: import the seed and open the Studio locally; confirm an athlete can be created and saved from a 390px-wide window.
 - [ ] **Step 6: Commit** `feat(studio): content model and seed data`.
 
@@ -268,13 +270,13 @@ test('mapping tolerates empty optional data', () => {
 ### Task 5: Homepage sections, without motion
 
 **Files:**
-- Create: the seven components in `web/src/components/home/`; modify `web/src/pages/index.astro`
+- Create: the eight components in `web/src/components/home/`; modify `web/src/pages/index.astro`
 - Test: `web/tests/e2e/home.spec.ts`
 
 **Interfaces:**
 - Consumes: `getHomeData()`, the functions of Task 2, `Base.astro`.
-- Produces: one section per component, in this order and with these ids: `Hero` (no id), `CalendarBand` `#calendar`, `Roster` `#sportivi`, `Groups` `#program`, `Hall`, `News` `#noutati`, `TrialCta` `#proba`. Each takes only the slice of `HomeData` it renders. Class hooks used by Task 6: hero lines `.l1 .l2 .l3`, `.poster`, `.poster img`; roster numerals `[data-roll]`; section headings `h2.display`; strip `.hall .track`.
-- Markup and styles come from `mockups/varianta-d.html` section by section. Hero: one headline line per entry of `heroLines` (odd lines get class `.l1`/`.l3`, even lines `.l2`, as in the mockup), `heroText` below, primary action "Vino la un antrenament de probă" → `#proba`, secondary "Vezi toți sportivii" → `#sportivi`. Calendar: next event large with `countdownLabel`, then `played` with the word `jucat` and the mark `acasă` when `home`; link "Tot calendarul 2026". Roster: `rosterOrder`; the first row large, later rows smaller; numeral, name, discipline and category, points when known, link "Profilul FRB" when `frbUrl`; heading "Sportivii noștri, loc cu loc"; under it the source line "Clasamentul FRB, săptămâna {week}, {range}" only when `rankingWeek` exists. Groups: heading "Cinci grupe, pe două drumuri", two lists titled "Pentru cine vrea performanță" and "Pentru cine vrea doar să joace"; `schedule` on the row when present. News: first post with cover, others as a list, each with kind label and date; link "Toate articolele". Links to pages that plan 2 will build point at their future paths (`/sportivi/`, `/calendar/`, `/noutati/`).
+- Produces: one section per component, in this order and with these ids: `Hero` (no id), `Why` `#de-ce`, `Groups` `#program`, `CalendarBand` `#calendar`, `Roster` `#sportivi`, `Hall`, `News` `#noutati`, `TrialCta` `#proba`. Each takes only the slice of `HomeData` it renders. Class hooks used by Task 6: hero lines `.l1 .l2 .l3`, `.poster`, `.poster img`; roster numerals `[data-roll]`; section headings `h2.display`; strip `.hall .track`.
+- Markup and styles come from `mockups/varianta-d.html` section by section. Hero: one headline line per entry of `heroLines` (odd lines get class `.l1`/`.l3`, even lines `.l2`, as in the mockup), `heroText` below, primary action "Vino la un antrenament de probă" → `#proba`, secondary "Vezi toți sportivii" → `#sportivi`. Why: heading "De ce badminton", `whyIntro`, `whyPhoto` with the red offset plate, `whyPoints` as a plain two-column list (title, text), no icons and no cards. Calendar: next event large with `countdownLabel`, then `played` with the word `jucat` and the mark `acasă` when `home`; link "Tot calendarul 2026". Roster: `rosterOrder`; the first row large, later rows smaller; numeral, name, discipline and category, points when known, link "Profilul FRB" when `frbUrl`; heading "Unde ajung cei care continuă"; under it the source line "Clasamentul FRB, săptămâna {week}, {range}" only when `rankingWeek` exists. Groups: heading "Cinci grupe, pe două drumuri", two lists titled "Pentru cine vrea performanță" and "Pentru cine vrea doar să joace"; `schedule` on the row when present. News: first post with cover, others as a list, each with kind label and date; link "Toate articolele". Links to pages that plan 2 will build point at their future paths (`/sportivi/`, `/calendar/`, `/noutati/`).
 
 - [ ] **Step 1: Write failing e2e tests** (fixtures as source):
 
@@ -291,7 +293,7 @@ test('roster names its source', async ({ page }) => {
 test('sections appear in the agreed order', async ({ page }) => {
   await page.goto('/');
   const ids = await page.locator('main > section').evaluateAll(s => s.map(e => e.id || e.className.split(' ')[0]));
-  expect(ids).toEqual(['hero','calendar','sportivi','program','hall','noutati','proba']);
+  expect(ids).toEqual(['hero','de-ce','program','calendar','sportivi','hall','noutati','proba']);
 });
 test('groups are two plain lists', async ({ page }) => {
   await page.goto('/');
@@ -308,7 +310,7 @@ test('every image declares its size and has alt text', async ({ page }) => {
 test('all content is visible without JavaScript', async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false }); const page = await ctx.newPage();
   await page.goto('/');
-  for (const t of ['Ai reușit?', 'Nistor Cristian-Ionuț', 'Amatori adulți', 'Novi Sad – 2026'])
+  for (const t of ['Ai reușit?', 'Prinzi încredere', 'Nistor Cristian-Ionuț', 'Amatori adulți', 'Novi Sad – 2026'])
     await expect(page.getByText(t).first()).toBeVisible();
 });
 for (const width of [380, 768, 1440]) test(`no overflow or clipped names at ${width}`, async ({ page }) => {
