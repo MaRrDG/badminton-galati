@@ -175,6 +175,15 @@ test.describe('athletes without rankings', on('quiet-season'), () => {
   });
 });
 
+test.describe('groups with sessions', on('quiet-season'), () => {
+  test('each group shows its week in one line', async ({ page }) => {
+    await page.goto('/');
+    const g = page.locator('#program');
+    await expect(g.getByRole('listitem').filter({ hasText: 'Inițiere' }).locator('.schedule')).toHaveText('Luni, miercuri, vineri, 17:00–18:30');
+    await expect(g.locator('.schedule')).toHaveCount(5);
+  });
+});
+
 test.describe('no athlete may be shown', on('sparse'), () => {
   test('the roster and every link to it are left out', async ({ page }) => {
     const html = await (await page.goto('/'))!.text();

@@ -4,6 +4,7 @@ import { calendarView, type CalendarPage } from './calendar';
 import { isIsoDate, todayInBucharest } from './dates';
 import { byStart, latestPosts, newestFirst, visibleAthletes } from './home';
 import { newsView, type NewsPage } from './news';
+import { programView, type ProgramPage } from './program';
 import { fetchHomeQuery, slugifyRo, toHomeData } from './sanity';
 import {
   COMPETITION_CATEGORIES, DISCIPLINES, POST_KINDS, TRACKS, WEEKDAYS,
@@ -92,6 +93,11 @@ export async function getPostPages(): Promise<PostPage[]> {
   const site = await getSiteData();
   const today = buildToday();
   return site.posts.map(post => postView(site, post, today));
+}
+
+/** The programme (/program/): the week in the hall, the group picker and the guide to the groups. */
+export async function getProgramPage(): Promise<ProgramPage> {
+  return programView(await getSiteData());
 }
 
 /** The homepage keeps its plan 1 keys and the newest `HOME_POSTS` posts. */
@@ -277,7 +283,6 @@ export function parseSiteData(value: unknown, source: string): SiteData {
       optional(g, 'slug', q, text);
       optionalList(g, 'sessions', q, session);
       optional(g, 'coachId', q, text);
-      optional(g, 'schedule', q, text);
     }),
     posts: (v, p) => list(v, p, (x, q) => {
       const post = record(x, q);

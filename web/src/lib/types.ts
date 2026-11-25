@@ -29,7 +29,6 @@ export type Competition = {
 export type Session = { day: (typeof WEEKDAYS)[number]; start: string; end: string }; // 'HH:MM', 24 h
 export type Group = {
   id: string; slug: string; name: string; audience: string; track: Track; sessions: Session[]; coachId?: string;
-  schedule?: string; // plan 1 field, kept until Task 8 moves the homepage to sessions, then removed
 };
 export type Coach = { id: string; name: string; role?: string; photo?: Img };
 export type Result = { athleteId: string; discipline?: Discipline; result: string };

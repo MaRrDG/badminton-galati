@@ -51,7 +51,7 @@ const rawSample = {
     rankingWeek: { week: 46, from: '2026-11-09', to: '2026-11-15' },
   },
   athletes: [rawAthlete],
-  groups: [{ _id: 'group-initiere', name: 'Inițiere', audience: 'Copii', track: 'performanta', schedule: null }],
+  groups: [{ _id: 'group-initiere', name: 'Inițiere', audience: 'Copii', track: 'performanta' }],
   competitions: [
     { _id: 'c1', title: 'CN U9 și CN U17', city: 'București', start: '2026-11-27', end: '2026-11-29', home: false },
   ],
@@ -371,7 +371,7 @@ describe('toHomeData', () => {
   });
 
   test('group slugs follow the Studio rule', () => {
-    const d = toHomeData({ ...rawSample, groups: [{ _id: 'g', name: 'Amatori adulți', audience: 'Adulți', track: 'amatori', schedule: null }] });
+    const d = toHomeData({ ...rawSample, groups: [{ _id: 'g', name: 'Amatori adulți', audience: 'Adulți', track: 'amatori' }] });
     expect(d.groups[0].slug).toBe('amatori-adulti');
   });
 

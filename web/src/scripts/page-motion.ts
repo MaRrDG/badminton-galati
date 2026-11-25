@@ -36,6 +36,9 @@ export function initPageMotion(moment: PageMoment): void {
     case 'cover-recrop':
       coverRecrop();
       break;
+    case 'sessions-settle':
+      sessionsSettle();
+      break;
     // The other moments arrive with their pages.
   }
 }
@@ -81,6 +84,26 @@ function coverRecrop(): void {
   const img = cover?.querySelector('img');
   if (!cover || !img) return;
   gsap.to(img, { scale: 1.16, ease: 'none', scrollTrigger: { trigger: cover, start: 'top top', end: 'bottom top', scrub: 0.6 } });
+}
+
+/**
+ * The session blocks of the programme (`.planner .blk`) settle into their time slots, growing
+ * down from their start, one after the other, once when the planner comes into view. Wide
+ * screens only: on phones the days are a plain list. The blocks end as rendered.
+ */
+function sessionsSettle(): void {
+  if (!document.querySelector('.planner .blk')) return;
+  gsap.matchMedia().add('(min-width: 861px)', () => {
+    gsap.from('.planner .blk', {
+      scaleY: 0,
+      transformOrigin: '50% 0',
+      duration: 0.55,
+      ease: 'power3.out',
+      stagger: 0.035,
+      clearProps: 'transform',
+      scrollTrigger: { trigger: '.planner', start: 'top 80%', once: true },
+    });
+  });
 }
 
 /**

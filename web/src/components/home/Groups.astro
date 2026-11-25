@@ -1,5 +1,6 @@
 ---
 import { groupsHeading } from '../../lib/home';
+import { scheduleLabel } from '../../lib/program';
 import type { Group } from '../../lib/types';
 
 interface Props {
@@ -28,15 +29,18 @@ const tracks = [
           <div class:list={{ play }}>
             <h3>{title}</h3>
             <List>
-              {groups.map((g) => (
-                <li>
-                  <b>{g.name}</b>
-                  <span>
-                    {g.audience}
-                    {g.schedule && <span class="schedule">{g.schedule}</span>}
-                  </span>
-                </li>
-              ))}
+              {groups.map((g) => {
+                const schedule = scheduleLabel(g.sessions);
+                return (
+                  <li>
+                    <b>{g.name}</b>
+                    <span>
+                      {g.audience}
+                      {schedule && <span class="schedule">{schedule}</span>}
+                    </span>
+                  </li>
+                );
+              })}
             </List>
           </div>
         ))

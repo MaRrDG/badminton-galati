@@ -20,13 +20,14 @@
 //   src/pages/calendar/**, src/components/calendar/**   calendar, home, build-output
 //   src/pages/noutati/index.astro, src/components/news/**   news, article
 //   src/pages/noutati/[slug].astro, src/scripts/{lightbox,share}.ts   article
+//   src/pages/program/**, src/components/program/**   program
 //   src/scripts/**                     motion, scroll-scan, home, athletes, calendar, news, article,
-//                                      build-output
+//                                      program, build-output
 //                                      (countdown.ts and calendar-panel.ts among them)
 //   src/components/home/**             home, motion, scroll-scan, build-output
 //     …/{Hero,CalendarBand,News,TrialCta}.astro   also shell (focus-ring targets live there)
 //   src/fixtures/{sparse,mixed-strip,quiet-season}.json   home, motion, scroll-scan, athletes, calendar,
-//                                                         news, article, build-output
+//                                                         news, article, program, build-output
 //   tests/e2e/<name>.spec.ts           that spec
 //   tests/unit/**, vitest.config.ts, .env.example, *.md   no e2e spec
 //   everything else (src/lib, Site*.astro, layouts, pages, styles, public, src/fixtures/home.json,
@@ -42,6 +43,7 @@ const NONE = [];
 const SHELL = 'shell.spec.ts', HOME = 'home.spec.ts', MOTION = 'motion.spec.ts';
 const SCAN = 'scroll-scan.spec.ts', BUILD = 'build-output.spec.ts', NOT_FOUND = 'not-found.spec.ts';
 const ATHLETES = 'athletes.spec.ts', CALENDAR = 'calendar.spec.ts', NEWS = 'news.spec.ts', ARTICLE = 'article.spec.ts';
+const PROGRAM = 'program.spec.ts';
 
 /** Outside web/, relative to the repository root. First match wins; no match runs every spec. */
 const ROOT_RULES = [
@@ -59,10 +61,11 @@ const WEB_RULES = [
   [/^src\/(pages\/calendar|components\/calendar)\//, [CALENDAR, HOME, BUILD]],
   [/^src\/(pages\/noutati\/index\.astro$|components\/news\/)/, [NEWS, ARTICLE]],
   [/^src\/(pages\/noutati\/\[slug\]|scripts\/(lightbox|share)\.ts$)/, [ARTICLE]],
-  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, CALENDAR, NEWS, ARTICLE, BUILD]],
+  [/^src\/(pages\/program|components\/program)\//, [PROGRAM]],
+  [/^src\/scripts\//, [MOTION, SCAN, HOME, ATHLETES, CALENDAR, NEWS, ARTICLE, PROGRAM, BUILD]],
   [/^src\/components\/home\/(Hero|CalendarBand|News|TrialCta)\.astro$/, [HOME, MOTION, SCAN, SHELL, BUILD]],
   [/^src\/components\/home\//, [HOME, MOTION, SCAN, BUILD]],
-  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, CALENDAR, NEWS, ARTICLE, BUILD]],
+  [/^src\/fixtures\/(sparse|mixed-strip|quiet-season)\.json$/, [HOME, MOTION, SCAN, ATHLETES, CALENDAR, NEWS, ARTICLE, PROGRAM, BUILD]],
   [/^tests\/e2e\/([^/]+\.spec\.ts)$/, m => [m[1]]],
   [/^tests\/unit\//, NONE],
   [/^(vitest\.config\.ts|\.env\.example|[^/]+\.md)$/, NONE],
