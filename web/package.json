@@ -9,7 +9,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
+    "test:changed": "vitest run --changed dev",
     "e2e": "node scripts/playwright.mjs",
+    "e2e:changed": "node scripts/e2e-changed.mjs",
     "astro": "astro"
   },
   "dependencies": {

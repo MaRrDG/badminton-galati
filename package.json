@@ -7,6 +7,8 @@
     "dev": "pnpm -C web dev",
     "build": "pnpm -C web build",
     "test": "pnpm -r test",
-    "e2e": "pnpm -C web e2e"
+    "e2e": "pnpm -C web e2e",
+    "test:changed": "pnpm -r test:changed",
+    "e2e:changed": "pnpm -C web e2e:changed"
   }
 }

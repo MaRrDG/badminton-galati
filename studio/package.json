@@ -9,6 +9,7 @@
     "deploy": "sanity deploy",
     "validate": "sanity schema validate",
     "test": "vitest run",
+    "test:changed": "vitest run --changed dev --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
