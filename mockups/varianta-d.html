@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS Siderurgistul Galați, varianta D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Instrument+Sans:wght@400;500;600&display=swap&subset=latin-ext" rel="stylesheet">
+<style>
+:root{
+  --blue:#1549A8;
+  --blue-deep:#0C2F74;
+  --red:#E23A45;
+  --white:#FFFFFF;
+  --mist:#E8EEF8;
+  --court:#F39A1E;
+  --ink:#0A1F4D;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+  --gut:clamp(16px,4vw,48px);
+  --col:1180px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;overflow-x:hidden;padding-bottom:44px}
+img{display:block;max-width:100%}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid var(--court);outline-offset:3px}
+h1,h2,h3,p,figure{margin:0}
+.wrap{max-width:calc(var(--col) + 2 * var(--gut));margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+.display{font-family:var(--display);font-weight:900;line-height:.95;text-transform:uppercase}
+h2.display{font-size:clamp(2.2rem,4.6vw,4.2rem)}
+.textlink{font-weight:600;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+
+/* ---------- nav ---------- */
+.nav{background:var(--white);border-bottom:3px solid var(--ink);position:relative;z-index:20}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1}
+.brand img{width:46px;height:46px;border-radius:50%}
+.nav ul{display:flex;gap:clamp(14px,2.2vw,32px);list-style:none;margin:0;padding:0}
+.nav ul a{text-decoration:none;font-weight:500;font-size:.98rem;padding:6px 0;border-bottom:3px solid transparent}
+.nav ul a:hover,.nav ul a[aria-current]{border-bottom-color:var(--red)}
+.menu-btn{display:none;background:var(--ink);color:var(--white);border:0;font:600 .95rem var(--body);padding:9px 16px;cursor:pointer}
+
+/* ---------- hero ---------- */
+.hero{background:var(--blue);color:var(--white);padding:clamp(32px,5.5vh,60px) 0 clamp(44px,7vh,76px);overflow:hidden}
+.hero h1{position:relative;z-index:3}
+.hero h1 span{display:block;white-space:nowrap;will-change:transform}
+section{overflow-x:clip}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(28px,5vw,80px);align-items:center}
+.hero h1{font-size:clamp(3rem,6.2vw,5.9rem)}
+.hero .src{margin-top:16px;max-width:46ch;font-size:1rem}
+.poster{position:relative;justify-self:end;width:min(100%,calc(min(64vh,580px) * .667));margin:0 18px 18px 0}
+.poster .plate{position:absolute;inset:0;background:var(--red);translate:18px 18px;transform-origin:50% 100%}
+.poster .shot{position:relative;overflow:hidden;aspect-ratio:2/3;background:var(--blue-deep)}
+.poster img{width:100%;height:100%;object-fit:cover;object-position:50% 0;transform-origin:50% 10%}
+.poster figcaption{position:absolute;left:0;bottom:0;background:var(--white);color:var(--ink);font-weight:600;font-size:.9rem;padding:6px 12px}
+
+.stamp{margin-top:10px;font-size:.92rem;opacity:.85}
+.hero-act{margin-top:clamp(22px,3.5vh,34px);display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px}
+.hero-go{background:var(--white);color:var(--blue);font-weight:700;padding:15px 22px;text-decoration:none}
+.hero-go:hover{background:var(--court);color:var(--ink)}
+.hero-more{color:var(--white);font-weight:600;text-underline-offset:5px}
+
+/* ---------- calendar ---------- */
+.cal{background:var(--red);color:var(--white);padding:clamp(40px,5.5vw,72px) 0}
+.cal .wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:start}
+.cal h2{margin-bottom:clamp(16px,2.4vw,26px)}
+.nextev{display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,2.6vw,32px);align-items:center}
+.nextev .when{font-family:var(--display);font-weight:900;font-size:clamp(3.4rem,7vw,6rem);line-height:.86}
+.nextev .when small{display:block;font-size:.27em;line-height:1.1;margin-top:.2em;font-weight:800}
+.nextev h3{font-family:var(--display);font-weight:900;font-size:clamp(1.7rem,2.8vw,2.5rem);line-height:1;text-transform:uppercase}
+.nextev p{margin-top:4px}
+.days{display:inline-block;margin-top:12px!important;background:var(--white);color:var(--ink);font-family:var(--display);font-weight:800;font-size:1.35rem;line-height:1;padding:9px 14px}
+.played{list-style:none;margin:0;padding:0}
+.played li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 18px;padding:13px 0;border-top:3px solid var(--white)}
+.played li:last-child{border-bottom:3px solid var(--white)}
+.played b{font-family:var(--display);font-weight:800;font-size:1.5rem;line-height:1.05}
+.played .st{font-size:.95rem;text-align:right;align-self:center;grid-row:1/3;grid-column:2}
+.played .wh{font-size:.98rem}
+.home{display:inline-block;background:var(--white);color:#C2222D;font-weight:600;font-size:.85rem;line-height:1;padding:4px 8px;margin-left:8px;vertical-align:1px}
+.cal .textlink{display:inline-block;margin-top:18px}
+
+/* ---------- roster ---------- */
+.roster{background:var(--white);padding:clamp(52px,7vw,104px) 0}
+.roster-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px 40px;flex-wrap:wrap;margin-bottom:clamp(22px,3vw,40px)}
+.roster-head h2{color:var(--blue);max-width:16ch}
+.roster-head p{max-width:38ch;font-size:1rem}
+.first{display:grid;grid-template-columns:auto 1fr auto;gap:clamp(18px,3.5vw,56px);align-items:center;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);padding:clamp(18px,2.4vw,30px) 0}
+.pair{display:grid;grid-template-columns:1.45fr 1fr}
+.second{display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,2.6vw,36px);align-items:center;padding:clamp(16px,2vw,26px) clamp(16px,3vw,40px) clamp(16px,2vw,26px) 0;border-right:4px solid var(--ink)}
+.third{display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,2vw,24px);align-items:center;padding:clamp(16px,2vw,26px) 0 clamp(16px,2vw,26px) clamp(16px,3vw,40px)}
+.pair{border-bottom:4px solid var(--ink)}
+.rank{font-family:var(--display);font-weight:900;color:var(--blue);line-height:.86;display:flex}
+.first .rank{font-size:clamp(8rem,17vw,14rem);color:var(--red)}
+.second .rank{font-size:clamp(5.4rem,10.5vw,8.6rem)}
+.third .rank{font-size:clamp(3.4rem,5.4vw,4.6rem);color:var(--ink)}
+.rank i{font-style:normal;display:block;height:.86em;overflow:hidden}
+.rank i u{text-decoration:none;display:block;height:.86em}
+.who h3{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.95}
+.first .who h3{font-size:clamp(2.2rem,5vw,4.4rem)}
+.second .who h3{font-size:clamp(1.7rem,3.1vw,2.7rem)}
+.third .who h3{font-size:clamp(1.3rem,1.9vw,1.6rem)}
+.who p{margin-top:.5em}
+.who .textlink{display:inline-block;margin-top:.7em;font-size:.98rem}
+.pts{background:var(--blue);color:var(--white);font-family:var(--display);font-weight:900;font-size:clamp(2.2rem,4vw,3.4rem);line-height:1;padding:.3em .45em .26em;text-align:center}
+.pts small{display:block;font:500 .9rem var(--body);margin-top:4px}
+.roster-foot{margin-top:22px;display:flex;gap:12px 32px;flex-wrap:wrap}
+
+/* ---------- groups on court lines ---------- */
+.groups{background:var(--blue);color:var(--white);padding:clamp(52px,7vw,104px) 0}
+.groups-head{display:grid;grid-template-columns:1fr 1fr;gap:20px clamp(24px,5vw,72px);align-items:end;margin-bottom:clamp(22px,3vw,38px)}
+.groups-head p{max-width:42ch}
+.tracks{display:grid;grid-template-columns:3fr 2fr;gap:36px clamp(32px,6vw,96px);align-items:start}
+.tracks h3{font-family:var(--body,inherit);font-weight:600;font-size:1.05rem;padding-bottom:12px;border-bottom:4px solid var(--white)}
+.tracks ul,.tracks ol{list-style:none;margin:0;padding:0}
+.tracks li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:4px 24px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.45)}
+.tracks b{font-family:var(--display);font-weight:900;line-height:.95;text-transform:uppercase;font-size:clamp(1.9rem,3.2vw,2.8rem)}
+.tracks .play li{grid-template-columns:1fr}
+@media (max-width:860px){.tracks,.tracks li{grid-template-columns:1fr}}
+
+/* ---------- hall + rally strip ---------- */
+.hall{background:var(--mist);padding:clamp(44px,6vw,80px) 0;overflow:hidden}
+.hall-head{display:grid;grid-template-columns:1fr 1fr;gap:20px clamp(24px,5vw,72px);align-items:end;margin-bottom:clamp(20px,3vw,34px)}
+.hall-head h2{color:var(--blue)}
+.hall-head p{max-width:44ch}
+.track{display:flex;gap:clamp(12px,1.4vw,20px);overflow-x:auto;padding-bottom:6px}
+.js-rally .track{overflow:visible;width:max-content;padding-bottom:0}
+.track figure{flex:none}
+.track img{height:clamp(200px,38vh,340px);width:auto}
+.track figcaption{margin-top:8px;font-weight:500;font-size:.93rem}
+.track figure:nth-child(3) img{outline:0;box-shadow:12px 12px 0 var(--red)}
+.track figure:nth-child(3){margin-right:12px}
+
+/* ---------- news ---------- */
+.news{background:var(--white);padding:clamp(52px,7vw,104px) 0}
+.news h2{color:var(--blue);margin-bottom:clamp(20px,3vw,34px)}
+.news-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(28px,5vw,72px);align-items:start}
+.news-grid figure{position:relative;z-index:0;margin:0 14px 14px 0}
+.news-grid figure img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.news-grid figure::after{content:"";position:absolute;inset:0;transform:translate(14px,14px);background:var(--red);z-index:-1}
+.nlist{list-style:none;margin:0;padding:0}
+.nlist a{display:block;text-decoration:none;padding:18px 0;border-bottom:3px solid var(--ink)}
+.nlist li:first-child a{border-top:3px solid var(--ink)}
+.nlist time{font-weight:600;color:#C2222D;font-size:.95rem}
+.nlist span{display:block;font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,2.6vw,2.3rem);line-height:1.02;margin-top:5px}
+.nlist a:hover span{color:var(--blue)}
+.news .textlink{display:inline-block;margin-top:20px}
+
+/* ---------- CTA ---------- */
+.cta{background:var(--red);color:var(--white);padding:clamp(48px,7vw,96px) 0}
+.cta .wrap{display:grid;grid-template-columns:1fr auto;gap:28px clamp(24px,5vw,72px);align-items:center}
+.cta h2{font-size:clamp(2.6rem,6.4vw,6rem);max-width:12ch}
+.cta p{margin-top:1em;max-width:44ch;font-size:1.05rem}
+.btn{display:inline-block;margin-top:1.3em;background:var(--white);color:var(--ink);font-weight:600;font-size:1.05rem;padding:15px 26px;text-decoration:none}
+.btn:hover{background:var(--ink);color:var(--white)}
+.cta img{width:clamp(150px,18vw,230px);border-radius:50%}
+
+/* ---------- footer ---------- */
+footer{background:var(--blue-deep);color:var(--white);padding:clamp(32px,4.5vw,56px) 0;font-size:.98rem}
+footer .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+footer h3{font-family:var(--display);font-weight:800;font-size:1.4rem;margin-bottom:.4em}
+footer p+p{margin-top:.35em}
+
+/* ---------- variant bar ---------- */
+.vbar{position:fixed;left:0;right:0;bottom:0;z-index:50;height:44px;background:var(--ink);color:var(--white);display:flex;align-items:center;justify-content:center;gap:18px;font-size:.9rem;padding:0 12px}
+.vbar b{font-weight:600}
+.vbar a{opacity:.85}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .nav ul{display:none;position:absolute;top:100%;right:var(--gut);background:var(--ink);color:var(--white);flex-direction:column;gap:0;padding:8px 20px;min-width:200px}
+  .nav ul.open{display:flex}
+  .nav ul a{display:block;padding:11px 0}
+  .menu-btn{display:block}
+  .hero .wrap,.groups-head,.hall-head,.news-grid,.cta .wrap{grid-template-columns:1fr}
+  .poster{justify-self:start;width:min(64vw,300px)}
+  .cal .wrap{grid-template-columns:1fr}
+  .first{grid-template-columns:auto 1fr}
+  .first .pts{grid-column:1/-1;justify-self:start}
+  .pair{grid-template-columns:1fr}
+  .second{border-right:0;border-bottom:4px solid var(--ink);padding-right:0}
+  .third{padding-left:0}
+  .cta img{display:none}
+  footer .wrap{grid-template-columns:1fr}
+  .vbar{gap:10px;font-size:.8rem}
+}
+@media (max-width:560px){
+  .rack{grid-template-columns:1fr;gap:14px}
+  .unit{--cw:46px;display:grid;grid-template-columns:auto 1fr;gap:0 16px;align-items:center}
+  .unit .stand{grid-row:1/3}
+  .unit b{margin-top:0;align-self:end}
+  .unit span{align-self:start}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/logo.jpg" alt="Stema CS Siderurgistul Galați"><span>CS Siderurgistul Galați</span></a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="meniu">Meniu</button>
+    <ul id="meniu">
+      <li><a href="#top" aria-current="page">Acasă</a></li>
+      <li><a href="#sportivi">Sportivi</a></li>
+      <li><a href="#program">Program</a></li>
+      <li><a href="#calendar">Calendar</a></li>
+      <li><a href="#noutati">Noutăți</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap">
+    <div>
+      <h1 class="display" id="hero-h"><span class="l1">Locul 2 la U17.</span> <span class="l2">Locul 3 la U15.</span> <span class="l3">Din Galați.</span></h1>
+      <p class="src">Nistor Cristian-Ionuț e al doilea în țară la simplu băieți U17, iar Pazargic Ligia-Beatrice a treia la simplu fete U15. Amândoi se antrenează în sala de pe Bulevardul Cloșca.</p>
+      <p class="stamp">Clasamentul FRB, săptămâna 46, 9–15 noiembrie 2026</p>
+      <p class="hero-act"><a class="hero-go" href="#proba">Vino la un antrenament de probă</a> <a class="hero-more" href="#sportivi">Vezi toți sportivii</a></p>
+    </div>
+    <figure class="poster">
+      <div class="plate" aria-hidden="true"></div>
+      <div class="shot"><img src="img/smash.jpg" alt="Sportiv al clubului în săritură, cu racheta ridicată spre fluturaș"></div>
+      <figcaption>Sala Siderurgistul, Galați</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="cal" id="calendar" aria-labelledby="cal-h">
+  <div class="wrap">
+    <div>
+      <h2 class="display" id="cal-h">Calendar competițional</h2>
+      <div class="nextev">
+        <p class="when">27–29<small>noiembrie 2026</small></p>
+        <div>
+          <h3>CN U9 și CN U17</h3>
+          <p>București. Următoarea competiție din calendar.</p>
+          <p class="days" id="zile" hidden></p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <ul class="played">
+        <li><b>CN U15 și CN Seniori</b><span class="wh">Blejoi/Bacău, 20–22 noiembrie</span><span class="st">jucat</span></li>
+        <li><b>CN U11 și CN U19</b><span class="wh">Galați, 23–25 octombrie <span class="home">acasă</span></span><span class="st">jucat</span></li>
+        <li><b>CN U13 și CN U23</b><span class="wh">Blejoi/Bacău, 25–27 septembrie</span><span class="st">jucat</span></li>
+      </ul>
+      <a class="textlink" href="#calendar">Tot calendarul 2026</a>
+    </div>
+  </div>
+</section>
+
+<section class="roster" id="sportivi" aria-labelledby="ros-h">
+  <div class="wrap">
+    <div class="roster-head">
+      <h2 class="display" id="ros-h">Sportivii noștri, loc cu loc</h2>
+      <p>Locul fiecărui sportiv legitimat, luat din clasamentul Federației Române de Badminton.</p>
+    </div>
+    <article class="first">
+      <p class="rank" data-roll="2" aria-label="Locul 2">2</p>
+      <div class="who">
+        <h3>Nistor Cristian-Ionuț</h3>
+        <p>U17, simplu băieți. Locul 2 în țară.</p>
+        <a class="textlink" href="https://badminton.ro/jucator/236/u17-sb-simplu-baieti/">Profilul FRB</a>
+      </div>
+      <p class="pts">168<small>de puncte</small></p>
+    </article>
+    <div class="pair">
+      <article class="second">
+        <p class="rank" data-roll="3" aria-label="Locul 3">3</p>
+        <div class="who">
+          <h3>Pazargic Ligia-Beatrice</h3>
+          <p>U15, simplu fete</p>
+          <a class="textlink" href="https://badminton.ro/jucator/434/u15-sf-simplu-fete/">Profilul FRB</a>
+        </div>
+      </article>
+      <article class="third">
+        <p class="rank" data-roll="58" aria-label="Locul 58">58</p>
+        <div class="who">
+          <h3>Bordeianu Nectarie-Ioan</h3>
+          <p>U13, dublu mixt</p>
+          <a class="textlink" href="https://badminton.ro/jucator/709/u13-xd-dublu-mixt/">Profilul FRB</a>
+        </div>
+      </article>
+    </div>
+    <p class="roster-foot"><a class="textlink" href="#sportivi">Toți sportivii clubului</a><a class="textlink" href="https://badminton.ro/clasamente/">Clasamentele pe badminton.ro</a></p>
+  </div>
+</section>
+
+<section class="groups" id="program" aria-labelledby="gr-h">
+  <div class="wrap">
+    <div class="groups-head">
+      <h2 class="display" id="gr-h">Cinci grupe, pe două drumuri</h2>
+      <p>Fiecare grupă lucrează cu antrenor calificat, iar la început primești de la club echipamentul minim necesar. Zilele și orele urmează să fie confirmate de club.</p>
+    </div>
+    <div class="tracks">
+      <div>
+        <h3>Pentru cine vrea performanță</h3>
+        <ol>
+          <li><b>Inițiere</b><span>Copii care țin prima dată racheta în mână</span></li>
+          <li><b>Performanță</b><span>Sportivi legitimați care merg la competiții</span></li>
+          <li><b>Elite</b><span>Sportivii din lotul de vârf al clubului</span></li>
+        </ol>
+      </div>
+      <div class="play">
+        <h3>Pentru cine vrea doar să joace</h3>
+        <ul>
+          <li><b>Amatori copii</b><span>Copii care joacă de plăcere</span></li>
+          <li><b>Amatori adulți</b><span>Adulți, indiferent de nivel</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hall" aria-labelledby="hall-h">
+  <div class="wrap">
+    <div class="hall-head">
+      <h2 class="display" id="hall-h">Patru terenuri pe Bulevardul Cloșca</h2>
+      <p>Clubul s-a înființat pe 7 martie 2002. În aceeași sală s-a jucat Balcaniada din 2002 și cea din 2023, iar aici se antrenează toate grupele.</p>
+    </div>
+    <div class="track">
+      <figure><img src="img/meci-dublu.jpg" width="1920" height="1080" alt="Meci de dublu în sala Siderurgistul"><figcaption>Meci de dublu pe terenul central</figcaption></figure>
+      <figure><img src="img/sala-turneu-1.jpg" width="1920" height="1080" alt="Sala Siderurgistul în timpul unui turneu"><figcaption>Sala în zi de turneu</figcaption></figure>
+      <figure><img src="img/echipa-rosu.jpg" width="1920" height="1281" alt="Sportivi și antrenori în echipamentul roșu al clubului"><figcaption>Echipa, în roșul clubului</figcaption></figure>
+      <figure><img src="img/festivitate.jpg" width="1920" height="1080" alt="Sportivi aliniați la o festivitate în sală"><figcaption>Festivitate în sală</figcaption></figure>
+      <figure><img src="img/cantonament.jpg" width="1920" height="1440" alt="Grupul din cantonament, în tricouri verzi"><figcaption>În cantonament</figcaption></figure>
+      <figure><img src="img/medalii.jpg" width="1920" height="868" alt="Sportivi cu medalii după o competiție"><figcaption>După premiere</figcaption></figure>
+      <figure><img src="img/sala-turneu-2.jpg" width="1920" height="1080" alt="Meciuri pe terenurile sălii"><figcaption>Toate cele patru terenuri în joc</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="news" id="noutati" aria-labelledby="news-h">
+  <div class="wrap">
+    <h2 class="display" id="news-h">Noutăți</h2>
+    <div class="news-grid">
+      <figure><img src="img/echipa-u15.jpg" alt="Echipa clubului în treninguri roșii, la un turneu" loading="lazy"></figure>
+      <div>
+        <ul class="nlist">
+          <li><a href="#noutati"><time datetime="2026-06-30">Competiție, 30 iunie 2026</time><span>Novi Sad – 2026</span></a></li>
+          <li><a href="#noutati"><time datetime="2026-05-13">Competiție, 13 mai 2026</time><span>București, Memorialul Rotaru U15 – 2026</span></a></li>
+          <li><a href="#noutati"><time datetime="2026-04-01">Competiție, 1 aprilie 2026</time><span>București, Cupa României U15 – 2026</span></a></li>
+        </ul>
+        <a class="textlink" href="#noutati">Toate articolele</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="proba" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div>
+      <h2 class="display" id="cta-h">Vino la un antrenament de probă</h2>
+      <p>Adu doar pantofi de sală. Rachetă și fluturași găsești la noi, iar după o oră știi dacă îți place.</p>
+      <a class="btn" href="mailto:siderurgistul@badmintongalati.ro">Scrie-ne pentru o probă</a>
+    </div>
+    <img src="img/logo.jpg" alt="" aria-hidden="true">
+  </div>
+</section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div><h3>CS Siderurgistul Galați</h3><p>Club de badminton înființat la 7 martie 2002.</p><p>Afiliat la Federația Română de Badminton.</p></div>
+    <div><h3>Sala</h3><p>Sala Siderurgistul, Bd. Cloșca, Galați</p><p>Patru terenuri de badminton</p></div>
+    <div><h3>Contact</h3><p><a href="mailto:siderurgistul@badmintongalati.ro">siderurgistul@badmintongalati.ro</a></p><p><a href="https://www.facebook.com/badmintongalati">Facebook</a></p></div>
+  </div>
+</footer>
+
+<nav class="vbar" aria-label="Variante de design">
+  <a href="/files/varianta-b-afis.html">B, Afiș</a>
+  <b>Varianta D — Afiș + Tabela</b>
+  <a href="/files/varianta-c-tabela.html">C, Tabela</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  var btn=document.querySelector('.menu-btn'),menu=document.getElementById('meniu');
+  btn.addEventListener('click',function(){var o=menu.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+
+  /* days until the competition */
+  var z=document.getElementById('zile');
+  var d=Math.ceil((new Date(2026,10,27)-new Date())/864e5);
+  if(d>=0&&d<60){z.textContent=d===0?'începe azi':d===1?'începe mâine':'peste '+d+' zile';z.hidden=false}
+
+  if(!window.gsap||!window.ScrollTrigger)return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  var mm=gsap.matchMedia();
+  mm.add({wide:'(min-width:861px)',narrow:'(max-width:860px)'},function(ctx){
+    var wide=ctx.conditions.wide;
+
+    /* 1. hero load: poster arrives, headline lines come in from opposite sides, score cards flip to the real places */
+    gsap.timeline({defaults:{ease:'power4.out'}})
+      .from('.poster .plate',{scaleY:0,duration:.7})
+      .from('.poster .shot',{clipPath:'inset(100% 0 0 0)',duration:.9},'-=.45')
+      .from('.l1,.l3',{xPercent:-10,opacity:0,duration:.9},'-=.8')
+      .from('.l2',{xPercent:12,opacity:0,duration:.9},'-=.8')
+      .from('.poster figcaption',{opacity:0,duration:.3},'-=.2');
+    /* 2. hero scrub: short pin, lines slide apart, poster grows and re-crops */
+    gsap.timeline({scrollTrigger:wide?{trigger:'.hero',start:'top top',end:'+=70%',pin:true,scrub:.6,anticipatePin:1}:{trigger:'.hero',start:'top top',end:'bottom 35%',scrub:.6}})
+      .to('.l1',{x:function(){return -innerWidth*(wide?.05:.08)},ease:'none'},0)
+      .to('.l3',{x:function(){return -innerWidth*(wide?.03:.05)},ease:'none'},0)
+      .to('.l2',{x:function(){return innerWidth*(wide?.15:.14)},ease:'none'},0)
+      .to('.poster',{scale:wide?1.07:1.04,ease:'none'},0)
+      .to('.poster img',{scale:1.4,ease:'none'},0);
+
+    /* 3. roster: rank numerals roll while the row scrolls in */
+    gsap.utils.toArray('[data-roll]').forEach(function(el){
+      var txt=el.dataset.roll,bands=[];
+      el.textContent='';
+      txt.split('').forEach(function(c){
+        var cell=document.createElement('i'),band=document.createElement('span'),n=10+(+c)+1,h='';
+        for(var k=0;k<n;k++)h+='<u>'+(k%10)+'</u>';
+        band.style.display='block';band.innerHTML=h;cell.appendChild(band);el.appendChild(cell);
+        bands.push({el:band,end:-100*(n-1)/n});
+      });
+      bands.forEach(function(b,i){
+        gsap.fromTo(b.el,{yPercent:0},{yPercent:b.end,ease:'power2.out',
+          scrollTrigger:{trigger:el,start:'top 95%',end:'top '+(52-i*8)+'%',scrub:.6}});
+      });
+    });
+
+    /* 4. section headings drift sideways with scroll, alternating direction */
+    gsap.utils.toArray('section:not(.hero) h2.display').forEach(function(h,i){
+      var amt=(wide?Math.min(innerWidth*.07,90):12)*(i%2?-1:1);
+      gsap.fromTo(h,{x:amt},{x:0,ease:'none',scrollTrigger:{trigger:h,start:'top bottom',end:'top 35%',scrub:.6}});
+    });
+
+    /* 5. hall photos travel sideways while you scroll */
+    var hall=document.querySelector('.hall'),track=hall.querySelector('.track');
+    hall.classList.add('js-rally');
+    var dist=function(){return Math.max(0,track.scrollWidth-track.parentNode.clientWidth+parseFloat(getComputedStyle(track.parentNode).paddingLeft)*2)};
+    gsap.to(track,{x:function(){return -dist()},ease:'none',
+      scrollTrigger:{trigger:hall,start:'center center',end:function(){return '+='+dist()*(wide?1:.5)},pin:true,scrub:.5,invalidateOnRefresh:true}});
+
+    return function(){
+      hall.classList.remove('js-rally');
+      document.querySelectorAll('[data-roll]').forEach(function(el){el.textContent=el.dataset.roll});
+      
+    };
+  });
+
+  window.addEventListener('load',function(){ScrollTrigger.refresh()});
+  document.querySelectorAll('.track img').forEach(function(i){if(!i.complete)i.addEventListener('load',function(){ScrollTrigger.refresh()})});
+})();
+</script>
+</body>
+</html>
